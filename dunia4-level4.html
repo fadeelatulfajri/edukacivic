@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level 16: Rangkuman & Misi Hukum Dasar - EdukaCivic</title>
+    <link rel="icon" type="image/png" href="Logo Edukacivic.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="student-system.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            gold: '#F59E0B', goldLight: '#FBBF24',
+                            purple: '#8B5CF6', purpleLight: '#A855F7', purpleDark: '#7C3AED',
+                            crimson: '#E11D48', crimsonLight: '#F43F5E',
+                            dark: '#0F172A', darker: '#020617', light: '#F8FAFC'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0b0f19; }
+        ::-webkit-scrollbar-thumb { background: #4c1d95; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #6d28d9; }
+
+        .section-card {
+            background: rgba(22, 17, 43, 0.85);
+            backdrop-filter: blur(14px);
+            border: 1px solid rgba(168, 85, 247, 0.35);
+            border-radius: 1.5rem;
+        }
+
+        /* Mind Map Selects */
+        .map-select {
+            background: rgba(13, 9, 28, 0.9);
+            border: 2px solid rgba(139, 92, 246, 0.6);
+            border-radius: 0.75rem;
+            color: white;
+            padding: 0.5rem 0.75rem;
+            width: 100%;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+        .map-select:focus {
+            border-color: #c084fc;
+            box-shadow: 0 0 12px rgba(192, 132, 252, 0.35);
+        }
+        .map-select.correct {
+            border-color: #10b981 !important;
+            background: rgba(16, 185, 129, 0.25) !important;
+            color: #ecfdf5 !important;
+        }
+        .map-select.wrong {
+            border-color: #ef4444 !important;
+            background: rgba(239, 68, 68, 0.25) !important;
+            color: #fef2f2 !important;
+            animation: shake 0.35s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            padding: 1rem;
+        }
+        .modal-box {
+            animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes modalPop {
+            0% { opacity: 0; transform: scale(0.9) translateY(15px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+    </style>
+    <script>
+        function getProgress() {
+            try { return JSON.parse(localStorage.getItem('edukacivic_progress')) || { poin: 0, level: 1, dunia: 4, completedLevels: [] }; }
+            catch(e) { return { poin: 0, level: 1, dunia: 4, completedLevels: [] }; }
+        }
+        const prog = getProgress();
+        if (!prog.completedLevels || !prog.completedLevels.includes('d4l3')) {
+            window.location.href = 'dunia4.html';
+        }
+    </script>
+    <script>
+        if (typeof isLevelUnlocked === "function" && !isLevelUnlocked("d4l4")) {
+            alert("🔒 Level ini masih terkunci! Selesaikan Level 15 terlebih dahulu.");
+            window.location.href = "index.html";
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-b from-[#110822] via-[#1a0f30] to-[#0a0415] text-white font-sans antialiased min-h-screen flex flex-col selection:bg-purple-600 selection:text-white">
+
+    <!-- Web Audio Sound Effects -->
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            try {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'correct') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.15);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, now);
+                    osc.frequency.exponentialRampToValueAtTime(146.83, now + 0.2);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                }
+            } catch(e) {}
+        }
+    </script>
+
+    <!-- NAVBAR -->
+    <nav class="fixed w-full z-50 bg-[#120924]/90 backdrop-blur-md border-b border-purple-900/50 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-4">
+                    <a href="dunia4.html" class="flex items-center gap-2 text-gray-400 hover:text-white transition-colors group">
+                        <div class="w-8 h-8 bg-purple-950/80 border border-purple-800/60 rounded-lg flex items-center justify-center group-hover:bg-purple-900 transition-colors">
+                            <i class="fa-solid fa-arrow-left text-sm text-purple-400"></i>
+                        </div>
+                        <span class="text-sm font-medium hidden sm:inline">Peta Dunia 4</span>
+                    </a>
+                    <div class="w-px h-8 bg-gray-800"></div>
+                    <a href="index.html" class="flex items-center gap-2">
+                        <img src="Logo Edukacivic.png" alt="EdukaCivic" class="h-8 w-auto">
+                        <span class="font-bold text-lg text-white hidden sm:inline">Eduka<span class="text-amber-400">Civic</span></span>
+                    </a>
+                </div>
+                
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2 bg-purple-500/10 border border-purple-500/30 px-3 py-1.5 rounded-full">
+                        <i class="fa-solid fa-magnifying-glass text-purple-400 text-xs"></i>
+                        <span class="text-purple-400 font-bold text-xs">Dunia 4 · Level 16</span>
+                    </div>
+                    <div class="flex items-center gap-2 bg-purple-950/80 px-3 py-1.5 rounded-lg border border-purple-800/60">
+                        <i class="fa-solid fa-bolt text-yellow-400 text-xs"></i>
+                        <span id="nav-poin" class="text-yellow-400 font-bold text-sm">0</span>
+                        <span class="text-gray-500 text-xs">Poin</span>
+                    </div>
+                    <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-purple-600 to-amber-400 p-0.5 cursor-pointer shadow-md" onclick="window.location.href='profil-siswa.html'">
+                        <img id="nav-avatar-img" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Student" alt="Avatar" class="w-full h-full rounded-full bg-slate-900 object-cover">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <script>document.getElementById('nav-poin').textContent = prog.poin || 0;</script>
+
+    <!-- HERO SECTION -->
+    <section class="relative pt-24 pb-12 overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-purple-950/30 via-[#110822] to-[#110822] pointer-events-none"></div>
+        <div class="absolute top-20 right-10 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 relative z-10 text-center">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/30 mb-4">
+                <i class="fa-solid fa-scale-balanced text-purple-400 text-xs"></i>
+                <span class="text-xs font-bold text-purple-400 tracking-widest uppercase">Dunia 4 · Level 16</span>
+            </div>
+            
+            <h1 class="text-3xl md:text-5xl font-extrabold leading-tight mb-4">
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-amber-300 to-yellow-400">Rangkuman & Misi Hukum Dasar</span>
+            </h1>
+            
+            <p class="text-gray-300 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
+                Kuasai 3 Pilar Misi Hukum Dasar, lengkapi Mind Map Peta Konsep Analisis Kasus Konstitusi, dan selesaikan tantangan kasus hukum di Kuis Analisis Kasus untuk membuka Dunia 5!
+            </p>
+
+            <!-- Reading progress bar -->
+            <div class="mt-6 max-w-sm mx-auto">
+                <div class="flex justify-between text-xs text-gray-500 mb-1">
+                    <span>Progres Membaca</span>
+                    <span id="read-pct">0%</span>
+                </div>
+                <div class="w-full h-1.5 bg-gray-900 rounded-full overflow-hidden border border-purple-900/40">
+                    <div id="read-bar" class="h-full bg-gradient-to-r from-purple-600 via-indigo-500 to-amber-400 rounded-full transition-all duration-300" style="width:0%"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-grow pb-16 px-4">
+        <div class="max-w-4xl mx-auto space-y-10">
+
+            <!-- ===== SECTION 1: MATERI RECAP (3 PILAR MISI HUKUM DASAR) ===== -->
+            <section class="section-card p-6 md:p-8">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-12 h-12 rounded-2xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-xl border border-purple-500/30">
+                        <i class="fa-solid fa-gavel"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-purple-400">Rangkuman Materi Inti</span>
+                        <h2 class="text-xl md:text-2xl font-bold text-white">3 Pilar Misi Penegakan Hukum Dasar</h2>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    
+                    <!-- Pilar 1 -->
+                    <div class="bg-gradient-to-b from-purple-950/40 to-slate-950/90 p-5 rounded-2xl border border-purple-500/30 flex flex-col justify-between shadow-lg">
+                        <div>
+                            <div class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-lg mb-3 font-bold">1</div>
+                            <h3 class="font-bold text-base text-white mb-2">Perlindungan Hak Warga</h3>
+                            <p class="text-xs text-gray-300 leading-relaxed mb-3">
+                                UUD 1945 menjamin hak pendidikan (Pasal 31), hak perlakuan adil (Pasal 28D), serta hak hidup layak dan kesehatan (Pasal 28H) bagi seluruh rakyat Indonesia tanpa diskriminasi.
+                            </p>
+                        </div>
+                        <span class="text-[11px] font-semibold text-purple-400 bg-purple-500/10 px-3 py-1 rounded-lg border border-purple-500/20 inline-block text-center">
+                            Hak Konstitusional
+                        </span>
+                    </div>
+
+                    <!-- Pilar 2 -->
+                    <div class="bg-gradient-to-b from-purple-950/40 to-slate-950/90 p-5 rounded-2xl border border-purple-500/30 flex flex-col justify-between shadow-lg">
+                        <div>
+                            <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg mb-3 font-bold">2</div>
+                            <h3 class="font-bold text-base text-white mb-2">Supremasi Hukum & MK</h3>
+                            <p class="text-xs text-gray-300 leading-relaxed mb-3">
+                                UUD 1945 adalah hukum dasar tertinggi. Jika ada UU yang merugikan rakyat, warga negara berhak menguji ke <strong>Mahkamah Konstitusi (MK)</strong> lewat jalur konstitusional resmi.
+                            </p>
+                        </div>
+                        <span class="text-[11px] font-semibold text-amber-400 bg-amber-500/10 px-3 py-1 rounded-lg border border-amber-500/20 inline-block text-center">
+                            Jalur Peradilan Resmi
+                        </span>
+                    </div>
+
+                    <!-- Pilar 3 -->
+                    <div class="bg-gradient-to-b from-purple-950/40 to-slate-950/90 p-5 rounded-2xl border border-purple-500/30 flex flex-col justify-between shadow-lg">
+                        <div>
+                            <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg mb-3 font-bold">3</div>
+                            <h3 class="font-bold text-base text-white mb-2">Kepatuhan Tanpa Anarki</h3>
+                            <p class="text-xs text-gray-300 leading-relaxed mb-3">
+                                Wajib menjunjung hukum dan pemerintahan (Pasal 27). Menuntut hak harus selalu melalui jalur hukum yang tertib, damai, dan menghindari segala bentuk anarki serta kekerasan.
+                            </p>
+                        </div>
+                        <span class="text-[11px] font-semibold text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-lg border border-emerald-500/20 inline-block text-center">
+                            Tanggung Jawab Warga
+                        </span>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- ===== SECTION 2: INFOGRAFIS GAMBAR LEVEL 16 ===== -->
+            <section class="section-card p-6 md:p-8">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl border border-amber-500/30">
+                        <i class="fa-solid fa-image"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-amber-400">Infografis Pembelajaran</span>
+                        <h2 class="text-xl md:text-2xl font-bold text-white">Visual Analisis Kasus & Penegakan Konstitusi</h2>
+                    </div>
+                </div>
+
+                <div class="flex flex-col md:flex-row items-center gap-6">
+                    <!-- Image Card -->
+                    <div class="w-full md:w-1/2 bg-gradient-to-tr from-purple-950/60 via-slate-900 to-amber-950/60 p-4 rounded-3xl border border-purple-500/40 text-center shadow-2xl">
+                        <div class="relative group rounded-2xl overflow-hidden border-2 border-purple-500/40 shadow-2xl mb-3 cursor-pointer" onclick="openImageModal()">
+                            <img src="Level 16.jfif" alt="Infografis Analisis Kasus Konstitusi - Level 16" class="w-full h-auto object-contain rounded-xl transform group-hover:scale-[1.02] transition-all duration-300">
+                            <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 text-white font-bold text-xs backdrop-blur-xs">
+                                <i class="fa-solid fa-magnifying-glass-plus text-lg"></i>
+                                <span>Klik untuk Memperbesar Gambar</span>
+                            </div>
+                        </div>
+                        <span class="inline-block bg-purple-500/20 text-purple-300 text-xs font-bold px-3 py-1 rounded-full uppercase mb-1 border border-purple-500/40">
+                            Infografis Level 16
+                        </span>
+                        <h4 class="text-sm font-bold text-white">Misi Hukum Dasar & Analisis Kasus</h4>
+                        <p class="text-[11px] text-gray-400 mt-0.5">Memvisualisasikan pemecahan masalah hukum dan perlindungan hak konstitusional warga negara.</p>
+                    </div>
+
+                    <!-- Guidelines -->
+                    <div class="w-full md:w-1/2 space-y-4">
+                        <div class="bg-slate-950/80 p-5 rounded-2xl border border-purple-900/60 shadow-lg space-y-3">
+                            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                                <span class="text-amber-400">⚖️</span> Prinsip Analisis Kasus
+                            </h3>
+                            <ul class="space-y-2.5 text-xs text-gray-300">
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-circle-check text-purple-400 mt-0.5"></i>
+                                    <span><strong>Identifikasi Hak:</strong> Kenali pasal UUD 1945 mana yang dilanggar dalam kasus tersebut.</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-circle-check text-purple-400 mt-0.5"></i>
+                                    <span><strong>Cari Solusi Hukum:</strong> Tentukan lembaga atau mekanisme hukum yang tepat untuk menuntut keadilan.</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-circle-check text-purple-400 mt-0.5"></i>
+                                    <span><strong>Hindari Kekerasan:</strong> Selalu tempuh musyawarah, laporan dinas, atau peradilan resmi (MK/MA).</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Image Modal for Fullscreen View -->
+            <div id="image-modal" class="modal-overlay hidden" onclick="closeImageModal()">
+                <div class="modal-box relative max-w-4xl w-full p-2 bg-gray-900/95 border-2 border-purple-500 rounded-2xl" onclick="event.stopPropagation()">
+                    <button onclick="closeImageModal()" class="absolute -top-4 -right-4 w-10 h-10 bg-red-600 hover:bg-red-500 text-white rounded-full flex items-center justify-center text-lg font-bold shadow-xl border-2 border-white z-10 transition">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                    <img src="Level 16.jfif" alt="Infografis Analisis Kasus Konstitusi" class="w-full max-h-[85vh] object-contain rounded-xl">
+                </div>
+            </div>
+
+            <!-- ===== SECTION 3: AKTIVITAS INTERAKTIF SISWA (MIND MAP ANALISIS KASUS) ===== -->
+            <section class="section-card p-6 md:p-8">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl border border-amber-500/30">
+                        <i class="fa-solid fa-puzzle-piece"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-amber-400">Aktivitas Interaktif Siswa</span>
+                        <h2 class="text-xl md:text-2xl font-bold text-white">Mind Map: Peta Konsep Hukum Dasar & Keadilan</h2>
+                    </div>
+                </div>
+
+                <p class="text-gray-300 text-xs sm:text-sm leading-relaxed mb-6">
+                    Lengkapilah cabang-cabang Peta Konsep di bawah ini dengan memilih pasal atau lembaga yang tepat pada setiap kotak pilihan:
+                </p>
+
+                <!-- Interactive Grid of Selects -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                    
+                    <!-- Item 1: Hak Pendidikan -->
+                    <div class="p-3.5 bg-slate-950/80 rounded-xl border border-purple-900/50 shadow-inner">
+                        <label class="block text-xs font-bold text-purple-400 mb-1.5">1. Pasal UUD 1945 yang menjamin hak setiap warga negara mendapatkan pendidikan:</label>
+                        <select id="map-sel-1" class="map-select" data-answer="pasal31">
+                            <option value="">-- Pilih Pasal UUD 1945 --</option>
+                            <option value="pasal31">Pasal 31 UUD NRI 1945</option>
+                            <option value="pasal27">Pasal 27 UUD NRI 1945</option>
+                            <option value="pasal34">Pasal 34 UUD NRI 1945</option>
+                        </select>
+                    </div>
+
+                    <!-- Item 2: Persamaan Hukum -->
+                    <div class="p-3.5 bg-slate-950/80 rounded-xl border border-purple-900/50 shadow-inner">
+                        <label class="block text-xs font-bold text-amber-400 mb-1.5">2. Pasal yang menjamin persamaan kedudukan warga di dalam hukum dan pemerintahan:</label>
+                        <select id="map-sel-2" class="map-select" data-answer="pasal27">
+                            <option value="">-- Pilih Pasal UUD 1945 --</option>
+                            <option value="pasal27">Pasal 27 Ayat (1) UUD NRI 1945</option>
+                            <option value="pasal30">Pasal 30 UUD NRI 1945</option>
+                            <option value="pasal36">Pasal 36 UUD NRI 1945</option>
+                        </select>
+                    </div>
+
+                    <!-- Item 3: Uji Materi UU -->
+                    <div class="p-3.5 bg-slate-950/80 rounded-xl border border-purple-900/50 shadow-inner">
+                        <label class="block text-xs font-bold text-emerald-400 mb-1.5">3. Lembaga peradilan yang berwenang menguji undang-undang terhadap UUD 1945:</label>
+                        <select id="map-sel-3" class="map-select" data-answer="mk">
+                            <option value="">-- Pilih Lembaga Peradilan --</option>
+                            <option value="mk">Mahkamah Konstitusi (MK)</option>
+                            <option value="ma">Mahkamah Agung (MA)</option>
+                            <option value="kpk">Komisi Pemberantasan Korupsi (KPK)</option>
+                        </select>
+                    </div>
+
+                    <!-- Item 4: Uji Peraturan di bawah UU -->
+                    <div class="p-3.5 bg-slate-950/80 rounded-xl border border-purple-900/50 shadow-inner">
+                        <label class="block text-xs font-bold text-blue-400 mb-1.5">4. Lembaga yang menguji peraturan di bawah UU (seperti Perda/PP) terhadap undang-undang:</label>
+                        <select id="map-sel-4" class="map-select" data-answer="ma">
+                            <option value="">-- Pilih Lembaga Peradilan --</option>
+                            <option value="ma">Mahkamah Agung (MA)</option>
+                            <option value="mk">Mahkamah Konstitusi (MK)</option>
+                            <option value="dpr">Dewan Perwakilan Rakyat (DPR)</option>
+                        </select>
+                    </div>
+
+                    <!-- Item 5: Sikap Menuntut Hak -->
+                    <div class="p-3.5 bg-slate-950/80 rounded-xl border border-purple-900/50 shadow-inner">
+                        <label class="block text-xs font-bold text-yellow-400 mb-1.5">5. Sikap yang benar saat menemukan aturan daerah yang melanggar hak konstitusional:</label>
+                        <select id="map-sel-5" class="map-select" data-answer="jalur-resmi">
+                            <option value="">-- Pilih Sikap Warga --</option>
+                            <option value="jalur-resmi">Mengajukan uji materiil lewat jalur hukum resmi</option>
+                            <option value="rusak">Merusak kantor instansi pemerintah</option>
+                            <option value="diam">Diam saja dan membiarkan aturan salah tersebut</option>
+                        </select>
+                    </div>
+
+                    <!-- Item 6: Hal yang Dihindari -->
+                    <div class="p-3.5 bg-slate-950/80 rounded-xl border border-purple-900/50 shadow-inner">
+                        <label class="block text-xs font-bold text-rose-400 mb-1.5">6. Sikap negatif yang wajib dihindari saat memperjuangkan keadilan:</label>
+                        <select id="map-sel-6" class="map-select" data-answer="anarki">
+                            <option value="">-- Pilih Tindakan Dihindari --</option>
+                            <option value="anarki">Tindakan kekerasan dan anarkisme</option>
+                            <option value="musyawarah">Musyawarah untuk mufakat</option>
+                            <option value="lapor">Melapor ke pihak yang berwenang</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <button onclick="checkMindMap()" class="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-purple-600 via-indigo-600 to-amber-500 hover:from-purple-500 hover:to-amber-400 text-white font-bold rounded-xl shadow-lg shadow-purple-600/30 transition transform hover:scale-105 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-circle-check"></i> Cek Peta Konsep
+                    </button>
+                    <button onclick="resetMindMap()" class="w-full sm:w-auto px-6 py-3.5 bg-slate-900 hover:bg-slate-800 text-gray-300 font-semibold rounded-xl border border-purple-900/60 transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-rotate-left"></i> Reset Peta Konsep
+                    </button>
+                </div>
+
+                <!-- Feedback Message -->
+                <div id="mindmap-feedback" class="hidden mt-6 p-4 rounded-xl text-center font-bold text-sm"></div>
+            </section>
+
+            <!-- ===== SECTION 4: GATED CTA TO QUIZ LEVEL 16 ===== -->
+            <div id="quiz-cta-container" class="py-6"></div>
+
+            <!-- NAVIGASI LEVEL (SEBELUMNYA & SELANJUTNYA) -->
+            <div class="mt-8 pt-6 border-t border-gray-800">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <a href="dunia4-level3.html" class="w-full sm:w-auto px-5 py-3 bg-slate-900 hover:bg-slate-800 text-gray-300 hover:text-white font-bold rounded-xl border border-gray-800 transition flex items-center justify-center gap-2 text-xs sm:text-sm">
+                        <i class="fa-solid fa-chevron-left"></i> Sebelumnya: Level 15
+                    </a>
+                    
+                    <a href="dunia4.html" class="text-xs text-gray-400 hover:text-white flex items-center gap-1.5 font-semibold">
+                        <i class="fa-solid fa-map"></i> Peta Dunia 4 (Level 16/20)
+                    </a>
+
+                    <a href="dunia5.html" class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-purple-600/30 transition transform hover:scale-105 flex items-center justify-center gap-2 text-xs sm:text-sm">
+                        Selanjutnya: Dunia 5 <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-[#0e061c]/90 text-gray-400 py-8 border-t border-purple-950/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-sm text-center flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-2">
+                <img src="Logo Edukacivic.png" alt="EdukaCivic" class="h-6 w-auto">
+                <span class="font-bold text-white">Eduka<span class="text-amber-400">Civic</span></span>
+            </div>
+            <p>&copy; 2026 EdukaCivic | Fadilatul Fajri</p>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Reading progress tracker
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const pct = docHeight > 0 ? Math.min(100, Math.round((scrollTop / docHeight) * 100)) : 0;
+            document.getElementById('read-bar').style.width = pct + '%';
+            document.getElementById('read-pct').textContent = pct + '%';
+        });
+
+        // Image Modal functions
+        function openImageModal() {
+            document.getElementById('image-modal').classList.remove('hidden');
+        }
+        function closeImageModal() {
+            document.getElementById('image-modal').classList.add('hidden');
+        }
+
+        // Mind Map Activity Logic
+        function checkMindMap() {
+            const selects = document.querySelectorAll('.map-select');
+            let correct = 0;
+            let filled = 0;
+
+            selects.forEach(sel => {
+                sel.classList.remove('correct', 'wrong');
+                if (sel.value !== "") {
+                    filled++;
+                    if (sel.value === sel.dataset.answer) {
+                        sel.classList.add('correct');
+                        correct++;
+                    } else {
+                        sel.classList.add('wrong');
+                    }
+                }
+            });
+
+            const fb = document.getElementById('mindmap-feedback');
+            fb.classList.remove('hidden');
+
+            if (correct === selects.length) {
+                playSound('correct');
+                fb.className = 'mt-6 p-4 rounded-xl text-center font-bold text-sm bg-green-500/20 border border-green-500/40 text-green-300';
+                fb.innerHTML = '🎉 Hebat Sekali! Seluruh cabang Peta Konsep Penegakan Hukum Dasar telah kamu lengkapi dengan 100% tepat!';
+
+                // Mark activity completed & unlock quiz CTA
+                sessionStorage.setItem('edukacivic_act_d4l4', 'true');
+                setQuizButtonUnlocked('d4l4', 'dunia4-level4-kuis.html', 'quiz-cta-container');
+
+            } else if (filled < selects.length) {
+                playSound('wrong');
+                fb.className = 'mt-6 p-4 rounded-xl text-center font-bold text-sm bg-yellow-500/20 border border-yellow-500/40 text-yellow-300';
+                fb.innerHTML = `⚠️ Baru ${filled} dari ${selects.length} bagian yang terisi (${correct} benar). Lengkapi semua bagian ya!`;
+            } else {
+                playSound('wrong');
+                fb.className = 'mt-6 p-4 rounded-xl text-center font-bold text-sm bg-red-500/20 border border-red-500/40 text-red-300';
+                fb.innerHTML = `💪 ${correct} dari ${selects.length} jawaban benar. Periksa kembali kotak yang bertanda merah!`;
+            }
+        }
+
+        function resetMindMap() {
+            document.querySelectorAll('.map-select').forEach(sel => {
+                sel.value = "";
+                sel.classList.remove('correct', 'wrong');
+            });
+            document.getElementById('mindmap-feedback').classList.add('hidden');
+        }
+
+        // Initialize gating on load
+        document.addEventListener('DOMContentLoaded', () => {
+            initInteractiveActivityGating('d4l4', 'dunia4-level4-kuis.html', 'quiz-cta-container');
+            updateNavbarStudent();
+        });
+    </script>
+</body>
+</html>

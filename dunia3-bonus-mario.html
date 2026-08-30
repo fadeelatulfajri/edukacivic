@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Level Bonus: Super Mario Konstitusi - EdukaCivic</title>
+    <link rel="icon" type="image/png" href="Logo Edukacivic.png">
+    
+    <!-- Google Fonts: Poppins & Press Start 2P -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS & Confetti -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="student-system.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                        pixel: ['"Press Start 2P"', 'monospace']
+                    },
+                    colors: {
+                        brand: {
+                            red: '#DC2626', redLight: '#EF4444', redDark: '#B91C1C',
+                            dark: '#0F172A', darker: '#020617', light: '#F8FAFC'
+                        }
+                    },
+                    animation: {
+                        'float': 'float 3s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-8px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+            background-color: #0c0204;
+        }
+
+        .pixel-font {
+            font-family: '"Press Start 2P"', monospace;
+        }
+
+        .glass-panel {
+            background: rgba(24, 6, 10, 0.88);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(225, 29, 72, 0.3);
+        }
+
+        .glow-red {
+            box-shadow: 0 0 35px rgba(225, 29, 72, 0.35);
+        }
+
+        #game-canvas {
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            border-radius: 24px;
+            box-shadow: 0 0 45px rgba(225, 29, 72, 0.3), inset 0 0 20px rgba(0, 0, 0, 0.6);
+            border: 3px solid rgba(225, 29, 72, 0.45);
+            max-width: 100%;
+            height: auto;
+            touch-action: none;
+        }
+
+        .arcade-btn {
+            transition: all 0.12s ease;
+        }
+        .arcade-btn:active {
+            transform: scale(0.92);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-b from-[#180306] via-[#24060b] to-[#0c0204] text-white font-sans antialiased min-h-screen flex flex-col selection:bg-rose-600 selection:text-white">
+
+    <!-- NAVBAR -->
+    <nav class="fixed w-full z-50 bg-[#140306]/95 backdrop-blur-md border-b border-rose-900/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                
+                <!-- Left: Back & Title -->
+                <div class="flex items-center gap-3">
+                    <a href="dunia3.html" class="flex items-center gap-2 text-gray-400 hover:text-white transition group">
+                        <div class="w-9 h-9 bg-rose-950/80 border border-rose-800/60 rounded-xl flex items-center justify-center group-hover:bg-rose-900 transition">
+                            <i class="fa-solid fa-arrow-left text-sm text-rose-400"></i>
+                        </div>
+                    </a>
+                    <div class="w-px h-6 bg-gray-800"></div>
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-red-600 to-rose-500 flex items-center justify-center shadow-md shadow-red-500/30">
+                            <span class="text-xs">🍄</span>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-1.5">
+                                <p class="text-white font-bold text-sm leading-none">Super Mario Konstitusi</p>
+                                <span class="bg-rose-500/20 text-rose-300 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-rose-500/30">Bonus</span>
+                            </div>
+                            <p class="text-gray-400 text-[10px] mt-0.5">Dunia 3: Pengesahan UUD 1945</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Stats & Avatar -->
+                <div class="flex items-center gap-3">
+                    <div class="hidden sm:flex items-center gap-2 bg-rose-950/80 px-3.5 py-1.5 rounded-xl border border-rose-800/60">
+                        <i class="fa-solid fa-trophy text-amber-400 text-xs"></i>
+                        <span class="text-xs text-gray-400 font-semibold">Skor:</span>
+                        <span id="nav-score" class="font-extrabold text-amber-400 text-sm">0</span>
+                    </div>
+                    <div class="hidden sm:flex items-center gap-2 bg-rose-950/80 px-3.5 py-1.5 rounded-xl border border-rose-800/60">
+                        <i class="fa-solid fa-crown text-yellow-400 text-xs"></i>
+                        <span class="text-xs text-gray-400 font-semibold">Rekor:</span>
+                        <span id="nav-best" class="font-extrabold text-yellow-300 text-sm">0</span>
+                    </div>
+                    <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-rose-600 to-amber-500 p-0.5 cursor-pointer shadow-md" onclick="window.location.href='profil-siswa.html'">
+                        <img id="nav-avatar-img" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Student" alt="Avatar" class="w-full h-full rounded-full bg-slate-900 object-cover">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN GAME ARENA -->
+    <main class="flex-1 flex flex-col items-center justify-center pt-20 pb-8 px-4 relative overflow-hidden">
+        
+        <!-- Ambient Glowing Orbs -->
+        <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-rose-600/15 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute bottom-10 left-10 w-72 h-72 bg-red-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- 1. START SCREEN -->
+        <div id="start-screen" class="glass-panel p-6 sm:p-10 rounded-3xl max-w-lg w-full text-center relative z-10 shadow-2xl border border-rose-500/30 glow-red">
+            <div class="relative inline-block mx-auto mb-4">
+                <div class="w-24 h-24 rounded-3xl bg-gradient-to-tr from-red-600 via-rose-600 to-amber-500 p-1 shadow-xl shadow-red-600/40 animate-float flex items-center justify-center">
+                    <span class="text-5xl">🍄</span>
+                </div>
+                <div class="absolute -bottom-2 -right-2 bg-yellow-400 text-slate-950 w-8 h-8 rounded-xl font-black text-sm flex items-center justify-center shadow-lg border-2 border-slate-900">
+                    ⭐
+                </div>
+            </div>
+
+            <h2 class="text-2xl sm:text-3xl font-black text-white pixel-font mb-2 text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-rose-300 to-amber-400">
+                SUPER MARIO
+            </h2>
+            <p class="text-rose-300 text-xs pixel-font mb-4 uppercase tracking-wider">Petualangan Konstitusi Dunia 3</p>
+
+            <p class="text-gray-300 text-xs sm:text-sm mb-6 max-w-md mx-auto leading-relaxed">
+                Bantu Mario melewati rintangan, sundul balok emas <strong>[?]</strong>, kumpulkan koin & 📜 <strong>Naskah Konstitusi</strong>, dan kibarkan <strong>Bendera Merah Putih</strong> di tiang akhir!
+            </p>
+
+            <!-- Guide Items -->
+            <div class="grid grid-cols-3 gap-2 bg-slate-950/80 p-3 rounded-2xl border border-rose-900/60 mb-6 text-xs">
+                <div class="flex flex-col items-center">
+                    <span class="text-xl mb-0.5">🪙</span>
+                    <span class="text-[10px] text-yellow-300 font-bold">Koin (+50)</span>
+                </div>
+                <div class="flex flex-col items-center border-x border-gray-800">
+                    <span class="text-xl mb-0.5">📜</span>
+                    <span class="text-[10px] text-amber-300 font-bold">Naskah (+100)</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <span class="text-xl mb-0.5">🚩</span>
+                    <span class="text-[10px] text-rose-300 font-bold">Finish (+1000)</span>
+                </div>
+            </div>
+
+            <!-- Highscore Card -->
+            <div class="flex items-center justify-between bg-slate-950/90 px-4 py-2.5 rounded-xl border border-gray-800 mb-6 text-xs">
+                <span class="text-gray-400 flex items-center gap-1.5"><i class="fa-solid fa-crown text-yellow-400"></i> Rekor Tertinggi:</span>
+                <span id="start-best-score" class="text-yellow-400 font-black text-sm">0 Poin</span>
+            </div>
+
+            <button onclick="startGame()" class="w-full py-4 bg-gradient-to-r from-red-600 via-rose-600 to-amber-500 hover:from-red-500 hover:to-amber-400 text-white font-black text-xs sm:text-sm pixel-font rounded-2xl shadow-xl shadow-red-600/40 hover:scale-[1.02] transition transform flex items-center justify-center gap-2">
+                <i class="fa-solid fa-play"></i> MULAI PETUALANGAN
+            </button>
+        </div>
+
+        <!-- 2. GAME CONTAINER -->
+        <div id="game-container" class="hidden flex-col items-center w-full max-w-3xl relative z-10">
+            
+            <!-- Game HUD / Dashboard -->
+            <div class="w-full bg-slate-950/95 border-2 border-rose-500/40 rounded-2xl p-3 sm:p-4 mb-3 flex flex-wrap items-center justify-between gap-3 shadow-xl">
+                <div class="flex items-center gap-5 sm:gap-8">
+                    <div>
+                        <span class="text-[9px] sm:text-[10px] text-gray-400 uppercase font-bold pixel-font">MARIO</span>
+                        <p id="hud-score" class="text-sm sm:text-base text-yellow-400 font-bold pixel-font">000000</p>
+                    </div>
+                    <div>
+                        <span class="text-[9px] sm:text-[10px] text-gray-400 uppercase font-bold pixel-font">COINS</span>
+                        <p class="text-sm sm:text-base text-yellow-300 font-bold pixel-font flex items-center gap-1">
+                            🪙 <span id="hud-coins">00</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4 sm:gap-6">
+                    <div>
+                        <span class="text-[9px] sm:text-[10px] text-gray-400 uppercase font-bold pixel-font">LIVES</span>
+                        <p class="text-sm sm:text-base text-red-400 font-bold pixel-font flex items-center gap-1">
+                            ❤️ <span id="hud-lives">3</span>
+                        </p>
+                    </div>
+
+                    <!-- Sound & Pause Buttons -->
+                    <div class="flex items-center gap-1.5">
+                        <button onclick="toggleAudio()" id="btn-sound" class="w-8 h-8 rounded-xl bg-slate-900 border border-gray-700 flex items-center justify-center text-gray-300 hover:text-white transition">
+                            <i class="fa-solid fa-volume-high text-xs"></i>
+                        </button>
+                        <button onclick="togglePause()" id="btn-pause" class="w-8 h-8 rounded-xl bg-slate-900 border border-gray-700 flex items-center justify-center text-gray-300 hover:text-white transition">
+                            <i class="fa-solid fa-pause text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Canvas Wrapper -->
+            <div class="relative w-full rounded-3xl overflow-hidden shadow-2xl bg-black">
+                <canvas id="game-canvas" width="800" height="450" class="w-full aspect-[16/9] block"></canvas>
+
+                <!-- Pause Overlay -->
+                <div id="pause-overlay" class="hidden absolute inset-0 bg-black/80 backdrop-blur-sm rounded-[24px] flex flex-col items-center justify-center p-6 z-20">
+                    <div class="w-16 h-16 rounded-2xl bg-rose-500/20 text-rose-400 flex items-center justify-center text-3xl mb-3 border border-rose-500/30">
+                        <i class="fa-solid fa-pause"></i>
+                    </div>
+                    <h3 class="text-xl sm:text-2xl font-black text-white pixel-font mb-4">GAME DIJEDA</h3>
+                    <button onclick="togglePause()" class="px-8 py-3 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold pixel-font text-xs rounded-xl shadow-lg transition transform hover:scale-105 mb-2">
+                        LANJUTKAN
+                    </button>
+                    <button onclick="endGameEarly()" class="text-xs text-gray-400 hover:text-white underline mt-2">
+                        Keluar ke Menu
+                    </button>
+                </div>
+
+                <!-- Game Over Overlay -->
+                <div id="gameover-overlay" class="hidden absolute inset-0 bg-black/90 backdrop-blur-md rounded-[24px] flex flex-col items-center justify-center p-6 text-center z-30">
+                    <div class="text-5xl mb-3 animate-bounce">💀</div>
+                    <h3 class="text-2xl sm:text-3xl font-black text-red-500 pixel-font mb-2">GAME OVER</h3>
+                    <p id="gameover-stats" class="text-gray-300 text-xs pixel-font mb-6"></p>
+                    <div class="flex flex-col sm:flex-row gap-3 w-full max-w-xs justify-center">
+                        <button onclick="startGame()" class="w-full py-3.5 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold rounded-xl pixel-font text-xs shadow-lg transition transform hover:scale-105 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-rotate-left"></i> MAIN LAGI
+                        </button>
+                        <a href="dunia3.html" class="w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-gray-300 font-bold rounded-xl pixel-font text-xs border border-gray-800 text-center transition">
+                            PETA DUNIA 3
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Victory Overlay (Flagpole Reached) -->
+                <div id="victory-overlay" class="hidden absolute inset-0 bg-black/90 backdrop-blur-md rounded-[24px] flex flex-col items-center justify-center p-6 text-center z-30">
+                    <div class="text-5xl mb-2 animate-bounce">🚩🏆</div>
+                    <h3 class="text-2xl sm:text-3xl font-black text-yellow-400 pixel-font mb-1">STAGE CLEAR!</h3>
+                    <p class="text-emerald-400 text-xs pixel-font mb-4">BENDERA KONSTITUSI BERKIBAR!</p>
+                    
+                    <div class="bg-slate-900/90 border border-yellow-500/40 rounded-2xl p-4 mb-6 max-w-xs w-full text-center">
+                        <p class="text-[10px] text-gray-400 pixel-font mb-1">TOTAL SKOR</p>
+                        <p id="victory-score" class="text-2xl text-yellow-400 font-black pixel-font mb-1">0</p>
+                        <p class="text-xs text-green-400 font-bold">+25 Poin Ditambahkan!</p>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-3 w-full max-w-xs justify-center">
+                        <a href="dunia3.html" class="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-xl pixel-font text-xs shadow-lg shadow-emerald-600/30 transition transform hover:scale-105 flex items-center justify-center">
+                            KEMBALI KE PETA
+                        </a>
+                        <button onclick="startGame()" class="w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-gray-300 font-bold rounded-xl pixel-font text-xs border border-gray-800 transition">
+                            MAIN LAGI
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Virtual Touch D-Pad for Mobile -->
+            <div class="w-full flex items-center justify-between gap-4 mt-3 px-2 select-none">
+                <div class="flex items-center gap-3">
+                    <button id="touch-left" class="arcade-btn w-14 h-14 sm:w-16 sm:h-16 bg-slate-900/90 active:bg-rose-600 border-2 border-rose-500/40 rounded-2xl flex items-center justify-center text-xl text-white shadow-lg">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                    <button id="touch-right" class="arcade-btn w-14 h-14 sm:w-16 sm:h-16 bg-slate-900/90 active:bg-rose-600 border-2 border-rose-500/40 rounded-2xl flex items-center justify-center text-xl text-white shadow-lg">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+
+                <div class="text-[11px] text-gray-400 font-medium text-center hidden sm:block">
+                    Gunakan <strong>← →</strong> dan <strong>Spasi / ↑</strong> untuk melompat
+                </div>
+
+                <button id="touch-jump" class="arcade-btn px-6 sm:px-8 h-14 sm:h-16 bg-gradient-to-r from-red-600 to-rose-600 active:from-red-500 active:to-rose-500 border-2 border-rose-400 rounded-2xl flex items-center justify-center text-xs sm:text-sm font-black text-white pixel-font shadow-lg shadow-red-600/40">
+                    JUMP
+                </button>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-[#100204]/90 text-gray-500 py-4 text-center text-xs border-t border-gray-900 mt-auto">
+        <p>&copy; 2026 EdukaCivic | Level Bonus Super Mario Konstitusi</p>
+    </footer>
+
+    <!-- WEB AUDIO SYNTHESIZER -->
+    <script>
+        let isAudioEnabled = true;
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let actx = null;
+
+        function initAudio() {
+            if (!actx) actx = new AudioContext();
+            if (actx.state === 'suspended') actx.resume();
+        }
+
+        function toggleAudio() {
+            isAudioEnabled = !isAudioEnabled;
+            const btn = document.getElementById('btn-sound');
+            if (btn) {
+                btn.innerHTML = isAudioEnabled ? '<i class="fa-solid fa-volume-high text-xs"></i>' : '<i class="fa-solid fa-volume-xmark text-xs text-red-400"></i>';
+            }
+        }
+
+        function playSfx(type) {
+            if (!isAudioEnabled) return;
+            try {
+                initAudio();
+                const now = actx.currentTime;
+
+                if (type === 'jump') {
+                    const osc = actx.createOscillator();
+                    const gain = actx.createGain();
+                    osc.connect(gain);
+                    gain.connect(actx.destination);
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(160, now);
+                    osc.frequency.exponentialRampToValueAtTime(620, now + 0.15);
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                    osc.start(now);
+                    osc.stop(now + 0.15);
+                } else if (type === 'coin') {
+                    const osc = actx.createOscillator();
+                    const gain = actx.createGain();
+                    osc.connect(gain);
+                    gain.connect(actx.destination);
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(987.77, now);
+                    osc.frequency.setValueAtTime(1318.51, now + 0.08);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'stomp') {
+                    const osc = actx.createOscillator();
+                    const gain = actx.createGain();
+                    osc.connect(gain);
+                    gain.connect(actx.destination);
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(320, now);
+                    osc.frequency.exponentialRampToValueAtTime(90, now + 0.14);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.14);
+                    osc.start(now);
+                    osc.stop(now + 0.14);
+                } else if (type === 'block') {
+                    const osc = actx.createOscillator();
+                    const gain = actx.createGain();
+                    osc.connect(gain);
+                    gain.connect(actx.destination);
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(240, now);
+                    osc.frequency.exponentialRampToValueAtTime(110, now + 0.08);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+                    osc.start(now);
+                    osc.stop(now + 0.08);
+                } else if (type === 'gameover') {
+                    [330, 311, 293, 277, 261].forEach((freq, i) => {
+                        const o = actx.createOscillator();
+                        const g = actx.createGain();
+                        o.connect(g);
+                        g.connect(actx.destination);
+                        o.type = 'sawtooth';
+                        o.frequency.setValueAtTime(freq, now + i * 0.12);
+                        g.gain.setValueAtTime(0.2, now + i * 0.12);
+                        g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.12 + 0.2);
+                        o.start(now + i * 0.12);
+                        o.stop(now + i * 0.12 + 0.2);
+                    });
+                } else if (type === 'win') {
+                    [261.63, 329.63, 392.00, 523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+                        const o = actx.createOscillator();
+                        const g = actx.createGain();
+                        o.connect(g);
+                        g.connect(actx.destination);
+                        o.type = 'triangle';
+                        o.frequency.setValueAtTime(freq, now + i * 0.09);
+                        g.gain.setValueAtTime(0.25, now + i * 0.09);
+                        g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.09 + 0.35);
+                        o.start(now + i * 0.09);
+                        o.stop(now + i * 0.09 + 0.35);
+                    });
+                }
+            } catch(e) {}
+        }
+    </script>
+
+    <!-- MARIO GAME ENGINE -->
+    <script>
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let isRunning = false;
+        let isPaused = false;
+        let animationId = null;
+
+        let bestScore = parseInt(localStorage.getItem('edukacivic_mario_best')) || 0;
+        let score = 0;
+        let coins = 0;
+        let lives = 3;
+        let cameraX = 0;
+
+        const groundY = 380;
+        const levelWidth = 2700;
+        const gravity = 0.52;
+
+        const player = {
+            x: 60,
+            y: 300,
+            w: 24,
+            h: 32,
+            vx: 0,
+            vy: 0,
+            speed: 5.0,
+            jumpStrength: -12.5,
+            grounded: false,
+            facingRight: true,
+            isInvulnerable: false,
+            invulnerableTimer: 0,
+            walkFrame: 0
+        };
+
+        const flagpole = { x: 2450, y: 120, height: 260, flagY: 130 };
+
+        let solids = [];
+        let enemies = [];
+        let coinItems = [];
+        let particles = [];
+
+        const keys = {
+            left: false,
+            right: false,
+            jump: false
+        };
+
+        function initLevel() {
+            solids = [];
+            enemies = [];
+            coinItems = [];
+            particles = [];
+
+            // Continuous safe Ground segments with friendly bridges over pits
+            solids.push({ x: 0, y: groundY, w: 700, h: 70, type: 'ground' });
+            solids.push({ x: 760, y: groundY, w: 750, h: 70, type: 'ground' });
+            solids.push({ x: 1580, y: groundY, w: 1200, h: 70, type: 'ground' });
+
+            // Green Pipes (easy jumpable height 45-55px)
+            solids.push({ x: 280, y: groundY - 45, w: 40, h: 45, type: 'pipe' });
+            solids.push({ x: 560, y: groundY - 55, w: 40, h: 55, type: 'pipe' });
+            solids.push({ x: 1050, y: groundY - 45, w: 40, h: 45, type: 'pipe' });
+            solids.push({ x: 1800, y: groundY - 55, w: 40, h: 55, type: 'pipe' });
+
+            // Mystery Question Blocks & Bricks (Cluster 1)
+            solids.push({ x: 160, y: 260, w: 30, h: 30, type: 'qblock', hasCoin: true });
+            solids.push({ x: 190, y: 260, w: 30, h: 30, type: 'brick' });
+            solids.push({ x: 220, y: 260, w: 30, h: 30, type: 'qblock', hasCoin: true });
+            solids.push({ x: 250, y: 260, w: 30, h: 30, type: 'brick' });
+
+            // High Mystery Block (Naskah Konstitusi)
+            solids.push({ x: 205, y: 170, w: 30, h: 30, type: 'qblock', hasScroll: true });
+
+            // Floating Bridge across Pit 1
+            solids.push({ x: 690, y: 290, w: 80, h: 20, type: 'brick' });
+
+            // Blocks Cluster 2
+            for (let i = 0; i < 4; i++) {
+                solids.push({ x: 840 + i * 30, y: 260, w: 30, h: 30, type: i % 2 === 0 ? 'qblock' : 'brick', hasCoin: i % 2 === 0 });
+            }
+
+            // Stepped Pyramid 1
+            const stepH = 22;
+            for (let s = 0; s < 4; s++) {
+                solids.push({ x: 1200 + s * 30, y: groundY - (s + 1) * stepH, w: 30, h: (s + 1) * stepH, type: 'step' });
+            }
+            solids.push({ x: 1320, y: groundY - 4 * stepH, w: 30, h: 4 * stepH, type: 'step' });
+            for (let s = 0; s < 4; s++) {
+                solids.push({ x: 1350 + s * 30, y: groundY - (4 - s) * stepH, w: 30, h: (4 - s) * stepH, type: 'step' });
+            }
+
+            // Floating Bridge across Pit 2
+            solids.push({ x: 1500, y: 290, w: 90, h: 20, type: 'brick' });
+
+            // High Platform Cluster 3
+            solids.push({ x: 1650, y: 250, w: 30, h: 30, type: 'qblock', hasCoin: true });
+            solids.push({ x: 1680, y: 250, w: 30, h: 30, type: 'brick' });
+            solids.push({ x: 1710, y: 250, w: 30, h: 30, type: 'qblock', hasScroll: true });
+
+            // Final Staircase to Flagpole
+            for (let s = 0; s < 6; s++) {
+                solids.push({ x: 2150 + s * 30, y: groundY - (s + 1) * stepH, w: 30, h: (s + 1) * stepH, type: 'step' });
+            }
+
+            // Floating Coin Items
+            [360, 390, 700, 730, 980, 1010, 1520, 1550, 1660, 1690, 1950, 1980].forEach(cx => {
+                coinItems.push({ x: cx, y: 240, w: 18, h: 18, collected: false });
+            });
+
+            // Enemies (Goombas)
+            const enemyPositions = [400, 520, 880, 960, 1150, 1620, 1900];
+            enemyPositions.forEach(ex => {
+                enemies.push({
+                    x: ex,
+                    y: groundY - 24,
+                    w: 24,
+                    h: 24,
+                    vx: -1.1,
+                    alive: true,
+                    squishTimer: 0
+                });
+            });
+
+            flagpole.x = 2450;
+            flagpole.flagY = 130;
+        }
+
+        function resetPlayer() {
+            player.x = 60;
+            player.y = groundY - player.h;
+            player.vx = 0;
+            player.vy = 0;
+            player.grounded = true;
+            player.isInvulnerable = true;
+            player.invulnerableTimer = 60;
+            cameraX = 0;
+        }
+
+        function startGame() {
+            initAudio();
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('gameover-overlay').classList.add('hidden');
+            document.getElementById('victory-overlay').classList.add('hidden');
+            document.getElementById('pause-overlay').classList.add('hidden');
+            document.getElementById('game-container').classList.remove('hidden');
+            document.getElementById('game-container').classList.add('flex');
+
+            score = 0;
+            coins = 0;
+            lives = 3;
+            resetPlayer();
+            initLevel();
+
+            isRunning = true;
+            isPaused = false;
+
+            updateHUD();
+            if (animationId) cancelAnimationFrame(animationId);
+            gameLoop();
+        }
+
+        function togglePause() {
+            if (!isRunning) return;
+            isPaused = !isPaused;
+            const overlay = document.getElementById('pause-overlay');
+            const btn = document.getElementById('btn-pause');
+
+            if (isPaused) {
+                overlay.classList.remove('hidden');
+                btn.innerHTML = '<i class="fa-solid fa-play text-xs"></i>';
+            } else {
+                overlay.classList.add('hidden');
+                btn.innerHTML = '<i class="fa-solid fa-pause text-xs"></i>';
+                gameLoop();
+            }
+        }
+
+        function endGameEarly() {
+            isRunning = false;
+            isPaused = false;
+            document.getElementById('game-container').classList.add('hidden');
+            document.getElementById('start-screen').classList.remove('hidden');
+            updateHUD();
+        }
+
+        function updateHUD() {
+            document.getElementById('hud-score').textContent = String(score).padStart(6, '0');
+            document.getElementById('hud-coins').textContent = String(coins).padStart(2, '0');
+            document.getElementById('hud-lives').textContent = lives;
+            document.getElementById('nav-score').textContent = score;
+            document.getElementById('nav-best').textContent = bestScore;
+            document.getElementById('start-best-score').textContent = bestScore + ' Poin';
+        }
+
+        function checkOverlap(ax, ay, aw, ah, bx, by, bw, bh) {
+            return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
+        }
+
+        // Main Game Loop
+        function gameLoop() {
+            if (!isRunning || isPaused) return;
+
+            update();
+            draw();
+
+            animationId = requestAnimationFrame(gameLoop);
+        }
+
+        function update() {
+            // Horizontal Movement
+            if (keys.left) {
+                player.vx = -player.speed;
+                player.facingRight = false;
+                player.walkFrame += 0.2;
+            } else if (keys.right) {
+                player.vx = player.speed;
+                player.facingRight = true;
+                player.walkFrame += 0.2;
+            } else {
+                player.vx = 0;
+            }
+
+            // Move X & Resolve Solid Collisions
+            player.x += player.vx;
+            if (player.x < 0) player.x = 0;
+
+            solids.forEach(b => {
+                if (checkOverlap(player.x, player.y, player.w, player.h, b.x, b.y, b.w, b.h)) {
+                    if (player.vx > 0) player.x = b.x - player.w;
+                    else if (player.vx < 0) player.x = b.x + b.w;
+                }
+            });
+
+            // Vertical Movement & Gravity
+            player.vy += gravity;
+            player.y += player.vy;
+            player.grounded = false;
+
+            // Resolve Vertical Collisions
+            solids.forEach(b => {
+                if (checkOverlap(player.x, player.y, player.w, player.h, b.x, b.y, b.w, b.h)) {
+                    // Falling on platform top
+                    if (player.vy > 0) {
+                        player.y = b.y - player.h;
+                        player.vy = 0;
+                        player.grounded = true;
+                    }
+                    // Headbutting block from below
+                    else if (player.vy < 0) {
+                        player.y = b.y + b.h;
+                        player.vy = 0;
+                        if (b.type === 'qblock') {
+                            b.type = 'empty';
+                            if (b.hasScroll) {
+                                score += 200;
+                                playSfx('coin');
+                                createParticleText(b.x + b.w / 2, b.y - 12, '📜+200');
+                            } else {
+                                coins++;
+                                score += 100;
+                                playSfx('coin');
+                                createParticleText(b.x + b.w / 2, b.y - 12, '🪙+100');
+                            }
+                            updateHUD();
+                        } else if (b.type === 'brick') {
+                            playSfx('block');
+                        }
+                    }
+                }
+            });
+
+            // Pit Fall Check
+            if (player.y > 450) {
+                playerHit();
+                return;
+            }
+
+            // Coin Items Pickup
+            coinItems.forEach(c => {
+                if (!c.collected && checkOverlap(player.x, player.y, player.w, player.h, c.x, c.y, c.w, c.h)) {
+                    c.collected = true;
+                    coins++;
+                    score += 50;
+                    playSfx('coin');
+                    createParticleText(c.x + 9, c.y, '🪙+50');
+                    updateHUD();
+                }
+            });
+
+            // Invulnerability timer
+            if (player.isInvulnerable) {
+                player.invulnerableTimer--;
+                if (player.invulnerableTimer <= 0) player.isInvulnerable = false;
+            }
+
+            // Update Enemies
+            enemies.forEach(en => {
+                if (!en.alive) {
+                    if (en.squishTimer > 0) en.squishTimer--;
+                    return;
+                }
+
+                en.x += en.vx;
+
+                // Turn around on solid collision
+                solids.forEach(b => {
+                    if (b.type !== 'ground' && checkOverlap(en.x, en.y, en.w, en.h, b.x, b.y, b.w, b.h)) {
+                        en.vx = -en.vx;
+                    }
+                });
+
+                if (en.x < 50 || en.x > levelWidth - 50) en.vx = -en.vx;
+
+                // Interaction with player
+                if (checkOverlap(player.x, player.y, player.w, player.h, en.x, en.y, en.w, en.h)) {
+                    // Stomp check: player is falling onto enemy top
+                    if (player.vy > 0 && (player.y + player.h - player.vy) <= en.y + 16) {
+                        en.alive = false;
+                        en.squishTimer = 25;
+                        player.vy = -8.5; // bounce up
+                        score += 200;
+                        playSfx('stomp');
+                        createParticleText(en.x + en.w / 2, en.y, '💥+200');
+                        updateHUD();
+                    } else if (!player.isInvulnerable) {
+                        playerHit();
+                    }
+                }
+            });
+
+            // Flagpole Victory Check
+            if (player.x >= flagpole.x - 10) {
+                triggerVictory();
+            }
+
+            // Camera Tracking
+            const targetCamX = player.x - 220;
+            if (targetCamX > cameraX) cameraX = targetCamX;
+            if (cameraX < 0) cameraX = 0;
+            if (cameraX > levelWidth - 800) cameraX = levelWidth - 800;
+
+            // Particles Update
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const pt = particles[i];
+                pt.y += pt.vy;
+                pt.life--;
+                if (pt.life <= 0) particles.splice(i, 1);
+            }
+        }
+
+        function createParticleText(x, y, text) {
+            particles.push({ x, y, text, vy: -2, life: 25 });
+        }
+
+        function playerHit() {
+            lives--;
+            updateHUD();
+            if (lives <= 0) {
+                isRunning = false;
+                playSfx('gameover');
+
+                if (score > bestScore) {
+                    bestScore = score;
+                    localStorage.setItem('edukacivic_mario_best', bestScore);
+                }
+
+                document.getElementById('gameover-stats').textContent = `SKOR AKHIR: ${score} | KOIN: ${coins}`;
+                document.getElementById('gameover-overlay').classList.remove('hidden');
+                updateHUD();
+            } else {
+                playSfx('block');
+                resetPlayer();
+            }
+        }
+
+        function triggerVictory() {
+            isRunning = false;
+            score += 1000;
+            updateHUD();
+            playSfx('win');
+
+            if (score > bestScore) {
+                bestScore = score;
+                localStorage.setItem('edukacivic_mario_best', bestScore);
+            }
+
+            // Save Progress & Points
+            const curProg = getProgress();
+            curProg.poin = (curProg.poin || 0) + 25;
+            localStorage.setItem('edukacivic_progress', JSON.stringify(curProg));
+            document.getElementById('nav-poin').textContent = curProg.poin;
+
+            document.getElementById('victory-score').textContent = score;
+            document.getElementById('victory-overlay').classList.remove('hidden');
+            updateHUD();
+
+            try {
+                confetti({
+                    particleCount: 120,
+                    spread: 85,
+                    origin: { y: 0.6 }
+                });
+            } catch(e) {}
+        }
+
+        // Render Canvas Graphics
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Sky Gradient (Sunset/Twilight Red & Blue)
+            const skyGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            skyGrad.addColorStop(0, '#3b1d36');
+            skyGrad.addColorStop(0.6, '#7f1d1d');
+            skyGrad.addColorStop(1, '#991b1b');
+            ctx.fillStyle = skyGrad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Background Clouds
+            ctx.fillStyle = 'rgba(255, 230, 230, 0.75)';
+            for (let i = 0; i < 12; i++) {
+                const cloudX = (i * 280) - (cameraX * 0.25) % 3360;
+                drawCloud(cloudX, 50 + (i % 3) * 25);
+            }
+
+            // Distant Hills
+            ctx.fillStyle = '#831843';
+            for (let i = 0; i < 8; i++) {
+                const hillX = (i * 420) - (cameraX * 0.45);
+                ctx.beginPath();
+                ctx.arc(hillX, groundY, 85, Math.PI, 0);
+                ctx.fill();
+            }
+
+            ctx.save();
+            ctx.translate(-cameraX, 0);
+
+            // Draw Solids (Ground, Pipes, Bricks, Steps)
+            solids.forEach(b => {
+                if (b.type === 'ground') {
+                    // Crimson Stone Ground
+                    const grad = ctx.createLinearGradient(b.x, b.y, b.x, b.y + b.h);
+                    grad.addColorStop(0, '#9f1239');
+                    grad.addColorStop(1, '#4c0519');
+                    ctx.fillStyle = grad;
+                    ctx.fillRect(b.x, b.y, b.w, b.h);
+
+                    // Top Red Grass / Border
+                    ctx.fillStyle = '#e11d48';
+                    ctx.fillRect(b.x, b.y, b.w, 8);
+                    ctx.fillStyle = '#fda4af';
+                    ctx.fillRect(b.x, b.y, b.w, 2);
+
+                } else if (b.type === 'pipe') {
+                    // Golden/Green Warp Pipe
+                    ctx.fillStyle = '#15803d';
+                    ctx.fillRect(b.x, b.y + 12, b.w, b.h - 12);
+                    ctx.fillStyle = '#16a34a';
+                    ctx.fillRect(b.x - 4, b.y, b.w + 8, 14);
+
+                    // Highlights
+                    ctx.fillStyle = '#86efac';
+                    ctx.fillRect(b.x + 4, b.y + 2, 6, b.h - 4);
+                    ctx.strokeStyle = '#052e16';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(b.x - 4, b.y, b.w + 8, 14);
+                    ctx.strokeRect(b.x, b.y + 12, b.w, b.h - 12);
+
+                } else if (b.type === 'brick' || b.type === 'step') {
+                    // Brick Block
+                    ctx.fillStyle = '#881337';
+                    ctx.fillRect(b.x, b.y, b.w, b.h);
+                    ctx.strokeStyle = '#4c0519';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(b.x, b.y, b.w, b.h);
+                    ctx.fillStyle = '#f43f5e';
+                    ctx.fillRect(b.x + 2, b.y + 2, 10, 4);
+
+                } else if (b.type === 'qblock') {
+                    // Mystery Gold Question Block
+                    const grad = ctx.createLinearGradient(b.x, b.y, b.x, b.y + b.h);
+                    grad.addColorStop(0, '#f59e0b');
+                    grad.addColorStop(1, '#b45309');
+                    ctx.fillStyle = grad;
+                    ctx.fillRect(b.x, b.y, b.w, b.h);
+                    ctx.strokeStyle = '#78350f';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(b.x, b.y, b.w, b.h);
+
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = 'bold 16px monospace';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('?', b.x + b.w / 2, b.y + 21);
+
+                } else if (b.type === 'empty') {
+                    ctx.fillStyle = '#57534e';
+                    ctx.fillRect(b.x, b.y, b.w, b.h);
+                    ctx.strokeStyle = '#292524';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(b.x, b.y, b.w, b.h);
+                }
+            });
+
+            // Coin Items
+            coinItems.forEach(c => {
+                if (!c.collected) {
+                    ctx.fillStyle = '#fbbf24';
+                    ctx.beginPath();
+                    ctx.ellipse(c.x + c.w / 2, c.y + c.h / 2, 7, 9, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = '#d97706';
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+                }
+            });
+
+            // Enemies (Goombas)
+            enemies.forEach(en => {
+                if (!en.alive && en.squishTimer <= 0) return;
+
+                if (!en.alive) {
+                    ctx.fillStyle = '#7c2d12';
+                    ctx.fillRect(en.x, en.y + 14, en.w, 10);
+                } else {
+                    ctx.fillStyle = '#9a3412';
+                    ctx.beginPath();
+                    ctx.arc(en.x + en.w / 2, en.y + 10, 11, Math.PI, 0);
+                    ctx.lineTo(en.x + en.w, en.y + 18);
+                    ctx.lineTo(en.x, en.y + 18);
+                    ctx.fill();
+
+                    // Eyes
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(en.x + 4, en.y + 8, 4, 5);
+                    ctx.fillRect(en.x + 16, en.y + 8, 4, 5);
+                    ctx.fillStyle = '#000000';
+                    ctx.fillRect(en.x + 6, en.y + 9, 2, 3);
+                    ctx.fillRect(en.x + 16, en.y + 9, 2, 3);
+
+                    // Feet
+                    ctx.fillStyle = '#431407';
+                    ctx.fillRect(en.x + 1, en.y + 18, 8, 6);
+                    ctx.fillRect(en.x + 15, en.y + 18, 8, 6);
+                }
+            });
+
+            // Flagpole (Merah Putih / Konstitusi)
+            ctx.fillStyle = '#cbd5e1';
+            ctx.fillRect(flagpole.x, flagpole.y, 8, flagpole.height);
+            // Golden Orb Top
+            ctx.fillStyle = '#f59e0b';
+            ctx.beginPath();
+            ctx.arc(flagpole.x + 4, flagpole.y, 9, 0, Math.PI * 2);
+            ctx.fill();
+            // Flag Red & White
+            ctx.fillStyle = '#dc2626';
+            ctx.fillRect(flagpole.x + 8, flagpole.flagY, 35, 12);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(flagpole.x + 8, flagpole.flagY + 12, 35, 12);
+            ctx.strokeStyle = '#0f172a';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(flagpole.x + 8, flagpole.flagY, 35, 24);
+
+            // Castle
+            drawCastle(flagpole.x + 90, groundY - 140);
+
+            // Mario Player
+            if (player.isInvulnerable && Math.floor(player.invulnerableTimer / 4) % 2 === 0) {
+                // Blink
+            } else {
+                drawMario(player.x, player.y, player.facingRight, player.grounded, player.walkFrame);
+            }
+
+            // Floating Text Particles
+            particles.forEach(p => {
+                ctx.fillStyle = '#fef08a';
+                ctx.font = 'bold 11px monospace';
+                ctx.textAlign = 'center';
+                ctx.fillText(p.text, p.x, p.y);
+            });
+
+            ctx.restore();
+        }
+
+        function drawCloud(cx, cy) {
+            ctx.beginPath();
+            ctx.arc(cx, cy, 18, 0, Math.PI * 2);
+            ctx.arc(cx + 14, cy - 10, 22, 0, Math.PI * 2);
+            ctx.arc(cx + 34, cy, 18, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function drawMario(x, y, facingRight, grounded, walkFrame) {
+            ctx.save();
+            if (!facingRight) {
+                ctx.translate(x + player.w, y);
+                ctx.scale(-1, 1);
+                x = 0;
+                y = 0;
+            }
+
+            // Cap (Red)
+            ctx.fillStyle = '#dc2626';
+            ctx.fillRect(x + 4, y, 16, 6);
+            ctx.fillRect(x + 8, y + 2, 14, 4);
+
+            // Face (Skin)
+            ctx.fillStyle = '#fed7aa';
+            ctx.fillRect(x + 6, y + 6, 12, 8);
+            // Eye & Mustache
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(x + 14, y + 7, 2, 3);
+            ctx.fillRect(x + 10, y + 10, 8, 3);
+
+            // Shirt (Red)
+            ctx.fillStyle = '#dc2626';
+            ctx.fillRect(x + 4, y + 14, 16, 8);
+
+            // Overalls (Blue)
+            ctx.fillStyle = '#2563eb';
+            ctx.fillRect(x + 6, y + 18, 12, 8);
+            // Yellow Buttons
+            ctx.fillStyle = '#fef08a';
+            ctx.fillRect(x + 8, y + 19, 2, 2);
+            ctx.fillRect(x + 14, y + 19, 2, 2);
+
+            // Shoes (Brown) with walk animation offset
+            const legOffset = (grounded && player.vx !== 0) ? Math.sin(walkFrame) * 2 : 0;
+            ctx.fillStyle = '#78350f';
+            ctx.fillRect(x + 2, y + 26 + legOffset, 8, 6);
+            ctx.fillRect(x + 14, y + 26 - legOffset, 8, 6);
+
+            ctx.restore();
+        }
+
+        function drawCastle(cx, cy) {
+            ctx.fillStyle = '#475569';
+            ctx.fillRect(cx, cy + 40, 100, 100);
+            ctx.fillRect(cx + 15, cy, 70, 40);
+            // Battlements
+            ctx.fillRect(cx, cy + 30, 20, 15);
+            ctx.fillRect(cx + 40, cy + 30, 20, 15);
+            ctx.fillRect(cx + 80, cy + 30, 20, 15);
+            // Door
+            ctx.fillStyle = '#0f172a';
+            ctx.beginPath();
+            ctx.arc(cx + 50, cy + 100, 18, Math.PI, 0);
+            ctx.lineTo(cx + 68, cy + 140);
+            ctx.lineTo(cx + 32, cy + 140);
+            ctx.fill();
+        }
+
+        // CONTROLS & EVENT LISTENERS
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = true;
+            if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = true;
+            if (e.code === 'ArrowUp' || e.code === 'KeyW' || e.code === 'Space') {
+                if (!keys.jump && isRunning && !isPaused && player.grounded) {
+                    player.vy = player.jumpStrength;
+                    player.grounded = false;
+                    playSfx('jump');
+                }
+                keys.jump = true;
+            }
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = false;
+            if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = false;
+            if (e.code === 'ArrowUp' || e.code === 'KeyW' || e.code === 'Space') keys.jump = false;
+        });
+
+        // Touch Virtual Controls
+        function bindTouch(btnId, keyName, isJump = false) {
+            const el = document.getElementById(btnId);
+            if (!el) return;
+            const start = (e) => {
+                e.preventDefault();
+                keys[keyName] = true;
+                if (isJump && isRunning && !isPaused && player.grounded) {
+                    player.vy = player.jumpStrength;
+                    player.grounded = false;
+                    playSfx('jump');
+                }
+            };
+            const end = (e) => {
+                e.preventDefault();
+                keys[keyName] = false;
+            };
+            el.addEventListener('touchstart', start, { passive: false });
+            el.addEventListener('touchend', end, { passive: false });
+            el.addEventListener('mousedown', start);
+            el.addEventListener('mouseup', end);
+            el.addEventListener('mouseleave', end);
+        }
+
+        bindTouch('touch-left', 'left');
+        bindTouch('touch-right', 'right');
+        bindTouch('touch-jump', 'jump', true);
+
+        // Touch Canvas Direct Sides
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const rect = canvas.getBoundingClientRect();
+            const touchX = e.touches[0].clientX - rect.left;
+            const touchY = e.touches[0].clientY - rect.top;
+
+            if (touchY < rect.height * 0.5) {
+                // Top half taps jump
+                if (isRunning && !isPaused && player.grounded) {
+                    player.vy = player.jumpStrength;
+                    player.grounded = false;
+                    playSfx('jump');
+                }
+            } else if (touchX < rect.width * 0.5) {
+                keys.left = true;
+                keys.right = false;
+            } else {
+                keys.right = true;
+                keys.left = false;
+            }
+        }, { passive: false });
+
+        canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            keys.left = false;
+            keys.right = false;
+        }, { passive: false });
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateNavbarStudent();
+            bestScore = parseInt(localStorage.getItem('edukacivic_mario_best')) || 0;
+            document.getElementById('nav-best').textContent = bestScore;
+            document.getElementById('start-best-score').textContent = bestScore + ' Poin';
+        });
+    </script>
+</body>
+</html>

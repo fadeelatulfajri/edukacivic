@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Level Bonus: Snake Konstitusi - EdukaCivic</title>
+    <link rel="icon" type="image/png" href="Logo Edukacivic.png">
+    
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS & Canvas Confetti -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="student-system.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            red: '#DC2626', redLight: '#EF4444', redDark: '#B91C1C',
+                            dark: '#0F172A', darker: '#020617', light: '#F8FAFC'
+                        }
+                    },
+                    animation: {
+                        'float': 'float 3s ease-in-out infinite',
+                        'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-8px)' },
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { opacity: '1', transform: 'scale(1)' },
+                            '50%': { opacity: '0.85', transform: 'scale(1.05)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glow-purple {
+            box-shadow: 0 0 35px rgba(168, 85, 247, 0.35);
+        }
+
+        .arcade-btn {
+            transition: all 0.15s ease;
+        }
+        .arcade-btn:active {
+            transform: scale(0.92);
+        }
+
+        #gameCanvas {
+            image-rendering: pixelated;
+            border-radius: 20px;
+            box-shadow: 0 0 40px rgba(147, 51, 234, 0.25), inset 0 0 20px rgba(0, 0, 0, 0.6);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-b from-[#0b0416] via-[#140b24] to-[#06020c] text-white font-sans antialiased min-h-screen flex flex-col selection:bg-purple-500 selection:text-white">
+
+    <!-- NAVBAR -->
+    <nav class="fixed w-full z-50 bg-slate-950/90 backdrop-blur-md border-b border-purple-500/20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                
+                <!-- Left: Back & Title -->
+                <div class="flex items-center gap-3">
+                    <a href="dunia1.html" class="flex items-center gap-2 text-gray-400 hover:text-white transition-colors group">
+                        <div class="w-9 h-9 bg-slate-900 border border-purple-500/30 rounded-xl flex items-center justify-center group-hover:bg-purple-600/30 transition">
+                            <i class="fa-solid fa-arrow-left text-sm"></i>
+                        </div>
+                    </a>
+                    <div class="w-px h-6 bg-gray-800"></div>
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-500 flex items-center justify-center shadow-md shadow-purple-500/30">
+                            <i class="fa-solid fa-gamepad text-white text-xs"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-1.5">
+                                <p class="text-white font-bold text-sm leading-none">Snake Konstitusi</p>
+                                <span class="bg-purple-500/20 text-purple-300 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-purple-500/30">Bonus</span>
+                            </div>
+                            <p class="text-gray-400 text-[10px] mt-0.5">Dunia 1: Mengenal Konstitusi</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Stats & Student Avatar -->
+                <div class="flex items-center gap-3">
+                    <div class="hidden sm:flex items-center gap-2 bg-slate-900/90 px-3.5 py-1.5 rounded-xl border border-purple-500/30">
+                        <i class="fa-solid fa-trophy text-amber-400 text-xs"></i>
+                        <span class="text-xs text-gray-400 font-semibold">Skor:</span>
+                        <span id="nav-score" class="font-extrabold text-amber-400 text-sm">0</span>
+                    </div>
+                    <div class="hidden sm:flex items-center gap-2 bg-slate-900/90 px-3.5 py-1.5 rounded-xl border border-purple-500/30">
+                        <i class="fa-solid fa-crown text-yellow-400 text-xs"></i>
+                        <span class="text-xs text-gray-400 font-semibold">Rekor:</span>
+                        <span id="nav-best" class="font-extrabold text-yellow-300 text-sm">0</span>
+                    </div>
+                    <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-purple-500 to-indigo-500 p-0.5 cursor-pointer shadow-md" onclick="window.location.href='profil-siswa.html'">
+                        <img id="nav-avatar-img" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Student" alt="Avatar" class="w-full h-full rounded-full bg-slate-900 object-cover">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT / GAME ARENA -->
+    <main class="flex-1 flex flex-col items-center justify-center pt-20 pb-8 px-4 relative overflow-hidden">
+        
+        <!-- Ambient Background Glows -->
+        <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-purple-600/15 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute bottom-10 left-10 w-72 h-72 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- 1. START SCREEN -->
+        <div id="start-screen" class="glass-panel p-6 sm:p-10 rounded-3xl max-w-lg w-full text-center relative z-10 shadow-2xl border border-purple-500/30 glow-purple">
+            <div class="relative inline-block mx-auto mb-4">
+                <div class="w-24 h-24 rounded-3xl bg-gradient-to-tr from-purple-600 via-indigo-600 to-cyan-500 p-1 shadow-xl shadow-purple-600/40 animate-float flex items-center justify-center">
+                    <span class="text-5xl">🐍</span>
+                </div>
+                <div class="absolute -bottom-2 -right-2 bg-yellow-400 text-slate-950 w-8 h-8 rounded-xl font-black text-sm flex items-center justify-center shadow-lg border-2 border-slate-900">
+                    ⭐
+                </div>
+            </div>
+
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 text-xs font-bold uppercase tracking-wider mb-2">
+                <i class="fa-solid fa-gamepad"></i> Mini Game Arcade
+            </div>
+
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-white mb-2 leading-tight">
+                Snake Konstitusi
+            </h1>
+            <p class="text-gray-300 text-xs sm:text-sm leading-relaxed mb-6 max-w-md mx-auto">
+                Bantu Sang Ular Penjaga Konstitusi mengumpulkan <strong>Buku Hukum</strong> 📘 dan <strong>Bintang Emas</strong> ⭐ tanpa menabrak dinding atau tubuh sendiri!
+            </p>
+
+            <!-- Mode / Kecepatan -->
+            <div class="bg-slate-950/80 p-3.5 rounded-2xl border border-gray-800 mb-6">
+                <p class="text-xs text-gray-400 font-semibold mb-2 flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-gauge-high text-purple-400"></i> Pilih Tingkat Kecepatan:
+                </p>
+                <div class="grid grid-cols-3 gap-2">
+                    <button onclick="setSpeedMode('slow', this)" class="speed-btn py-2 px-3 rounded-xl text-xs font-bold bg-slate-900 text-gray-400 border border-gray-700 hover:text-white transition">
+                        🟢 Santai
+                    </button>
+                    <button onclick="setSpeedMode('normal', this)" class="speed-btn py-2 px-3 rounded-xl text-xs font-bold bg-purple-600 text-white border border-purple-400 shadow-md transition">
+                        🟡 Normal
+                    </button>
+                    <button onclick="setSpeedMode('fast', this)" class="speed-btn py-2 px-3 rounded-xl text-xs font-bold bg-slate-900 text-gray-400 border border-gray-700 hover:text-white transition">
+                        🔴 Cepat
+                    </button>
+                </div>
+            </div>
+
+            <!-- Start Button -->
+            <button onclick="startGame()" class="w-full py-4 px-8 bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-500 hover:from-purple-500 hover:to-cyan-400 text-white font-black rounded-2xl shadow-xl shadow-purple-600/40 hover:scale-[1.02] active:scale-98 transition-all text-base sm:text-lg flex items-center justify-center gap-2.5">
+                <i class="fa-solid fa-play"></i>
+                <span>Mulai Petualangan Snake</span>
+            </button>
+
+            <!-- Guide Controls -->
+            <div class="mt-6 pt-5 border-t border-gray-800/80 flex flex-wrap items-center justify-center gap-3 text-[11px] text-gray-400">
+                <span class="bg-slate-900/80 px-2.5 py-1 rounded-lg border border-gray-800">
+                    <i class="fa-solid fa-keyboard mr-1 text-purple-400"></i> Arah / WASD
+                </span>
+                <span class="bg-slate-900/80 px-2.5 py-1 rounded-lg border border-gray-800">
+                    <i class="fa-solid fa-hand-pointer mr-1 text-purple-400"></i> Tombol Sentuh / Gesek
+                </span>
+                <span class="bg-slate-900/80 px-2.5 py-1 rounded-lg border border-gray-800">
+                    <i class="fa-solid fa-pause mr-1 text-purple-400"></i> Spasi = Jeda
+                </span>
+            </div>
+        </div>
+
+        <!-- 2. GAME ARENA CONTAINER -->
+        <div id="game-container" class="hidden flex-col items-center justify-center w-full max-w-lg z-10">
+            
+            <!-- In-game HUD Header -->
+            <div class="w-full bg-slate-950/80 border border-purple-500/30 rounded-2xl p-3 sm:p-4 mb-3 flex items-center justify-between shadow-xl">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-lg text-purple-300 font-black" id="hud-avatar-icon">
+                        🐍
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Skor Sesi</span>
+                            <span id="combo-badge" class="hidden bg-amber-500/20 text-amber-300 text-[9px] font-extrabold px-1.5 py-0.2 rounded border border-amber-500/30">BONUS!</span>
+                        </div>
+                        <p class="text-xl font-black text-amber-400 leading-tight" id="live-score">0</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <div class="text-right mr-2 hidden sm:block">
+                        <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Panjang Ular</span>
+                        <p class="text-sm font-extrabold text-cyan-400 leading-tight" id="snake-length">1</p>
+                    </div>
+                    <button onclick="togglePause()" id="btn-pause" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-gray-300 hover:text-white text-xs font-bold border border-gray-700 transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-pause" id="pause-icon"></i> <span id="pause-text">Jeda</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Canvas Container -->
+            <div class="relative w-full flex justify-center">
+                <canvas id="gameCanvas" width="400" height="400" class="bg-slate-950 border-2 border-purple-500/40"></canvas>
+                
+                <!-- Pause Overlay -->
+                <div id="pause-overlay" class="hidden absolute inset-0 bg-slate-950/85 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center text-center p-6 z-20">
+                    <div class="w-16 h-16 rounded-2xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-2xl mb-3 border border-purple-500/30">
+                        <i class="fa-solid fa-pause"></i>
+                    </div>
+                    <h3 class="text-2xl font-black text-white mb-1">Permainan Dijeda</h3>
+                    <p class="text-gray-400 text-xs mb-5">Tarik napas sejenak lalu lanjutkan petualangan!</p>
+                    <button onclick="togglePause()" class="px-6 py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl shadow-lg transition flex items-center gap-2 text-sm">
+                        <i class="fa-solid fa-play"></i> Lanjutkan Main
+                    </button>
+                </div>
+            </div>
+
+            <!-- MOBILE / TOUCH VIRTUAL D-PAD CONTROLLER -->
+            <div class="mt-4 w-full flex flex-col items-center gap-1.5 sm:hidden">
+                <!-- Top Button -->
+                <button ontouchstart="handleTouchBtn(0,-1)" onclick="changeDir(0,-1)" class="arcade-btn w-16 h-14 bg-slate-900 active:bg-purple-600 border border-purple-500/40 rounded-2xl flex items-center justify-center text-white text-xl shadow-lg">
+                    <i class="fa-solid fa-chevron-up"></i>
+                </button>
+                <!-- Left, Center, Right -->
+                <div class="flex items-center gap-3">
+                    <button ontouchstart="handleTouchBtn(-1,0)" onclick="changeDir(-1,0)" class="arcade-btn w-16 h-14 bg-slate-900 active:bg-purple-600 border border-purple-500/40 rounded-2xl flex items-center justify-center text-white text-xl shadow-lg">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <div class="w-12 h-12 rounded-full bg-slate-950/80 border border-gray-800 flex items-center justify-center text-purple-400 text-xs">
+                        <i class="fa-solid fa-compass"></i>
+                    </div>
+                    <button ontouchstart="handleTouchBtn(1,0)" onclick="changeDir(1,0)" class="arcade-btn w-16 h-14 bg-slate-900 active:bg-purple-600 border border-purple-500/40 rounded-2xl flex items-center justify-center text-white text-xl shadow-lg">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
+                <!-- Down Button -->
+                <button ontouchstart="handleTouchBtn(0,1)" onclick="changeDir(0,1)" class="arcade-btn w-16 h-14 bg-slate-900 active:bg-purple-600 border border-purple-500/40 rounded-2xl flex items-center justify-center text-white text-xl shadow-lg">
+                    <i class="fa-solid fa-chevron-down"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- 3. GAME OVER SCREEN -->
+        <div id="gameover-screen" class="hidden glass-panel p-6 sm:p-10 rounded-3xl max-w-md w-full text-center relative z-10 shadow-2xl border border-red-500/30">
+            <div class="w-20 h-20 bg-red-500/20 text-red-400 rounded-3xl flex items-center justify-center mx-auto mb-4 border border-red-500/40 text-3xl shadow-lg shadow-red-500/20">
+                <i class="fa-solid fa-skull"></i>
+            </div>
+            
+            <h2 class="text-2xl sm:text-3xl font-black text-white mb-1">Permainan Berakhir!</h2>
+            <p class="text-gray-400 text-xs sm:text-sm mb-6">Ular Penjaga Konstitusi menabrak rintangan.</p>
+
+            <!-- Score Summary Box -->
+            <div class="bg-slate-950/90 rounded-2xl p-5 mb-6 border border-gray-800 space-y-3">
+                <div class="flex justify-between items-center border-b border-gray-800/80 pb-2.5">
+                    <span class="text-xs text-gray-400 font-medium">Skor Akhir Kamu:</span>
+                    <span id="final-score" class="text-2xl font-black text-amber-400">0</span>
+                </div>
+                <div class="flex justify-between items-center border-b border-gray-800/80 pb-2.5">
+                    <span class="text-xs text-gray-400 font-medium">Rekor Terbaik:</span>
+                    <span id="best-score-display" class="text-lg font-black text-yellow-300">0</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-xs text-gray-400 font-medium">Panjang Maksimal:</span>
+                    <span id="final-length" class="text-sm font-bold text-cyan-400">0 Segmen</span>
+                </div>
+            </div>
+
+            <p id="new-record" class="hidden text-amber-400 font-black mb-6 text-sm sm:text-base animate-bounce">
+                🎉 REKOR BARU TERCIPTA! LUAR BIASA! 👑
+            </p>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col gap-2.5">
+                <button onclick="startGame()" class="w-full py-3.5 px-6 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold rounded-2xl shadow-lg shadow-purple-600/30 transition transform hover:scale-[1.02] flex items-center justify-center gap-2 text-sm">
+                    <i class="fa-solid fa-rotate-right"></i> Main Lagi
+                </button>
+                <a href="dunia1.html" class="w-full py-3 px-6 bg-slate-900 hover:bg-slate-800 text-gray-300 hover:text-white font-semibold rounded-2xl border border-gray-800 transition flex items-center justify-center gap-2 text-xs">
+                    <i class="fa-solid fa-map"></i> Kembali ke Peta Dunia 1
+                </a>
+                <a href="index.html#dunia-game" class="text-xs text-gray-500 hover:text-gray-300 transition py-1">
+                    Kembali ke Beranda 5 Dunia
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-950/80 text-gray-500 py-4 border-t border-purple-500/20 text-center text-xs">
+        <p>&copy; 2026 EdukaCivic | Fadilatul Fajri · Level Bonus</p>
+    </footer>
+
+    <!-- SOUND SYNTHESIZER (WEB AUDIO API) -->
+    <script>
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        let audioCtx;
+        function getAudioContext() {
+            if (!audioCtx) audioCtx = new AudioContextClass();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            return audioCtx;
+        }
+
+        function playSfx(type) {
+            try {
+                const ctx = getAudioContext();
+                const now = ctx.currentTime;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                if (type === 'eat') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.08);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                    osc.start(now);
+                    osc.stop(now + 0.1);
+                } else if (type === 'star') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(659.25, now);
+                    osc.frequency.setValueAtTime(880.00, now + 0.06);
+                    osc.frequency.setValueAtTime(1318.51, now + 0.12);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                } else if (type === 'die') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, now);
+                    osc.frequency.exponentialRampToValueAtTime(80, now + 0.35);
+                    gain.gain.setValueAtTime(0.35, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                    osc.start(now);
+                    osc.stop(now + 0.4);
+                }
+            } catch(e) {}
+        }
+    </script>
+
+    <!-- GAME ENGINE SCRIPT -->
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        const GRID_COUNT = 20; // 20x20 grid
+        let CELL_SIZE = 20;
+        
+        let snake = [];
+        let dx = 1;
+        let dy = 0;
+        let nextDx = 1;
+        let nextDy = 0;
+        
+        let food = { x: 5, y: 5 };
+        let star = null; // Bonus golden star item
+        let starTimer = null;
+        let starCountdown = 0;
+
+        let score = 0;
+        let gameLoop = null;
+        let isPaused = false;
+        let speedInterval = 130; // base speed ms
+
+        let speedConfig = {
+            'slow': 160,
+            'normal': 120,
+            'fast': 85
+        };
+        let currentSpeedMode = 'normal';
+
+        function setSpeedMode(mode, btn) {
+            currentSpeedMode = mode;
+            speedInterval = speedConfig[mode] || 120;
+            
+            document.querySelectorAll('.speed-btn').forEach(b => {
+                b.className = 'speed-btn py-2 px-3 rounded-xl text-xs font-bold bg-slate-900 text-gray-400 border border-gray-700 hover:text-white transition';
+            });
+            if (btn) {
+                btn.className = 'speed-btn py-2 px-3 rounded-xl text-xs font-bold bg-purple-600 text-white border border-purple-400 shadow-md transition';
+            }
+        }
+
+        function resizeCanvas() {
+            const containerW = Math.min(window.innerWidth - 32, 420);
+            const size = Math.floor(containerW / GRID_COUNT) * GRID_COUNT;
+            canvas.width = size;
+            canvas.height = size;
+            CELL_SIZE = size / GRID_COUNT;
+        }
+
+        function startGame() {
+            resizeCanvas();
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('gameover-screen').classList.add('hidden');
+            document.getElementById('game-container').classList.remove('hidden');
+            document.getElementById('pause-overlay').classList.add('hidden');
+            isPaused = false;
+            document.getElementById('pause-text').textContent = 'Jeda';
+            document.getElementById('pause-icon').className = 'fa-solid fa-pause';
+
+            // Center snake
+            const startX = Math.floor(GRID_COUNT / 2);
+            const startY = Math.floor(GRID_COUNT / 2);
+            snake = [
+                { x: startX, y: startY },
+                { x: startX - 1, y: startY },
+                { x: startX - 2, y: startY }
+            ];
+
+            dx = 1; dy = 0;
+            nextDx = 1; nextDy = 0;
+            score = 0;
+            updateScoreDisplay();
+
+            placeFood();
+            star = null;
+            if (starTimer) clearInterval(starTimer);
+
+            if (gameLoop) clearInterval(gameLoop);
+            gameLoop = setInterval(gameStep, speedInterval);
+
+            // Periodically attempt spawn star bonus
+            startBonusStarSpawner();
+        }
+
+        function startBonusStarSpawner() {
+            if (starTimer) clearInterval(starTimer);
+            starTimer = setInterval(() => {
+                if (isPaused || !gameLoop) return;
+                // 35% chance to spawn if star not active
+                if (!star && Math.random() < 0.4) {
+                    placeStar();
+                }
+            }, 7000);
+        }
+
+        function placeFood() {
+            let valid = false;
+            while (!valid) {
+                const rx = Math.floor(Math.random() * GRID_COUNT);
+                const ry = Math.floor(Math.random() * GRID_COUNT);
+                if (!snake.some(s => s.x === rx && s.y === ry) && (!star || star.x !== rx || star.y !== ry)) {
+                    food = { x: rx, y: ry };
+                    valid = true;
+                }
+            }
+        }
+
+        function placeStar() {
+            let valid = false;
+            let attempts = 0;
+            while (!valid && attempts < 50) {
+                attempts++;
+                const rx = Math.floor(Math.random() * GRID_COUNT);
+                const ry = Math.floor(Math.random() * GRID_COUNT);
+                if (!snake.some(s => s.x === rx && s.y === ry) && (food.x !== rx || food.y !== ry)) {
+                    star = { x: rx, y: ry, life: 60 }; // lasts 60 ticks
+                    valid = true;
+                    const badge = document.getElementById('combo-badge');
+                    if (badge) badge.classList.remove('hidden');
+                }
+            }
+        }
+
+        function updateScoreDisplay() {
+            document.getElementById('live-score').textContent = score;
+            document.getElementById('nav-score').textContent = score;
+            document.getElementById('snake-length').textContent = snake.length;
+
+            const best = parseInt(localStorage.getItem('edukacivic_snake_best') || '0');
+            document.getElementById('nav-best').textContent = best;
+        }
+
+        function gameStep() {
+            if (isPaused) return;
+
+            dx = nextDx;
+            dy = nextDy;
+
+            const head = { x: snake[0].x + dx, y: snake[0].y + dy };
+
+            // Wall Collision
+            if (head.x < 0 || head.x >= GRID_COUNT || head.y < 0 || head.y >= GRID_COUNT) {
+                return triggerGameOver();
+            }
+
+            // Self Collision
+            if (snake.some((s, idx) => idx !== snake.length - 1 && s.x === head.x && s.y === head.y)) {
+                return triggerGameOver();
+            }
+
+            snake.unshift(head);
+
+            // Check food eat
+            let ate = false;
+            if (head.x === food.x && head.y === food.y) {
+                score += 10;
+                ate = true;
+                playSfx('eat');
+                placeFood();
+            }
+
+            // Check bonus star eat
+            if (star && head.x === star.x && head.y === star.y) {
+                score += 35;
+                ate = true;
+                star = null;
+                playSfx('star');
+                const badge = document.getElementById('combo-badge');
+                if (badge) badge.classList.add('hidden');
+                try { confetti({ particleCount: 35, spread: 60, origin: { y: 0.7 } }); } catch(e) {}
+            }
+
+            if (!ate) {
+                snake.pop();
+            }
+
+            // Star lifespan decay
+            if (star) {
+                star.life--;
+                if (star.life <= 0) {
+                    star = null;
+                    const badge = document.getElementById('combo-badge');
+                    if (badge) badge.classList.add('hidden');
+                }
+            }
+
+            updateScoreDisplay();
+            renderFrame();
+        }
+
+        function renderFrame() {
+            // Background Clear
+            ctx.fillStyle = '#0a0514';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Subdued Grid lines
+            ctx.strokeStyle = 'rgba(168, 85, 247, 0.07)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= GRID_COUNT; i++) {
+                ctx.beginPath();
+                ctx.moveTo(i * CELL_SIZE, 0);
+                ctx.lineTo(i * CELL_SIZE, canvas.height);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(0, i * CELL_SIZE);
+                ctx.lineTo(canvas.width, i * CELL_SIZE);
+                ctx.stroke();
+            }
+
+            // Draw Regular Food (📘 Buku Konstitusi)
+            drawFoodItem(food.x, food.y, '#38bdf8', '#0284c7');
+
+            // Draw Bonus Star (⭐ Golden Star)
+            if (star) {
+                drawStarItem(star.x, star.y);
+            }
+
+            // Draw Snake Segments
+            snake.forEach((seg, index) => {
+                const px = seg.x * CELL_SIZE;
+                const py = seg.y * CELL_SIZE;
+                const radius = CELL_SIZE * 0.35;
+
+                if (index === 0) {
+                    // Head with glowing gradient
+                    const headGrad = ctx.createRadialGradient(
+                        px + CELL_SIZE/2, py + CELL_SIZE/2, 2,
+                        px + CELL_SIZE/2, py + CELL_SIZE/2, CELL_SIZE/2
+                    );
+                    headGrad.addColorStop(0, '#c084fc');
+                    headGrad.addColorStop(1, '#7e22ce');
+                    
+                    ctx.fillStyle = headGrad;
+                    ctx.beginPath();
+                    ctx.roundRect(px + 1.5, py + 1.5, CELL_SIZE - 3, CELL_SIZE - 3, radius);
+                    ctx.fill();
+
+                    // Eyes
+                    drawSnakeEyes(px, py);
+                } else {
+                    // Body Segments with tapering color
+                    const alpha = Math.max(0.4, 1 - (index / snake.length) * 0.5);
+                    ctx.fillStyle = `rgba(168, 85, 247, ${alpha})`;
+                    ctx.beginPath();
+                    ctx.roundRect(px + 2, py + 2, CELL_SIZE - 4, CELL_SIZE - 4, radius * 0.7);
+                    ctx.fill();
+
+                    // Inner highlight
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+                    ctx.beginPath();
+                    ctx.roundRect(px + 3.5, py + 3.5, CELL_SIZE / 3, CELL_SIZE / 3, 2);
+                    ctx.fill();
+                }
+            });
+        }
+
+        function drawSnakeEyes(px, py) {
+            ctx.fillStyle = '#ffffff';
+            let e1x, e1y, e2x, e2y;
+            const eyeSize = Math.max(2.5, CELL_SIZE * 0.18);
+
+            if (dx === 1) { // Right
+                e1x = px + CELL_SIZE * 0.7; e1y = py + CELL_SIZE * 0.25;
+                e2x = px + CELL_SIZE * 0.7; e2y = py + CELL_SIZE * 0.75;
+            } else if (dx === -1) { // Left
+                e1x = px + CELL_SIZE * 0.3; e1y = py + CELL_SIZE * 0.25;
+                e2x = px + CELL_SIZE * 0.3; e2y = py + CELL_SIZE * 0.75;
+            } else if (dy === 1) { // Down
+                e1x = px + CELL_SIZE * 0.25; e1y = py + CELL_SIZE * 0.7;
+                e2x = px + CELL_SIZE * 0.75; e2y = py + CELL_SIZE * 0.7;
+            } else { // Up
+                e1x = px + CELL_SIZE * 0.25; e1y = py + CELL_SIZE * 0.3;
+                e2x = px + CELL_SIZE * 0.75; e2y = py + CELL_SIZE * 0.3;
+            }
+
+            ctx.beginPath(); ctx.arc(e1x, e1y, eyeSize, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(e2x, e2y, eyeSize, 0, Math.PI * 2); ctx.fill();
+
+            // Pupil
+            ctx.fillStyle = '#1e1b4b';
+            ctx.beginPath(); ctx.arc(e1x, e1y, eyeSize * 0.5, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(e2x, e2y, eyeSize * 0.5, 0, Math.PI * 2); ctx.fill();
+        }
+
+        function drawFoodItem(gx, gy, colorLight, colorDark) {
+            const px = gx * CELL_SIZE;
+            const py = gy * CELL_SIZE;
+
+            // Outer Glow
+            ctx.shadowColor = colorLight;
+            ctx.shadowBlur = 10;
+
+            // Book body
+            ctx.fillStyle = colorLight;
+            ctx.beginPath();
+            ctx.roundRect(px + 3, py + 3, CELL_SIZE - 6, CELL_SIZE - 6, 4);
+            ctx.fill();
+
+            // Book spine line
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(px + CELL_SIZE/2 - 1, py + 4, 2, CELL_SIZE - 8);
+        }
+
+        function drawStarItem(gx, gy) {
+            const px = gx * CELL_SIZE;
+            const py = gy * CELL_SIZE;
+            const cx = px + CELL_SIZE / 2;
+            const cy = py + CELL_SIZE / 2;
+            const r = CELL_SIZE * 0.42;
+
+            ctx.shadowColor = '#facc15';
+            ctx.shadowBlur = 15;
+            ctx.fillStyle = '#facc15';
+
+            ctx.beginPath();
+            for (let i = 0; i < 5; i++) {
+                ctx.lineTo(
+                    cx + r * Math.cos((18 + i * 72) * Math.PI / 180),
+                    cy - r * Math.sin((18 + i * 72) * Math.PI / 180)
+                );
+                ctx.lineTo(
+                    cx + (r / 2) * Math.cos((54 + i * 72) * Math.PI / 180),
+                    cy - (r / 2) * Math.sin((54 + i * 72) * Math.PI / 180)
+                );
+            }
+            ctx.closePath();
+            ctx.fill();
+            ctx.shadowBlur = 0;
+        }
+
+        function triggerGameOver() {
+            if (gameLoop) clearInterval(gameLoop);
+            if (starTimer) clearInterval(starTimer);
+            gameLoop = null;
+
+            playSfx('die');
+
+            document.getElementById('game-container').classList.add('hidden');
+            document.getElementById('gameover-screen').classList.remove('hidden');
+            document.getElementById('final-score').textContent = score;
+            document.getElementById('final-length').textContent = `${snake.length} Segmen`;
+
+            let best = parseInt(localStorage.getItem('edukacivic_snake_best') || '0');
+            const recEl = document.getElementById('new-record');
+            if (score > best && score > 0) {
+                best = score;
+                localStorage.setItem('edukacivic_snake_best', best);
+                recEl.classList.remove('hidden');
+                try {
+                    confetti({ particleCount: 80, spread: 100, origin: { y: 0.6 } });
+                } catch(e) {}
+            } else {
+                recEl.classList.add('hidden');
+            }
+
+            document.getElementById('best-score-display').textContent = best;
+            document.getElementById('nav-best').textContent = best;
+        }
+
+        function togglePause() {
+            if (!gameLoop && !isPaused) return;
+            isPaused = !isPaused;
+            const overlay = document.getElementById('pause-overlay');
+            const pauseText = document.getElementById('pause-text');
+            const pauseIcon = document.getElementById('pause-icon');
+
+            if (isPaused) {
+                overlay.classList.remove('hidden');
+                pauseText.textContent = 'Lanjut';
+                pauseIcon.className = 'fa-solid fa-play';
+            } else {
+                overlay.classList.add('hidden');
+                pauseText.textContent = 'Jeda';
+                pauseIcon.className = 'fa-solid fa-pause';
+            }
+        }
+
+        function changeDir(nx, ny) {
+            // Prevent 180 reversing
+            if (nx === -dx && ny === 0) return;
+            if (ny === -dy && nx === 0) return;
+            nextDx = nx;
+            nextDy = ny;
+        }
+
+        function handleTouchBtn(x, y) {
+            changeDir(x, y);
+        }
+
+        // Keyboard Listener
+        document.addEventListener('keydown', e => {
+            if (e.key === ' ' || e.code === 'Space') {
+                e.preventDefault();
+                togglePause();
+                return;
+            }
+            if (isPaused) return;
+
+            switch(e.key) {
+                case 'ArrowUp': case 'w': case 'W':
+                    e.preventDefault(); changeDir(0, -1); break;
+                case 'ArrowDown': case 's': case 'S':
+                    e.preventDefault(); changeDir(0, 1); break;
+                case 'ArrowLeft': case 'a': case 'A':
+                    e.preventDefault(); changeDir(-1, 0); break;
+                case 'ArrowRight': case 'd': case 'D':
+                    e.preventDefault(); changeDir(1, 0); break;
+            }
+        });
+
+        // Touch Swipe Gesture Support on Canvas
+        let touchStartX = 0;
+        let touchStartY = 0;
+        canvas.addEventListener('touchstart', e => {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+        }, { passive: true });
+
+        canvas.addEventListener('touchend', e => {
+            if (isPaused) return;
+            const dxT = e.changedTouches[0].clientX - touchStartX;
+            const dyT = e.changedTouches[0].clientY - touchStartY;
+            if (Math.abs(dxT) > Math.abs(dyT) && Math.abs(dxT) > 20) {
+                changeDir(dxT > 0 ? 1 : -1, 0);
+            } else if (Math.abs(dyT) > 20) {
+                changeDir(0, dyT > 0 ? 1 : -1);
+            }
+        }, { passive: true });
+
+        window.addEventListener('resize', () => {
+            if (gameLoop) {
+                resizeCanvas();
+                renderFrame();
+            }
+        });
+
+        // Initialize Page
+        document.addEventListener('DOMContentLoaded', () => {
+            const best = localStorage.getItem('edukacivic_snake_best') || '0';
+            document.getElementById('nav-best').textContent = best;
+            updateNavbarStudent();
+        });
+    </script>
+</body>
+</html>

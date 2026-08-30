@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Level Bonus: Hop Mania - EdukaCivic</title>
+    <link rel="icon" type="image/png" href="Logo Edukacivic.png">
+    
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS & Canvas Confetti -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="student-system.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            red: '#DC2626', redLight: '#EF4444', redDark: '#B91C1C',
+                            dark: '#0F172A', darker: '#020617', light: '#F8FAFC'
+                        }
+                    },
+                    animation: {
+                        'float': 'float 3s ease-in-out infinite',
+                        'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-8px)' },
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { opacity: '1', transform: 'scale(1)' },
+                            '50%': { opacity: '0.85', transform: 'scale(1.05)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+            background-color: #0c0401;
+        }
+
+        .glass-panel {
+            background: rgba(24, 9, 2, 0.88);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(249, 115, 22, 0.25);
+        }
+
+        .glow-orange {
+            box-shadow: 0 0 35px rgba(249, 115, 22, 0.35);
+        }
+
+        .arcade-btn {
+            transition: all 0.15s ease;
+        }
+        .arcade-btn:active {
+            transform: scale(0.92);
+        }
+
+        #gameCanvas {
+            border-radius: 24px;
+            box-shadow: 0 0 45px rgba(249, 115, 22, 0.25), inset 0 0 20px rgba(0, 0, 0, 0.7);
+            border: 2px solid rgba(249, 115, 22, 0.4);
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-b from-[#180902] via-[#2a1306] to-[#0c0401] text-white font-sans antialiased min-h-screen flex flex-col selection:bg-orange-500 selection:text-white">
+
+    <!-- NAVBAR -->
+    <nav class="fixed w-full z-50 bg-slate-950/90 backdrop-blur-md border-b border-orange-500/20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                
+                <!-- Left: Back & Title -->
+                <div class="flex items-center gap-3">
+                    <a href="dunia2.html" class="flex items-center gap-2 text-gray-400 hover:text-white transition-colors group">
+                        <div class="w-9 h-9 bg-slate-900 border border-orange-500/30 rounded-xl flex items-center justify-center group-hover:bg-orange-600/30 transition">
+                            <i class="fa-solid fa-arrow-left text-sm text-orange-400"></i>
+                        </div>
+                    </a>
+                    <div class="w-px h-6 bg-gray-800"></div>
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-orange-600 to-amber-500 flex items-center justify-center shadow-md shadow-orange-500/30">
+                            <i class="fa-solid fa-frog text-white text-xs"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-1.5">
+                                <p class="text-white font-bold text-sm leading-none">Hop Mania</p>
+                                <span class="bg-orange-500/20 text-orange-300 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-orange-500/30">Bonus</span>
+                            </div>
+                            <p class="text-gray-400 text-[10px] mt-0.5">Dunia 2: Perumusan UUD 1945</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Stats & Student Avatar -->
+                <div class="flex items-center gap-3">
+                    <div class="hidden sm:flex items-center gap-2 bg-slate-900/90 px-3.5 py-1.5 rounded-xl border border-orange-500/30">
+                        <i class="fa-solid fa-trophy text-amber-400 text-xs"></i>
+                        <span class="text-xs text-gray-400 font-semibold">Skor:</span>
+                        <span id="nav-score" class="font-extrabold text-amber-400 text-sm">0</span>
+                    </div>
+                    <div class="hidden sm:flex items-center gap-2 bg-slate-900/90 px-3.5 py-1.5 rounded-xl border border-orange-500/30">
+                        <i class="fa-solid fa-crown text-yellow-400 text-xs"></i>
+                        <span class="text-xs text-gray-400 font-semibold">Rekor:</span>
+                        <span id="nav-best" class="font-extrabold text-yellow-300 text-sm">0</span>
+                    </div>
+                    <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-orange-500 to-amber-400 p-0.5 cursor-pointer shadow-md" onclick="window.location.href='profil-siswa.html'">
+                        <img id="nav-avatar-img" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Student" alt="Avatar" class="w-full h-full rounded-full bg-slate-900 object-cover">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT / GAME ARENA -->
+    <main class="flex-1 flex flex-col items-center justify-center pt-20 pb-8 px-4 relative overflow-hidden">
+        
+        <!-- Ambient Background Glows -->
+        <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-orange-600/15 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute bottom-10 left-10 w-72 h-72 bg-amber-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- 1. START SCREEN -->
+        <div id="start-screen" class="glass-panel p-6 sm:p-10 rounded-3xl max-w-lg w-full text-center relative z-10 shadow-2xl border border-orange-500/30 glow-orange">
+            <div class="relative inline-block mx-auto mb-4">
+                <div class="w-24 h-24 rounded-3xl bg-gradient-to-tr from-orange-600 via-amber-600 to-yellow-500 p-1 shadow-xl shadow-orange-600/40 animate-float flex items-center justify-center">
+                    <span class="text-5xl">🐸</span>
+                </div>
+                <div class="absolute -bottom-2 -right-2 bg-yellow-400 text-slate-950 w-8 h-8 rounded-xl font-black text-sm flex items-center justify-center shadow-lg border-2 border-slate-900">
+                    ⭐
+                </div>
+            </div>
+
+            <h2 class="text-2xl sm:text-3xl font-black text-white mb-2">
+                Hop Mania Konstitusi
+            </h2>
+            <p class="text-gray-300 text-xs sm:text-sm mb-6 max-w-md mx-auto leading-relaxed">
+                Bantu Katak Pejuang melompat menembus angkasa, kumpulkan 📜 <strong>Naskah Perumusan (+50 Poin)</strong>, ⭐ <strong>Bintang Konstitusi (+100 Poin)</strong>, dan 🚀 <strong>Roket Super</strong>!
+            </p>
+
+            <!-- Items Guide -->
+            <div class="grid grid-cols-3 gap-2 bg-slate-900/90 p-3 rounded-2xl border border-orange-500/20 mb-6 text-xs">
+                <div class="flex flex-col items-center">
+                    <span class="text-xl mb-0.5">📜</span>
+                    <span class="text-[10px] text-orange-300 font-bold">Naskah (+50)</span>
+                </div>
+                <div class="flex flex-col items-center border-x border-gray-800">
+                    <span class="text-xl mb-0.5">⭐</span>
+                    <span class="text-[10px] text-yellow-300 font-bold">Bintang (+100)</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <span class="text-xl mb-0.5">🚀</span>
+                    <span class="text-[10px] text-cyan-300 font-bold">Roket Super</span>
+                </div>
+            </div>
+
+            <!-- Highscore Card -->
+            <div class="flex items-center justify-between bg-slate-950/80 px-4 py-2.5 rounded-xl border border-gray-800 mb-6 text-xs">
+                <span class="text-gray-400 flex items-center gap-1.5"><i class="fa-solid fa-crown text-yellow-400"></i> Rekor Tertinggi:</span>
+                <span id="start-best-score" class="text-yellow-400 font-black text-sm">0 Poin</span>
+            </div>
+
+            <button onclick="startGame()" class="w-full py-4 bg-gradient-to-r from-orange-600 via-amber-600 to-yellow-500 hover:from-orange-500 hover:to-yellow-400 text-slate-950 font-black text-base sm:text-lg rounded-2xl shadow-xl shadow-orange-600/30 hover:scale-[1.02] transition transform flex items-center justify-center gap-2">
+                <i class="fa-solid fa-play"></i> Mulai Petualangan
+            </button>
+        </div>
+
+        <!-- 2. GAME CONTAINER -->
+        <div id="game-container" class="hidden flex-col items-center w-full max-w-md relative z-10">
+            
+            <!-- Game HUD / Dashboard -->
+            <div class="w-full flex items-center justify-between gap-2 mb-3 px-2">
+                <!-- Score & Altitude -->
+                <div class="flex items-center gap-2">
+                    <div class="bg-slate-950/90 px-3.5 py-1.5 rounded-xl border border-orange-500/30 flex items-center gap-2 shadow-md">
+                        <i class="fa-solid fa-bolt text-yellow-400 text-xs"></i>
+                        <span class="text-xs text-gray-400">Skor:</span>
+                        <span id="live-score" class="text-white font-black text-sm sm:text-base">0</span>
+                    </div>
+                    <div class="bg-slate-950/90 px-3 py-1.5 rounded-xl border border-gray-800 flex items-center gap-1.5 shadow-md">
+                        <i class="fa-solid fa-arrows-up-down text-orange-400 text-xs"></i>
+                        <span id="live-height" class="text-orange-300 font-extrabold text-xs">0m</span>
+                    </div>
+                </div>
+
+                <!-- Controls: Pause & Sound -->
+                <div class="flex items-center gap-2">
+                    <button onclick="toggleAudio()" id="btn-sound" class="w-9 h-9 rounded-xl bg-slate-900 border border-gray-700 flex items-center justify-center text-gray-300 hover:text-white transition">
+                        <i class="fa-solid fa-volume-high text-xs"></i>
+                    </button>
+                    <button onclick="togglePause()" id="btn-pause" class="w-9 h-9 rounded-xl bg-slate-900 border border-gray-700 flex items-center justify-center text-gray-300 hover:text-white transition">
+                        <i class="fa-solid fa-pause text-xs"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Canvas Wrapper -->
+            <div class="relative w-full max-w-[400px]">
+                <canvas id="gameCanvas" width="400" height="600" class="w-full aspect-[2/3] block"></canvas>
+
+                <!-- In-Game Message Overlay (e.g. Jetpack active) -->
+                <div id="status-toast" class="hidden absolute top-4 left-1/2 -translate-x-1/2 bg-slate-950/90 border border-yellow-400/50 text-yellow-300 text-xs font-bold px-4 py-1.5 rounded-full shadow-lg pointer-events-none transition-all">
+                    🚀 ROKET AKTIF!
+                </div>
+
+                <!-- Pause Overlay -->
+                <div id="pause-overlay" class="hidden absolute inset-0 bg-slate-950/80 backdrop-blur-sm rounded-[24px] flex flex-col items-center justify-center p-6 z-20">
+                    <div class="w-16 h-16 rounded-2xl bg-orange-500/20 text-orange-400 flex items-center justify-center text-3xl mb-3 border border-orange-500/30">
+                        <i class="fa-solid fa-pause"></i>
+                    </div>
+                    <h3 class="text-2xl font-black text-white mb-4">Game Dijeda</h3>
+                    <button onclick="togglePause()" class="px-8 py-3 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-bold rounded-xl shadow-lg transition transform hover:scale-105 mb-2">
+                        Lanjutkan Main
+                    </button>
+                    <button onclick="endGameEarly()" class="text-xs text-gray-400 hover:text-white underline">
+                        Keluar ke Menu
+                    </button>
+                </div>
+
+                <!-- Game Over Overlay -->
+                <div id="gameover-overlay" class="hidden absolute inset-0 bg-slate-950/90 backdrop-blur-md rounded-[24px] flex flex-col items-center justify-center p-6 text-center z-30">
+                    <div class="w-20 h-20 rounded-3xl bg-gradient-to-tr from-red-600 to-orange-500 flex items-center justify-center text-4xl mb-3 shadow-xl shadow-red-600/30 border-2 border-white/20 animate-bounce">
+                        🐸
+                    </div>
+                    <span class="inline-block bg-orange-500/20 text-orange-400 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-2 border border-orange-500/30">
+                        Petualangan Selesai
+                    </span>
+                    <h3 class="text-2xl sm:text-3xl font-black text-white mb-1">Terjatuh!</h3>
+                    
+                    <div class="bg-slate-900/90 p-4 rounded-2xl border border-gray-800 my-4 w-full max-w-xs">
+                        <div class="flex justify-between items-center text-xs mb-2">
+                            <span class="text-gray-400">Skor Kamu:</span>
+                            <span id="final-score" class="text-xl font-black text-yellow-400">0</span>
+                        </div>
+                        <div class="flex justify-between items-center text-xs pt-2 border-t border-gray-800">
+                            <span class="text-gray-400">Ketinggian:</span>
+                            <span id="final-height" class="font-bold text-orange-300">0m</span>
+                        </div>
+                        <div class="flex justify-between items-center text-xs pt-2 border-t border-gray-800">
+                            <span class="text-gray-400">Rekor Terbaik:</span>
+                            <span id="final-best" class="font-bold text-green-400">0</span>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-2 w-full max-w-xs">
+                        <button onclick="startGame()" class="w-full py-3.5 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-bold rounded-xl shadow-lg transition transform hover:scale-105 flex items-center justify-center gap-2 text-sm">
+                            <i class="fa-solid fa-rotate-right"></i> Main Lagi
+                        </button>
+                        <a href="dunia2.html" class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-gray-300 font-semibold rounded-xl border border-gray-800 text-xs text-center transition">
+                            <i class="fa-solid fa-map mr-1"></i> Kembali ke Peta Dunia 2
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Virtual Touch D-Pad for Mobile -->
+            <div class="w-full max-w-[400px] flex items-center justify-between gap-4 mt-3 px-2">
+                <button id="touch-left" class="arcade-btn flex-1 py-4 bg-slate-900/90 active:bg-orange-600 border border-orange-500/30 rounded-2xl flex items-center justify-center text-2xl text-white shadow-lg active:shadow-orange-500/40">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <div class="text-[10px] text-gray-500 font-semibold text-center px-1">
+                    Gunakan Tombol / Sentuh Layar Kiri-Kanan
+                </div>
+                <button id="touch-right" class="arcade-btn flex-1 py-4 bg-slate-900/90 active:bg-orange-600 border border-orange-500/30 rounded-2xl flex items-center justify-center text-2xl text-white shadow-lg active:shadow-orange-500/40">
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-950/80 text-gray-500 py-4 text-center text-xs border-t border-gray-900 mt-auto">
+        <p>&copy; 2026 EdukaCivic | Level Bonus Hop Mania</p>
+    </footer>
+
+    <!-- WEB AUDIO SYNTHESIZER -->
+    <script>
+        let isAudioEnabled = true;
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let actx = null;
+
+        function initAudio() {
+            if (!actx) {
+                actx = new AudioContext();
+            }
+            if (actx.state === 'suspended') {
+                actx.resume();
+            }
+        }
+
+        function toggleAudio() {
+            isAudioEnabled = !isAudioEnabled;
+            const btn = document.getElementById('btn-sound');
+            if (btn) {
+                btn.innerHTML = isAudioEnabled ? '<i class="fa-solid fa-volume-high text-xs"></i>' : '<i class="fa-solid fa-volume-xmark text-xs text-red-400"></i>';
+            }
+        }
+
+        function playSound(type) {
+            if (!isAudioEnabled) return;
+            try {
+                initAudio();
+                const now = actx.currentTime;
+
+                if (type === 'jump') {
+                    const osc = actx.createOscillator();
+                    const gain = actx.createGain();
+                    osc.connect(gain);
+                    gain.connect(actx.destination);
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(320, now);
+                    osc.frequency.exponentialRampToValueAtTime(620, now + 0.12);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                    osc.start(now);
+                    osc.stop(now + 0.15);
+                } else if (type === 'spring') {
+                    const osc = actx.createOscillator();
+                    const gain = actx.createGain();
+                    osc.connect(gain);
+                    gain.connect(actx.destination);
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(380, now);
+                    osc.frequency.exponentialRampToValueAtTime(950, now + 0.25);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.28);
+                    osc.start(now);
+                    osc.stop(now + 0.28);
+                } else if (type === 'item') {
+                    const osc = actx.createOscillator();
+                    const gain = actx.createGain();
+                    osc.connect(gain);
+                    gain.connect(actx.destination);
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.setValueAtTime(783.99, now + 0.08);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                } else if (type === 'star') {
+                    [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => {
+                        const osc = actx.createOscillator();
+                        const gain = actx.createGain();
+                        osc.connect(gain);
+                        gain.connect(actx.destination);
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(f, now + i * 0.06);
+                        gain.gain.setValueAtTime(0.2, now + i * 0.06);
+                        gain.gain.exponentialRampToValueAtTime(0.01, now + i * 0.06 + 0.2);
+                        osc.start(now + i * 0.06);
+                        osc.stop(now + i * 0.06 + 0.2);
+                    });
+                } else if (type === 'rocket') {
+                    const osc = actx.createOscillator();
+                    const gain = actx.createGain();
+                    osc.connect(gain);
+                    gain.connect(actx.destination);
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(200, now);
+                    osc.frequency.exponentialRampToValueAtTime(800, now + 0.5);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+                    osc.start(now);
+                    osc.stop(now + 0.6);
+                } else if (type === 'gameover') {
+                    [440, 392, 349, 293].forEach((f, i) => {
+                        const osc = actx.createOscillator();
+                        const gain = actx.createGain();
+                        osc.connect(gain);
+                        gain.connect(actx.destination);
+                        osc.type = 'sawtooth';
+                        osc.frequency.setValueAtTime(f, now + i * 0.12);
+                        gain.gain.setValueAtTime(0.2, now + i * 0.12);
+                        gain.gain.exponentialRampToValueAtTime(0.01, now + i * 0.12 + 0.25);
+                        osc.start(now + i * 0.12);
+                        osc.stop(now + i * 0.12 + 0.25);
+                    });
+                }
+            } catch(e) {}
+        }
+    </script>
+
+    <!-- CORE HOP MANIA GAME ENGINE -->
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let isRunning = false;
+        let isPaused = false;
+        let animationId = null;
+
+        // Player & World State
+        let bestScore = parseInt(localStorage.getItem('edukacivic_hop_best')) || 0;
+        let score = 0;
+        let altitude = 0;
+        let maxAltitude = 0;
+
+        const player = {
+            x: 180,
+            y: 450,
+            w: 36,
+            h: 36,
+            vx: 0,
+            vy: 0,
+            speed: 6.5,
+            jumpForce: -12.5,
+            gravity: 0.45,
+            facingLeft: false,
+            isJumping: false,
+            hasShield: false,
+            jetpackTimer: 0
+        };
+
+        let platforms = [];
+        let items = [];
+        let particles = [];
+        let starsBg = [];
+        let cloudsBg = [];
+
+        const keys = {
+            left: false,
+            right: false
+        };
+
+        // Initialize Background Stars & Clouds
+        function initBackground() {
+            starsBg = [];
+            for (let i = 0; i < 40; i++) {
+                starsBg.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2 + 1,
+                    alpha: Math.random() * 0.7 + 0.3,
+                    speed: Math.random() * 0.2 + 0.1
+                });
+            }
+
+            cloudsBg = [];
+            for (let i = 0; i < 5; i++) {
+                cloudsBg.push({
+                    x: Math.random() * canvas.width,
+                    y: i * 130 + Math.random() * 40,
+                    w: Math.random() * 60 + 80,
+                    h: 30,
+                    alpha: 0.12 + Math.random() * 0.1,
+                    speed: 0.2 + Math.random() * 0.3
+                });
+            }
+        }
+
+        // Platform Generator ensuring guaranteed reachability
+        function createPlatform(y, type = 'normal') {
+            const width = type === 'fragile' ? 55 : (type === 'moving' ? 65 : 70);
+            const x = Math.random() * (canvas.width - width - 20) + 10;
+            
+            const plat = {
+                x: x,
+                y: y,
+                w: width,
+                h: 12,
+                type: type, // 'normal', 'spring', 'moving', 'fragile'
+                vx: type === 'moving' ? (Math.random() > 0.5 ? 1.8 : -1.8) : 0,
+                hasSpring: (type === 'spring' || (Math.random() < 0.18 && type === 'normal')),
+                isBroken: false
+            };
+
+            // Chance to spawn item on platform
+            if (type !== 'fragile' && Math.random() < 0.25) {
+                const rand = Math.random();
+                let itemType = 'scroll'; // 50 pts
+                if (rand < 0.08) itemType = 'jetpack';
+                else if (rand < 0.35) itemType = 'star'; // 100 pts
+
+                items.push({
+                    x: plat.x + plat.w / 2 - 10,
+                    y: plat.y - 24,
+                    w: 20,
+                    h: 20,
+                    type: itemType,
+                    bobOffset: Math.random() * Math.PI * 2,
+                    parentPlat: plat
+                });
+            }
+
+            return plat;
+        }
+
+        function initLevel() {
+            platforms = [];
+            items = [];
+            particles = [];
+
+            // Solid Base platform
+            platforms.push({
+                x: 0,
+                y: 580,
+                w: 400,
+                h: 20,
+                type: 'normal',
+                vx: 0,
+                hasSpring: false,
+                isBroken: false
+            });
+
+            // Initial safe platforms climbing up
+            let currentY = 500;
+            for (let i = 0; i < 8; i++) {
+                let type = 'normal';
+                if (i > 2 && Math.random() < 0.25) type = 'moving';
+                if (i > 4 && Math.random() < 0.2) type = 'spring';
+
+                platforms.push(createPlatform(currentY, type));
+                currentY -= 65 + Math.random() * 20;
+            }
+        }
+
+        // Particle system
+        function addParticles(x, y, count, color = '#f97316') {
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: (Math.random() - 0.5) * 4,
+                    vy: (Math.random() - 0.5) * 4 - 1,
+                    size: Math.random() * 3 + 2,
+                    color: color,
+                    alpha: 1,
+                    life: Math.random() * 20 + 15
+                });
+            }
+        }
+
+        function startGame() {
+            initAudio();
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('gameover-overlay').classList.add('hidden');
+            document.getElementById('pause-overlay').classList.add('hidden');
+            document.getElementById('game-container').classList.remove('hidden');
+            document.getElementById('game-container').classList.add('flex');
+
+            score = 0;
+            altitude = 0;
+            maxAltitude = 0;
+
+            player.x = 180;
+            player.y = 480;
+            player.vx = 0;
+            player.vy = player.jumpForce;
+            player.hasShield = false;
+            player.jetpackTimer = 0;
+
+            initBackground();
+            initLevel();
+
+            isRunning = true;
+            isPaused = false;
+
+            updateScoreUI();
+            if (animationId) cancelAnimationFrame(animationId);
+            gameLoop();
+        }
+
+        function togglePause() {
+            if (!isRunning) return;
+            isPaused = !isPaused;
+            const overlay = document.getElementById('pause-overlay');
+            const btn = document.getElementById('btn-pause');
+
+            if (isPaused) {
+                overlay.classList.remove('hidden');
+                btn.innerHTML = '<i class="fa-solid fa-play text-xs"></i>';
+            } else {
+                overlay.classList.add('hidden');
+                btn.innerHTML = '<i class="fa-solid fa-pause text-xs"></i>';
+                gameLoop();
+            }
+        }
+
+        function endGameEarly() {
+            isRunning = false;
+            isPaused = false;
+            document.getElementById('game-container').classList.add('hidden');
+            document.getElementById('start-screen').classList.remove('hidden');
+            updateScoreUI();
+        }
+
+        function gameOver() {
+            isRunning = false;
+            playSound('gameover');
+
+            if (score > bestScore) {
+                bestScore = score;
+                localStorage.setItem('edukacivic_hop_best', bestScore);
+                try {
+                    confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 } });
+                } catch(e) {}
+            }
+
+            document.getElementById('final-score').textContent = score;
+            document.getElementById('final-height').textContent = maxAltitude + 'm';
+            document.getElementById('final-best').textContent = bestScore;
+            document.getElementById('gameover-overlay').classList.remove('hidden');
+
+            updateScoreUI();
+        }
+
+        function updateScoreUI() {
+            document.getElementById('live-score').textContent = score;
+            document.getElementById('live-height').textContent = maxAltitude + 'm';
+            document.getElementById('nav-score').textContent = score;
+            document.getElementById('nav-best').textContent = bestScore;
+            document.getElementById('start-best-score').textContent = bestScore + ' Poin';
+        }
+
+        function showToast(text) {
+            const toast = document.getElementById('status-toast');
+            toast.textContent = text;
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 2500);
+        }
+
+        // Main Game Loop
+        function gameLoop() {
+            if (!isRunning || isPaused) return;
+
+            update();
+            render();
+
+            animationId = requestAnimationFrame(gameLoop);
+        }
+
+        function update() {
+            // Horizontal Movement
+            if (keys.left) {
+                player.vx = -player.speed;
+                player.facingLeft = true;
+            } else if (keys.right) {
+                player.vx = player.speed;
+                player.facingLeft = false;
+            } else {
+                player.vx *= 0.82; // smooth friction
+            }
+            player.x += player.vx;
+
+            // Screen Wrap
+            if (player.x + player.w < 0) player.x = canvas.width;
+            if (player.x > canvas.width) player.x = -player.w;
+
+            // Jetpack powerup active
+            if (player.jetpackTimer > 0) {
+                player.jetpackTimer--;
+                player.vy = -14; // rapid ascension
+                addParticles(player.x + player.w/2, player.y + player.h, 2, '#38bdf8');
+            } else {
+                // Gravity & Jump Physics
+                player.vy += player.gravity;
+                player.y += player.vy;
+            }
+
+            // Platform Update (Movement)
+            platforms.forEach(p => {
+                if (p.type === 'moving') {
+                    p.x += p.vx;
+                    if (p.x <= 5 || p.x + p.w >= canvas.width - 5) {
+                        p.vx *= -1;
+                    }
+                }
+            });
+
+            // Platform Collision (only when falling)
+            if (player.vy > 0 && player.jetpackTimer <= 0) {
+                for (let i = 0; i < platforms.length; i++) {
+                    const p = platforms[i];
+                    if (p.isBroken) continue;
+
+                    // Foot collision bounding box
+                    if (player.x + player.w * 0.8 > p.x &&
+                        player.x + player.w * 0.2 < p.x + p.w &&
+                        player.y + player.h >= p.y &&
+                        player.y + player.h <= p.y + p.h + player.vy + 4) {
+
+                        // Hit spring
+                        if (p.hasSpring) {
+                            player.vy = player.jumpForce * 1.65;
+                            playSound('spring');
+                            addParticles(player.x + player.w/2, p.y, 10, '#facc15');
+                        } else {
+                            player.vy = player.jumpForce;
+                            playSound('jump');
+                            addParticles(player.x + player.w/2, p.y, 6, '#4ade80');
+                        }
+
+                        // Fragile platform disappears
+                        if (p.type === 'fragile') {
+                            p.isBroken = true;
+                            addParticles(p.x + p.w/2, p.y + p.h/2, 12, '#a855f7');
+                            score += 15;
+                        }
+                        break;
+                    }
+                }
+            }
+
+            // Item Collisions
+            for (let i = items.length - 1; i >= 0; i--) {
+                const it = items[i];
+                // Check parent platform
+                if (it.parentPlat) {
+                    it.x = it.parentPlat.x + it.parentPlat.w / 2 - 10;
+                }
+
+                if (player.x + player.w > it.x &&
+                    player.x < it.x + it.w &&
+                    player.y + player.h > it.y &&
+                    player.y < it.y + it.h) {
+
+                    if (it.type === 'scroll') {
+                        score += 50;
+                        playSound('item');
+                        addParticles(it.x + 10, it.y + 10, 12, '#fbbf24');
+                    } else if (it.type === 'star') {
+                        score += 100;
+                        playSound('star');
+                        addParticles(it.x + 10, it.y + 10, 18, '#f59e0b');
+                    } else if (it.type === 'jetpack') {
+                        player.jetpackTimer = 160; // ~2.7s
+                        playSound('rocket');
+                        showToast('🚀 ROKET KONSTITUSI AKTIF!');
+                        addParticles(it.x + 10, it.y + 10, 20, '#38bdf8');
+                    }
+
+                    items.splice(i, 1);
+                    updateScoreUI();
+                }
+            }
+
+            // Camera Scroll & Altitude
+            if (player.y < canvas.height * 0.45) {
+                const dy = canvas.height * 0.45 - player.y;
+                player.y += dy;
+                altitude += Math.round(dy);
+                maxAltitude = Math.max(maxAltitude, Math.round(altitude / 8));
+                score += Math.round(dy / 5);
+                updateScoreUI();
+
+                // Scroll background elements
+                cloudsBg.forEach(c => {
+                    c.y += dy * 0.3;
+                    if (c.y > canvas.height) {
+                        c.y = -c.h;
+                        c.x = Math.random() * canvas.width;
+                    }
+                });
+
+                // Scroll platforms & Recycle
+                platforms.forEach(p => {
+                    p.y += dy;
+                });
+
+                items.forEach(it => {
+                    it.y += dy;
+                });
+
+                // Filter out off-screen platforms
+                platforms = platforms.filter(p => p.y < canvas.height + 40);
+                items = items.filter(it => it.y < canvas.height + 40);
+
+                // Spawn new platforms at top to maintain continuity
+                let highestY = Math.min(...platforms.map(p => p.y));
+                while (highestY > -40) {
+                    const nextGap = Math.min(105, 60 + Math.random() * (maxAltitude > 500 ? 40 : 25));
+                    highestY -= nextGap;
+
+                    let type = 'normal';
+                    const rand = Math.random();
+                    if (rand < 0.25) type = 'moving';
+                    else if (rand < 0.45) type = 'spring';
+                    else if (rand < 0.60 && maxAltitude > 300) type = 'fragile';
+
+                    platforms.push(createPlatform(highestY, type));
+                }
+            }
+
+            // Update particles
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const pt = particles[i];
+                pt.x += pt.vx;
+                pt.y += pt.vy;
+                pt.alpha -= 0.04;
+                pt.life--;
+                if (pt.life <= 0 || pt.alpha <= 0) {
+                    particles.splice(i, 1);
+                }
+            }
+
+            // Fall off bottom (Game Over)
+            if (player.y > canvas.height + 40) {
+                gameOver();
+            }
+        }
+
+        // Render Canvas Scene
+        function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Sky Gradient
+            const skyGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            skyGrad.addColorStop(0, '#1c0802');
+            skyGrad.addColorStop(0.5, '#2e1205');
+            skyGrad.addColorStop(1, '#0a0301');
+            ctx.fillStyle = skyGrad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Stars
+            starsBg.forEach(s => {
+                ctx.fillStyle = `rgba(255, 237, 213, ${s.alpha})`;
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // Clouds
+            cloudsBg.forEach(c => {
+                ctx.fillStyle = `rgba(249, 115, 22, ${c.alpha})`;
+                ctx.beginPath();
+                ctx.ellipse(c.x, c.y, c.w / 2, c.h / 2, 0, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // Draw Platforms
+            platforms.forEach(p => {
+                if (p.isBroken) return;
+
+                if (p.type === 'normal') {
+                    // Amber Wood / Stone Platform
+                    const grad = ctx.createLinearGradient(p.x, p.y, p.x, p.y + p.h);
+                    grad.addColorStop(0, '#f97316');
+                    grad.addColorStop(1, '#c2410c');
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    ctx.roundRect(p.x, p.y, p.w, p.h, 6);
+                    ctx.fill();
+
+                    // Glowing top edge
+                    ctx.strokeStyle = '#fdba74';
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+
+                } else if (p.type === 'moving') {
+                    // Glowing Cyan / Blue Cloud Platform
+                    const grad = ctx.createLinearGradient(p.x, p.y, p.x, p.y + p.h);
+                    grad.addColorStop(0, '#38bdf8');
+                    grad.addColorStop(1, '#0284c7');
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    ctx.roundRect(p.x, p.y, p.w, p.h, 6);
+                    ctx.fill();
+
+                    ctx.strokeStyle = '#bae6fd';
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+
+                } else if (p.type === 'spring') {
+                    // Golden Spring Platform
+                    const grad = ctx.createLinearGradient(p.x, p.y, p.x, p.y + p.h);
+                    grad.addColorStop(0, '#eab308');
+                    grad.addColorStop(1, '#ca8a04');
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    ctx.roundRect(p.x, p.y, p.w, p.h, 6);
+                    ctx.fill();
+
+                    ctx.strokeStyle = '#fef08a';
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+
+                } else if (p.type === 'fragile') {
+                    // Purple Fragile Cloud Platform
+                    const grad = ctx.createLinearGradient(p.x, p.y, p.x, p.y + p.h);
+                    grad.addColorStop(0, '#c084fc');
+                    grad.addColorStop(1, '#7e22ce');
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    ctx.roundRect(p.x, p.y, p.w, p.h, 6);
+                    ctx.fill();
+
+                    ctx.strokeStyle = '#e9d5ff';
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+                }
+
+                // Spring Graphic
+                if (p.hasSpring) {
+                    ctx.fillStyle = '#fef08a';
+                    ctx.fillRect(p.x + p.w / 2 - 6, p.y - 7, 12, 7);
+                    ctx.strokeStyle = '#854d0e';
+                    ctx.lineWidth = 1;
+                    ctx.strokeRect(p.x + p.w / 2 - 6, p.y - 7, 12, 7);
+                }
+            });
+
+            // Draw Items
+            items.forEach(it => {
+                const bob = Math.sin(Date.now() * 0.005 + it.bobOffset) * 3;
+                if (it.type === 'scroll') {
+                    ctx.font = '18px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('📜', it.x + 10, it.y + 16 + bob);
+                } else if (it.type === 'star') {
+                    ctx.font = '18px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('⭐', it.x + 10, it.y + 16 + bob);
+                } else if (it.type === 'jetpack') {
+                    ctx.font = '18px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('🚀', it.x + 10, it.y + 16 + bob);
+                }
+            });
+
+            // Draw Particles
+            particles.forEach(pt => {
+                ctx.fillStyle = pt.color;
+                ctx.globalAlpha = Math.max(0, pt.alpha);
+                ctx.beginPath();
+                ctx.arc(pt.x, pt.y, pt.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            });
+
+            // Draw Frog Character
+            drawFrog(player.x, player.y, player.w, player.h, player.facingLeft, player.vy);
+        }
+
+        // Cute Animated Vector Frog Character
+        function drawFrog(x, y, w, h, facingLeft, vy) {
+            ctx.save();
+            ctx.translate(x + w / 2, y + h / 2);
+            if (facingLeft) ctx.scale(-1, 1);
+
+            // Jetpack flame
+            if (player.jetpackTimer > 0) {
+                ctx.fillStyle = '#38bdf8';
+                ctx.beginPath();
+                ctx.moveTo(-8, 16);
+                ctx.lineTo(0, 28 + Math.random() * 6);
+                ctx.lineTo(8, 16);
+                ctx.fill();
+            }
+
+            // Frog Body (Green Oval)
+            ctx.fillStyle = '#22c55e';
+            ctx.beginPath();
+            ctx.ellipse(0, 2, w * 0.44, h * 0.40, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#15803d';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Frog Belly (Light Green/Yellow)
+            ctx.fillStyle = '#bbf7d0';
+            ctx.beginPath();
+            ctx.ellipse(0, 5, w * 0.28, h * 0.24, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Legs
+            ctx.fillStyle = '#16a34a';
+            const legY = vy < 0 ? 10 : 6;
+            // Left leg
+            ctx.beginPath();
+            ctx.ellipse(-14, legY, 7, 5, -0.3, 0, Math.PI * 2);
+            ctx.fill();
+            // Right leg
+            ctx.beginPath();
+            ctx.ellipse(14, legY, 7, 5, 0.3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Eyes (Big cute cartoon eyes)
+            // Left eye socket
+            ctx.fillStyle = '#22c55e';
+            ctx.beginPath();
+            ctx.arc(-8, -12, 7, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+            // Right eye socket
+            ctx.beginPath();
+            ctx.arc(8, -12, 7, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            // Eye whites
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(-8, -12, 5.5, 0, Math.PI * 2);
+            ctx.arc(8, -12, 5.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Pupils (Look slightly right or forward)
+            ctx.fillStyle = '#0f172a';
+            ctx.beginPath();
+            ctx.arc(-6.5, -12, 2.5, 0, Math.PI * 2);
+            ctx.arc(9.5, -12, 2.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Eye sparkle highlights
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(-7.5, -13.5, 1, 0, Math.PI * 2);
+            ctx.arc(8.5, -13.5, 1, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Rosy cheeks
+            ctx.fillStyle = 'rgba(239, 68, 68, 0.4)';
+            ctx.beginPath();
+            ctx.arc(-11, 2, 3, 0, Math.PI * 2);
+            ctx.arc(11, 2, 3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Happy mouth
+            ctx.strokeStyle = '#14532d';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.arc(0, 1, 5, 0.2, Math.PI - 0.2);
+            ctx.stroke();
+
+            // Hero Red Bandana / Cape
+            ctx.fillStyle = '#ef4444';
+            ctx.beginPath();
+            ctx.roundRect(-10, -5, 20, 4, 2);
+            ctx.fill();
+            // Cape tail fluttering
+            ctx.beginPath();
+            ctx.moveTo(-8, -3);
+            ctx.lineTo(-18, -1 + Math.sin(Date.now() * 0.02) * 3);
+            ctx.lineTo(-10, 3);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        // CONTROLS & EVENT LISTENERS
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
+                keys.left = true;
+            } else if (e.code === 'ArrowRight' || e.code === 'KeyD') {
+                keys.right = true;
+            } else if (e.code === 'Space') {
+                if (!isRunning) startGame();
+                else togglePause();
+            }
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
+                keys.left = false;
+            } else if (e.code === 'ArrowRight' || e.code === 'KeyD') {
+                keys.right = false;
+            }
+        });
+
+        // Touch Virtual D-Pad Buttons
+        const touchLeft = document.getElementById('touch-left');
+        const touchRight = document.getElementById('touch-right');
+
+        function bindTouch(btn, keyProp) {
+            const start = (e) => { e.preventDefault(); keys[keyProp] = true; };
+            const end = (e) => { e.preventDefault(); keys[keyProp] = false; };
+            btn.addEventListener('touchstart', start, { passive: false });
+            btn.addEventListener('touchend', end, { passive: false });
+            btn.addEventListener('mousedown', () => keys[keyProp] = true);
+            btn.addEventListener('mouseup', () => keys[keyProp] = false);
+            btn.addEventListener('mouseleave', () => keys[keyProp] = false);
+        }
+
+        bindTouch(touchLeft, 'left');
+        bindTouch(touchRight, 'right');
+
+        // Touch Canvas Direct Screen Sides (Left Half / Right Half)
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const rect = canvas.getBoundingClientRect();
+            const touchX = e.touches[0].clientX - rect.left;
+            if (touchX < rect.width / 2) {
+                keys.left = true;
+                keys.right = false;
+            } else {
+                keys.right = true;
+                keys.left = false;
+            }
+        }, { passive: false });
+
+        canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            keys.left = false;
+            keys.right = false;
+        }, { passive: false });
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateNavbarStudent();
+            bestScore = parseInt(localStorage.getItem('edukacivic_hop_best')) || 0;
+            document.getElementById('nav-best').textContent = bestScore;
+            document.getElementById('start-best-score').textContent = bestScore + ' Poin';
+        });
+    </script>
+</body>
+</html>

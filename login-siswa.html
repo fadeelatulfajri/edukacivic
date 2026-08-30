@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil & Masuk Siswa - EdukaCivic</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="Logo Edukacivic.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="student-system.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            red: '#DC2626', redLight: '#EF4444', redDark: '#B91C1C',
+                            emerald: '#10B981', emeraldDark: '#059669',
+                            dark: '#0F172A', darker: '#020617', light: '#F8FAFC'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0F172A; }
+        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4B5563; }
+
+        .avatar-card {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .avatar-card:hover:not(.avatar-occupied) {
+            transform: translateY(-4px) scale(1.03);
+        }
+        .avatar-card.selected {
+            border-color: #10B981 !important;
+            background: rgba(16, 185, 129, 0.2) !important;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+            transform: scale(1.05);
+        }
+        .avatar-occupied {
+            opacity: 0.45;
+            filter: grayscale(80%);
+            cursor: not-allowed;
+            border-color: #EF4444 !important;
+            background: rgba(239, 68, 68, 0.08);
+        }
+    </style>
+</head>
+<body class="bg-brand-darker text-white font-sans antialiased min-h-screen py-10 px-4 flex flex-col justify-between selection:bg-brand-red selection:text-white">
+
+    <!-- Audio FX -->
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            try {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'select') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(440, now);
+                    osc.frequency.setValueAtTime(660, now + 0.06);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                    osc.start(now);
+                    osc.stop(now + 0.15);
+                } else if (type === 'error') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, now);
+                    osc.frequency.exponentialRampToValueAtTime(130, now + 0.2);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                }
+            } catch(e) {}
+        }
+    </script>
+
+    <!-- MAIN CONTAINER -->
+    <div class="max-w-5xl mx-auto w-full">
+        
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <a href="index.html" class="inline-flex items-center gap-2 mb-4 bg-gray-800/80 hover:bg-gray-700 px-4 py-2 rounded-xl text-xs font-semibold text-gray-300 transition">
+                <i class="fa-solid fa-arrow-left"></i> Kembali ke Beranda
+            </a>
+            <div class="flex justify-center mb-3">
+                <img src="Logo Edukacivic.png" alt="EdukaCivic" class="h-12 w-auto">
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-white">
+                Profil Siswa <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-red to-orange-400">EdukaCivic</span>
+            </h1>
+            <p class="text-gray-400 text-xs sm:text-sm mt-1 max-w-md mx-auto">
+                Lengkapi identitas belajarmu dan pilih salah satu dari <strong>50 Avatar Unik</strong> untuk memulai petualangan konstitusi!
+            </p>
+        </div>
+
+        <!-- FORM CARD -->
+        <form id="studentProfileForm" class="bg-gray-900/90 backdrop-blur-md border border-gray-800 rounded-3xl p-6 sm:p-10 shadow-2xl space-y-8">
+            
+            <!-- IDENTITAS SISWA -->
+            <div>
+                <div class="flex items-center gap-2.5 mb-4 pb-3 border-b border-gray-800">
+                    <div class="w-8 h-8 rounded-lg bg-red-500/20 text-brand-red flex items-center justify-center font-bold text-sm">
+                        1
+                    </div>
+                    <h2 class="text-lg font-bold text-white">Identitas Pelajar</h2>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs sm:text-sm">
+                    
+                    <!-- Nama Lengkap -->
+                    <div class="sm:col-span-2 lg:col-span-1">
+                        <label class="block text-gray-300 font-semibold mb-1.5">Nama Lengkap <span class="text-red-400">*</span></label>
+                        <div class="relative">
+                            <i class="fa-solid fa-user absolute left-3.5 top-3.5 text-gray-500 text-sm"></i>
+                            <input type="text" id="inputNama" required placeholder="Contoh: Fadilatul Fajri" class="w-full bg-slate-950 border border-gray-700 rounded-xl pl-10 pr-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red transition">
+                        </div>
+                    </div>
+
+                    <!-- Nomor Absen -->
+                    <div>
+                        <label class="block text-gray-300 font-semibold mb-1.5">Nomor Absen <span class="text-red-400">*</span></label>
+                        <div class="relative">
+                            <i class="fa-solid fa-arrow-down-1-9 absolute left-3.5 top-3.5 text-gray-500 text-sm"></i>
+                            <input type="number" id="inputAbsen" required min="1" max="50" placeholder="1 – 40" class="w-full bg-slate-950 border border-gray-700 rounded-xl pl-10 pr-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red transition">
+                        </div>
+                    </div>
+
+                    <!-- Kelas -->
+                    <div>
+                        <label class="block text-gray-300 font-semibold mb-1.5">Kelas <span class="text-red-400">*</span></label>
+                        <div class="relative">
+                            <i class="fa-solid fa-graduation-cap absolute left-3.5 top-3.5 text-gray-500 text-sm"></i>
+                            <select id="inputKelas" required class="w-full bg-slate-950 border border-gray-700 rounded-xl pl-10 pr-4 py-3 text-white focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red transition">
+                                <option value="VIII A">Kelas VIII A</option>
+                                <option value="VIII B">Kelas VIII B</option>
+                                <option value="VIII C">Kelas VIII C</option>
+                                <option value="VIII D">Kelas VIII D</option>
+                                <option value="VIII E">Kelas VIII E</option>
+                                <option value="VIII F">Kelas VIII F</option>
+                                <option value="VIII G">Kelas VIII G</option>
+                                <option value="VIII H">Kelas VIII H</option>
+                                <option value="VIII I">Kelas VIII I</option>
+                                <option value="VIII J">Kelas VIII J</option>
+                                <option value="VIII">Kelas VIII (Umum)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Jenis Kelamin -->
+                    <div>
+                        <label class="block text-gray-300 font-semibold mb-1.5">Jenis Kelamin <span class="text-red-400">*</span></label>
+                        <div class="grid grid-cols-2 gap-2.5">
+                            <!-- Hidden Accessible Radio Inputs -->
+                            <input type="radio" id="genderL" name="gender" value="L" checked class="sr-only">
+                            <input type="radio" id="genderP" name="gender" value="P" class="sr-only">
+
+                            <!-- Interactive Button Card Laki-laki -->
+                            <button type="button" id="btnGenderL" onclick="selectGender('L')" class="flex items-center justify-center gap-2.5 p-3.5 bg-blue-950/70 border-2 border-blue-500 rounded-xl cursor-pointer transition-all duration-200 text-blue-300 font-bold shadow-lg shadow-blue-500/20 active:scale-95">
+                                <i class="fa-solid fa-mars text-blue-400 text-base"></i>
+                                <span class="font-bold text-xs">Laki-laki</span>
+                            </button>
+
+                            <!-- Interactive Button Card Perempuan -->
+                            <button type="button" id="btnGenderP" onclick="selectGender('P')" class="flex items-center justify-center gap-2.5 p-3.5 bg-slate-950 border border-gray-700 rounded-xl cursor-pointer hover:border-pink-500 transition-all duration-200 text-gray-400 font-semibold active:scale-95">
+                                <i class="fa-solid fa-venus text-pink-400 text-base"></i>
+                                <span class="font-semibold text-xs">Perempuan</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Asal Sekolah -->
+                    <div class="sm:col-span-2">
+                        <label class="block text-gray-300 font-semibold mb-1.5">Asal Sekolah <span class="text-red-400">*</span></label>
+                        <div class="relative">
+                            <i class="fa-solid fa-school absolute left-3.5 top-3.5 text-gray-500 text-sm"></i>
+                            <input type="text" id="inputSekolah" required value="SMP Negeri 5 Purwokerto" placeholder="Nama Sekolah..." class="w-full bg-slate-950 border border-gray-700 rounded-xl pl-10 pr-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red transition">
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- PILIH AVATAR DARI 50 AVATAR -->
+            <div>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-gray-800">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm">
+                            2
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-bold text-white">Pilih Avatar Karakter (50 Avatar Tersedia)</h2>
+                            <p class="text-gray-400 text-xs">Setiap avatar hanya boleh dipilih oleh <strong>1 siswa</strong> dalam kelas!</p>
+                        </div>
+                    </div>
+
+                    <!-- Filter Gender Tabs -->
+                    <div class="flex items-center gap-1.5 bg-slate-950 p-1 rounded-xl border border-gray-800 text-xs">
+                        <button type="button" onclick="renderAvatarGrid('ALL')" id="tabAll" class="px-3 py-1.5 rounded-lg font-semibold bg-gray-800 text-white transition">
+                            Semua (50)
+                        </button>
+                        <button type="button" onclick="renderAvatarGrid('L')" id="tabL" class="px-3 py-1.5 rounded-lg font-semibold text-gray-400 hover:text-white transition">
+                            👦 Laki-laki (25)
+                        </button>
+                        <button type="button" onclick="renderAvatarGrid('P')" id="tabP" class="px-3 py-1.5 rounded-lg font-semibold text-gray-400 hover:text-white transition">
+                            👧 Perempuan (25)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Avatar Selection Indicator -->
+                <div id="selectedAvatarPreview" class="hidden mb-4 p-3 bg-emerald-950/40 border border-emerald-500/50 rounded-2xl flex items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <img id="previewImg" src="" alt="Selected Avatar" class="w-12 h-12 rounded-xl bg-slate-800 border-2 border-emerald-400 shadow-md">
+                        <div>
+                            <p class="text-[10px] uppercase tracking-wider text-emerald-400 font-bold">Wajah Avatar Dipilih:</p>
+                            <h4 id="previewName" class="text-sm font-extrabold text-white">Avatar Terpilih</h4>
+                        </div>
+                    </div>
+                    <span class="text-xs bg-emerald-500/20 text-emerald-300 font-bold px-3 py-1 rounded-full border border-emerald-500/40">
+                        <i class="fa-solid fa-check"></i> Siap Digunakan
+                    </span>
+                </div>
+
+                <!-- Hidden Input for Avatar ID -->
+                <input type="hidden" id="selectedAvatarId" required value="">
+
+                <!-- Avatar Grid Container -->
+                <div id="avatarGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-3 max-h-96 overflow-y-auto pr-2 p-1">
+                    <!-- Dynamic Injected by JS -->
+                </div>
+            </div>
+
+            <!-- SUBMIT BUTTON & ERROR MESSAGE -->
+            <div class="pt-4 border-t border-gray-800">
+                <div id="formFeedback" class="hidden mb-4 p-4 rounded-xl text-xs font-bold"></div>
+
+                <button type="submit" id="btnSubmit" class="w-full bg-gradient-to-r from-brand-red to-brand-redDark hover:from-brand-redLight hover:to-brand-red text-white font-extrabold py-4 rounded-2xl shadow-xl shadow-red-600/30 transition transform hover:-translate-y-0.5 flex items-center justify-center gap-2 text-base cursor-pointer">
+                    <i class="fa-solid fa-gamepad"></i> Simpan Profil & Masuk Petualangan!
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="mt-12 text-center text-xs text-gray-500">
+        <p>&copy; 2026 EdukaCivic | Fadilatul Fajri · SMP Negeri 5 Purwokerto</p>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        let currentFilter = 'ALL';
+        let selectedAvatar = null;
+        let currentStudentId = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if existing student
+            let initialGender = 'L';
+            const existing = getActiveStudent();
+            if (existing) {
+                currentStudentId = existing.id;
+                document.getElementById('inputNama').value = existing.nama || '';
+                document.getElementById('inputAbsen').value = existing.noAbsen || '';
+                if (existing.kelas) document.getElementById('inputKelas').value = existing.kelas;
+                if (existing.sekolah) document.getElementById('inputSekolah').value = existing.sekolah;
+                if (existing.gender) {
+                    initialGender = existing.gender;
+                }
+                if (existing.avatarId) {
+                    selectAvatar(existing.avatarId);
+                }
+            }
+
+            selectGender(initialGender);
+        });
+
+        function selectGender(g) {
+            playSound('select');
+            const rL = document.getElementById('genderL');
+            const rP = document.getElementById('genderP');
+            if (rL && rP) {
+                if (g === 'L') {
+                    rL.checked = true;
+                    rP.checked = false;
+                } else {
+                    rP.checked = true;
+                    rL.checked = false;
+                }
+            }
+            updateGenderUI(g);
+            renderAvatarGrid(g);
+        }
+
+        function updateGenderUI(g) {
+            const btnL = document.getElementById('btnGenderL');
+            const btnP = document.getElementById('btnGenderP');
+            if (!btnL || !btnP) return;
+
+            if (g === 'L') {
+                btnL.className = 'flex items-center justify-center gap-2.5 p-3.5 bg-blue-950/70 border-2 border-blue-500 rounded-xl cursor-pointer transition-all duration-200 text-blue-300 font-bold shadow-lg shadow-blue-500/20 active:scale-95';
+                btnP.className = 'flex items-center justify-center gap-2.5 p-3.5 bg-slate-950 border border-gray-700 rounded-xl cursor-pointer hover:border-pink-500 transition-all duration-200 text-gray-400 font-semibold active:scale-95';
+            } else {
+                btnP.className = 'flex items-center justify-center gap-2.5 p-3.5 bg-pink-950/70 border-2 border-pink-500 rounded-xl cursor-pointer transition-all duration-200 text-pink-300 font-bold shadow-lg shadow-pink-500/20 active:scale-95';
+                btnL.className = 'flex items-center justify-center gap-2.5 p-3.5 bg-slate-950 border border-gray-700 rounded-xl cursor-pointer hover:border-blue-500 transition-all duration-200 text-gray-400 font-semibold active:scale-95';
+            }
+        }
+
+        function renderAvatarGrid(filter) {
+            currentFilter = filter;
+            
+            // Update tabs UI
+            document.getElementById('tabAll').className = filter === 'ALL' ? 'px-3 py-1.5 rounded-lg font-semibold bg-gray-800 text-white transition' : 'px-3 py-1.5 rounded-lg font-semibold text-gray-400 hover:text-white transition';
+            document.getElementById('tabL').className = filter === 'L' ? 'px-3 py-1.5 rounded-lg font-semibold bg-blue-900/60 text-blue-300 border border-blue-500/50 transition' : 'px-3 py-1.5 rounded-lg font-semibold text-gray-400 hover:text-white transition';
+            document.getElementById('tabP').className = filter === 'P' ? 'px-3 py-1.5 rounded-lg font-semibold bg-pink-900/60 text-pink-300 border border-pink-500/50 transition' : 'px-3 py-1.5 rounded-lg font-semibold text-gray-400 hover:text-white transition';
+
+            const grid = document.getElementById('avatarGrid');
+            grid.innerHTML = '';
+
+            const occupiedMap = getOccupiedAvatars(currentStudentId);
+
+            const filteredList = EDUKACIVIC_AVATARS.filter(av => {
+                if (filter === 'L') return av.gender === 'L';
+                if (filter === 'P') return av.gender === 'P';
+                return true;
+            });
+
+            filteredList.forEach(av => {
+                const isOccupied = !!occupiedMap[av.id];
+                const occupant = occupiedMap[av.id];
+                const isSelected = selectedAvatar === av.id;
+
+                const card = document.createElement('div');
+                card.id = `av-card-${av.id}`;
+                card.className = `avatar-card relative p-3 rounded-2xl border-2 text-center select-none ${
+                    isOccupied 
+                        ? 'avatar-occupied border-red-500/40 bg-red-950/20' 
+                        : isSelected
+                            ? 'selected border-emerald-500 bg-emerald-950/40'
+                            : 'border-gray-700 bg-slate-950/80 hover:border-gray-500 cursor-pointer'
+                }`;
+
+                const avUrl = getAvatarUrl(av);
+
+                card.innerHTML = `
+                    <div class="relative mx-auto w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden bg-slate-900 flex items-center justify-center border border-gray-800 shadow-sm mb-1.5">
+                        <img src="${avUrl}" alt="Avatar" class="w-full h-full object-cover">
+                        ${isOccupied ? `
+                            <div class="absolute inset-0 bg-red-950/85 flex flex-col items-center justify-center p-1 text-center backdrop-blur-xs">
+                                <i class="fa-solid fa-lock text-red-400 text-sm mb-0.5"></i>
+                                <span class="text-[9px] font-black text-red-200 leading-tight">Terpakai</span>
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    ${isOccupied ? `
+                        <div class="text-[9px] font-bold text-red-400 truncate" title="Dipakai: ${occupant.nama}">
+                            Oleh: ${occupant.nama.split(' ')[0]}
+                        </div>
+                    ` : isSelected ? `
+                        <div class="text-[10px] font-black text-emerald-400 flex items-center justify-center gap-1">
+                            <i class="fa-solid fa-circle-check text-xs"></i> Terpilih
+                        </div>
+                    ` : `
+                        <div class="text-[10px] text-gray-400 hover:text-emerald-400 font-semibold">
+                            Tersedia
+                        </div>
+                    `}
+                `;
+
+                if (!isOccupied) {
+                    card.onclick = () => selectAvatar(av.id);
+                } else {
+                    card.onclick = () => {
+                        playSound('error');
+                        showFeedback(`❌ Wajah avatar ini sudah dipilih oleh ${occupant.nama} (Kelas ${occupant.kelas}, No. ${occupant.noAbsen})! Silakan pilih wajah avatar lain yang masih tersedia.`, 'error');
+                    };
+                }
+
+                grid.appendChild(card);
+            });
+        }
+
+        function selectAvatar(avatarId) {
+            const occupiedMap = getOccupiedAvatars(currentStudentId);
+            if (occupiedMap[avatarId]) {
+                playSound('error');
+                showFeedback(`❌ Wajah avatar ini sudah dipilih oleh siswa lain (${occupiedMap[avatarId].nama}). Silakan pilih avatar yang berstatus Tersedia.`, 'error');
+                return;
+            }
+
+            playSound('select');
+            selectedAvatar = avatarId;
+            document.getElementById('selectedAvatarId').value = avatarId;
+
+            const avObj = EDUKACIVIC_AVATARS.find(a => a.id === avatarId);
+            if (avObj) {
+                const preview = document.getElementById('selectedAvatarPreview');
+                preview.classList.remove('hidden');
+                document.getElementById('previewImg').src = getAvatarUrl(avObj);
+                document.getElementById('previewName').textContent = avObj.gender === 'L' ? 'Karakter Laki-laki' : 'Karakter Perempuan';
+            }
+
+            renderAvatarGrid(currentFilter);
+        }
+
+        function showFeedback(msg, type) {
+            const fb = document.getElementById('formFeedback');
+            fb.classList.remove('hidden');
+            if (type === 'error') {
+                fb.className = 'mb-4 p-4 rounded-xl text-xs font-bold bg-red-500/20 border border-red-500/50 text-red-300';
+            } else {
+                fb.className = 'mb-4 p-4 rounded-xl text-xs font-bold bg-green-500/20 border border-green-500/50 text-green-300';
+            }
+            fb.innerHTML = msg;
+            fb.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // Form Submit Handler
+        document.getElementById('studentProfileForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const nama = document.getElementById('inputNama').value.trim();
+            const noAbsen = document.getElementById('inputAbsen').value;
+            const kelas = document.getElementById('inputKelas').value;
+            const genderInput = document.querySelector('input[name="gender"]:checked');
+            const gender = genderInput ? genderInput.value : 'L';
+            const sekolah = document.getElementById('inputSekolah').value.trim();
+            const avatarId = document.getElementById('selectedAvatarId').value;
+
+            if (!avatarId) {
+                playSound('error');
+                showFeedback('⚠️ Harap pilih salah satu Avatar terlebih dahulu sebelum memulai!', 'error');
+                return;
+            }
+
+            const res = saveAndLoginStudent({
+                nama: nama,
+                noAbsen: noAbsen,
+                kelas: kelas,
+                gender: gender,
+                sekolah: sekolah,
+                avatarId: avatarId
+            });
+
+            if (!res.success) {
+                playSound('error');
+                showFeedback(`❌ ${res.message}`, 'error');
+                return;
+            }
+
+            showFeedback(`🎉 Selamat datang, <strong>${res.student.nama}</strong>! Profilmu berhasil disimpan. Memulai petualangan...`, 'success');
+
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

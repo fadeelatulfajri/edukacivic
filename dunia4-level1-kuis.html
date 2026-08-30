@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Level 13: Sifat UUD NRI 1945 - EdukaCivic</title>
+    <link rel="icon" type="image/png" href="Logo Edukacivic.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="student-system.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            purple: '#8B5CF6', purpleLight: '#A855F7', purpleDark: '#7C3AED',
+                            dark: '#0F172A', darker: '#020617', light: '#F8FAFC'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .quiz-card {
+            background: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            border-radius: 1.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .option-btn {
+            background: rgba(15, 23, 42, 0.7);
+            border: 2px solid rgba(75, 85, 99, 0.6);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            user-select: none;
+        }
+        .option-btn:hover:not(:disabled) {
+            border-color: #a855f7;
+            background: rgba(168, 85, 247, 0.15);
+            transform: translateY(-2px);
+        }
+        .option-btn.correct {
+            border-color: #10b981 !important;
+            background: rgba(16, 185, 129, 0.25) !important;
+            color: #ecfdf5 !important;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+        }
+        .option-btn.wrong {
+            border-color: #ef4444 !important;
+            background: rgba(239, 68, 68, 0.25) !important;
+            color: #fef2f2 !important;
+            animation: shake 0.4s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.35s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .pulse-glow {
+            animation: pulseGlow 2s infinite alternate;
+        }
+        @keyframes pulseGlow {
+            from { box-shadow: 0 0 15px rgba(139, 92, 246, 0.2); }
+            to { box-shadow: 0 0 30px rgba(139, 92, 246, 0.5); }
+        }
+    </style>
+    <script>
+        function getProgress() {
+            try { return JSON.parse(localStorage.getItem('edukacivic_progress')) || { poin: 0, level: 1, dunia: 4, completedLevels: [] }; }
+            catch(e) { return { poin: 0, level: 1, dunia: 4, completedLevels: [] }; }
+        }
+        const prog = getProgress();
+        if (!prog.completedLevels || !prog.completedLevels.includes('d3l4')) {
+            window.location.href = 'dunia4.html';
+        }
+    </script>
+</head>
+<body class="bg-brand-darker text-white font-sans antialiased min-h-screen flex flex-col selection:bg-purple-600 selection:text-white">
+
+    <!-- Web Audio Sound Effects -->
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            try {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'correct') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.15);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, now);
+                    osc.frequency.exponentialRampToValueAtTime(146.83, now + 0.2);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                } else if (type === 'victory') {
+                    [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+                        const o = audioCtx.createOscillator();
+                        const g = audioCtx.createGain();
+                        o.connect(g);
+                        g.connect(audioCtx.destination);
+                        o.type = 'triangle';
+                        o.frequency.setValueAtTime(freq, now + i * 0.1);
+                        g.gain.setValueAtTime(0.3, now + i * 0.1);
+                        g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.1 + 0.4);
+                        o.start(now + i * 0.1);
+                        o.stop(now + i * 0.1 + 0.4);
+                    });
+                }
+            } catch(e) {}
+        }
+    </script>
+
+    <!-- NAVBAR -->
+    <nav class="fixed w-full z-50 bg-brand-dark/90 backdrop-blur-md border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center">
+            <a href="dunia4-level1.html" class="flex items-center gap-2 text-gray-400 hover:text-white transition group">
+                <div class="w-8 h-8 bg-gray-800 rounded-lg flex items-center justify-center group-hover:bg-gray-700">
+                    <i class="fa-solid fa-arrow-left text-sm"></i>
+                </div>
+                <span class="text-sm font-medium hidden sm:inline">Materi Level 13</span>
+            </a>
+            
+            <div class="flex items-center gap-2">
+                <img src="Logo Edukacivic.png" alt="EdukaCivic" class="h-8">
+                <span class="font-bold text-lg hidden sm:inline">Eduka<span class="text-purple-400">Civic</span></span>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2 bg-purple-500/10 border border-purple-500/30 px-3 py-1 rounded-full">
+                    <span class="text-purple-400 font-bold text-xs">Level 13</span>
+                </div>
+                <div class="flex items-center gap-2 bg-gray-800 px-3 py-1.5 rounded-lg border border-gray-700">
+                    <i class="fa-solid fa-bolt text-yellow-400"></i>
+                    <span id="nav-poin" class="text-yellow-400 font-bold text-sm">0</span>
+                    <span class="text-gray-500 text-xs">Poin</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <script>document.getElementById('nav-poin').textContent = prog.poin || 0;</script>
+
+    <!-- MAIN QUIZ AREA -->
+    <main class="flex-grow pt-24 pb-16 px-4 max-w-3xl mx-auto w-full flex flex-col justify-center">
+
+        <!-- QUIZ CONTAINER -->
+        <div id="quiz-screen" class="quiz-card p-6 md:p-8 shadow-2xl pulse-glow">
+            
+            <!-- Quiz Header: Progress & Score -->
+            <div class="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-gray-700/80">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-sm border border-purple-500/40">
+                        <span id="q-current">1</span>/<span id="q-total">10</span>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-400 uppercase font-semibold">Kuis Pemahaman</p>
+                        <h2 class="text-white font-bold text-sm sm:text-base">Sifat UUD NRI Tahun 1945</h2>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 bg-gray-900/80 px-3 py-1.5 rounded-xl border border-gray-700">
+                    <i class="fa-solid fa-fire text-purple-400 text-sm"></i>
+                    <span class="text-xs text-gray-400 font-medium">Skor Sesi:</span>
+                    <span id="session-score" class="font-extrabold text-purple-400 text-sm">0</span>
+                    <span class="text-[10px] text-gray-500">/ 25</span>
+                </div>
+            </div>
+
+            <!-- Question Progress Bar -->
+            <div class="w-full h-2 bg-gray-900 rounded-full overflow-hidden mb-6 border border-gray-800">
+                <div id="progress-bar-fill" class="h-full bg-gradient-to-r from-purple-600 to-pink-500 transition-all duration-300" style="width: 10%;"></div>
+            </div>
+
+            <!-- Question Content Box -->
+            <div id="question-box" class="fade-in">
+                <!-- Question Badge & Text -->
+                <div class="text-center mb-6">
+                    <span id="question-tag" class="inline-block bg-purple-500/20 text-purple-300 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-2 border border-purple-500/30">
+                        Karakteristik Konstitusi
+                    </span>
+                    <h3 id="question-text" class="text-lg md:text-xl font-bold text-white leading-relaxed">
+                        Loading pertanyaan...
+                    </h3>
+                </div>
+
+                <!-- Answer Options (4 buttons) -->
+                <div id="options-grid" class="space-y-3">
+                    <!-- Options injected here -->
+                </div>
+
+                <!-- Feedback & Explanation Box -->
+                <div id="feedback-box" class="hidden mt-6 p-4 rounded-2xl text-sm font-medium border fade-in"></div>
+
+                <!-- Next Button -->
+                <div id="next-action" class="hidden mt-6 text-center">
+                    <button onclick="handleNextQuestion()" class="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-purple-600/30 transition transform hover:scale-105 inline-flex items-center justify-center gap-2">
+                        <span>Lanjut ke Soal Berikutnya</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RESULTS SCREEN -->
+        <div id="results-screen" class="hidden quiz-card p-6 md:p-10 shadow-2xl text-center fade-in">
+            <div class="w-20 h-20 bg-gradient-to-tr from-purple-600 to-pink-500 rounded-full flex items-center justify-center text-4xl text-white mx-auto mb-4 shadow-xl border-4 border-white/20">
+                🏆
+            </div>
+
+            <span class="inline-block bg-purple-500/20 text-purple-300 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-2 border border-purple-500/30">
+                Hasil Kuis Level 13
+            </span>
+
+            <h2 id="result-title" class="text-2xl md:text-3xl font-black text-white mb-2">
+                Luar Biasa! Kuis Level 13 Selesai!
+            </h2>
+            
+            <p id="result-desc" class="text-gray-300 text-sm max-w-md mx-auto mb-6">
+                Kamu telah memahami kedudukan UUD 1945 sebagai hukum dasar serta sifatnya yang singkat dan supel!
+            </p>
+
+            <!-- Score Summary Card -->
+            <div class="bg-gray-900/90 rounded-2xl p-6 border border-gray-700 max-w-sm mx-auto mb-8 shadow-inner">
+                <p class="text-xs text-gray-400 uppercase font-bold tracking-wider mb-1">Total Poin Diperoleh</p>
+                <div class="flex items-center justify-center gap-2 text-4xl font-black text-yellow-400 mb-2">
+                    <i class="fa-solid fa-bolt text-3xl"></i>
+                    <span id="final-points">+0</span>
+                    <span class="text-lg text-gray-400 font-medium">/ 25 Poin</span>
+                </div>
+                <div class="flex justify-between items-center text-xs text-gray-400 pt-3 border-t border-gray-800">
+                    <span>Jawaban Benar:</span>
+                    <span id="final-correct" class="font-bold text-green-400 text-sm">0 dari 10 Soal</span>
+                </div>
+            </div>
+
+            <!-- Action Navigation Buttons -->
+            <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                <a href="dunia4-level2.html" class="px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-purple-600/30 transition transform hover:scale-105 inline-flex items-center justify-center gap-2 text-base">
+                    <i class="fa-solid fa-forward"></i> Lanjut ke Level 14
+                </a>
+                <button onclick="restartQuiz()" class="px-6 py-4 bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold rounded-xl border border-gray-700 transition inline-flex items-center justify-center gap-2 text-base">
+                    <i class="fa-solid fa-rotate-left"></i> Ulangi Kuis
+                </button>
+                <a href="dunia4.html" class="px-6 py-4 bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold rounded-xl border border-gray-700 transition inline-flex items-center justify-center gap-2 text-base">
+                    <i class="fa-solid fa-map"></i> Peta Dunia 4
+                </a>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-brand-dark text-gray-400 py-6 border-t border-gray-800 text-center text-sm">
+        <p>&copy; 2026 EdukaCivic | Fadilatul Fajri</p>
+    </footer>
+
+    <!-- QUIZ SCRIPT -->
+    <script>
+        const quizQuestions = [
+            {
+                tag: "Kedudukan UUD 1945",
+                q: "Apakah kedudukan utama UUD NRI Tahun 1945 dalam sistem ketatanegaraan Indonesia?",
+                opts: [
+                    "Hukum dasar tertulis tertinggi di Indonesia",
+                    "Peraturan pelaksana dari keputusan presiden",
+                    "Peraturan hukum sementara khusus masa perang",
+                    "Hukum adat pelengkap kebijakan daerah"
+                ],
+                ans: 0,
+                explain: "UUD 1945 adalah hukum dasar tertulis tertinggi yang menjadi sumber dan landasan seluruh produk hukum di Indonesia."
+            },
+            {
+                tag: "Sumber Hukum",
+                q: "Semua produk hukum seperti Undang-Undang dan Peraturan Pemerintah harus...",
+                opts: [
+                    "Bersumber dan tidak boleh bertentangan dengan UUD 1945",
+                    "Dibuat secara rahasia tanpa persetujuan rakyat",
+                    "Boleh menggantikan kedudukan UUD 1945 kapan saja",
+                    "Hanya berlaku untuk instansi pembuatnya saja"
+                ],
+                ans: 0,
+                explain: "Semua produk hukum di bawah UUD 1945 harus bersumber dari dan tidak bertentangan dengan ketentuan UUD 1945."
+            },
+            {
+                tag: "Sifat Singkat",
+                q: "UUD NRI Tahun 1945 bersifat 'Singkat', artinya adalah...",
+                opts: [
+                    "Hanya memuat aturan-aturan pokok dan instruksi garis besar",
+                    "Hanya terdiri dari satu halaman naskah",
+                    "Dibuat dalam waktu yang sangat singkat dan terburu-buru",
+                    "Hanya berlaku untuk kurun waktu beberapa bulan saja"
+                ],
+                ans: 0,
+                explain: "Singkat berarti hanya memuat prinsip pokok dan garis besar, sedangkan hal teknis didelegasikan ke UU dan PP."
+            },
+            {
+                tag: "Pendelegasian Teknis",
+                q: "Ketentuan teknis dan operasional yang tidak dicantumkan dalam UUD 1945 didelegasikan kepada...",
+                opts: [
+                    "Peraturan perundang-undangan di bawahnya (UU, PP, Perpres, dll)",
+                    "Kebijakan pribadi masing-masing pejabat",
+                    "Hukum negara lain yang sedang berkembang",
+                    "Perjanjian tidak tertulis antar partai politik"
+                ],
+                ans: 0,
+                explain: "Aturan teknis dijabarkan lebih lanjut dalam Undang-Undang (UU), Peraturan Pemerintah (PP), dan peraturan pelaksana lainnya."
+            },
+            {
+                tag: "Sifat Supel / Luwes",
+                q: "UUD NRI Tahun 1945 bersifat 'Supel (Luwes)', yang bermakna...",
+                opts: [
+                    "Dinamis dan adaptif terhadap tuntutan perkembangan zaman",
+                    "Mudah diubah seenaknya oleh kelompok yang berkuasa",
+                    "Tidak memiliki ketegasan dalam penegakan hukum",
+                    "Tidak mengikat masyarakat umum"
+                ],
+                ans: 0,
+                explain: "Supel bermakna dinamis dan fleksibel mengikuti perkembangan zaman tanpa kehilangan jiwa dasarnya."
+            },
+            {
+                tag: "Relevansi Masa Depan",
+                q: "Mengapa UUD 1945 tetap relevan menjawab tantangan masa depan meski dibuat pada tahun 1945?",
+                opts: [
+                    "Karena hanya memuat prinsip pokok yang dapat dikembangkan secara dinamis melalui UU",
+                    "Karena tidak ada negara lain yang mempermasalahkannya",
+                    "Karena masyarakat dilarang mengubah pola hidup modern",
+                    "Karena seluruh aturan teknologi sudah ditulis sejak 1945"
+                ],
+                ans: 0,
+                explain: "Dengan memuat prinsip pokok, UUD 1945 memberi ruang bagi generasi penerus untuk menyesuaikan aturan teknis lewat UU baru."
+            },
+            {
+                tag: "Infografis Pohon Hukum",
+                q: "Dalam infografis 'Pohon Hukum Nasional', bagian 'Batang Utama & Akar Kokoh' melambangkan...",
+                opts: [
+                    "UUD NRI Tahun 1945 sebagai hukum dasar yang fundamental",
+                    "Peraturan Daerah Kabupaten/Kota",
+                    "Instruksi Bupati dan Walikota",
+                    "Surat Keputusan Kepala Sekolah"
+                ],
+                ans: 0,
+                explain: "Batang dan akar pohon yang kokoh melambangkan UUD 1945 sebagai fondasi dasar yang menopang seluruh tata hukum."
+            },
+            {
+                tag: "Infografis Pohon Hukum",
+                q: "Dalam ilustrasi Pohon Hukum, bagian ranting dan dedaunan yang fleksibel melambangkan...",
+                opts: [
+                    "Peraturan pelaksana (UU, PP, Perpres) yang adaptif terhadap kebutuhan masyarakat",
+                    "Naskah proklamasi kemerdekaan",
+                    "Stempel resmi kepresidenan",
+                    "Teks Piagam Jakarta"
+                ],
+                ans: 0,
+                explain: "Ranting dan dedaunan yang fleksibel melambangkan peraturan pelaksana yang terus tumbuh dan adaptif mengikuti arah zaman."
+            },
+            {
+                tag: "Analisis Dampak",
+                q: "Apa dampak negatif jika sebuah konstitusi dirumuskan terlalu panjang dan teramat kaku?",
+                opts: [
+                    "Cepat usang dan sulit merespons perubahan kebutuhan zaman",
+                    "Negara menjadi semakin cepat maju teknologinya",
+                    "Pemerintah tidak perlu membuat undang-undang lagi",
+                    "Seluruh warga negara langsung menjadi kaya"
+                ],
+                ans: 0,
+                explain: "Konstitusi yang terlalu kaku akan cepat usang dan menghambat perkembangan masyarakat saat menghadapi zaman baru."
+            },
+            {
+                tag: "Nilai Luhur Konstitusi",
+                q: "Kebijaksanaan apa yang ditunjukkan para pendiri bangsa dalam merumuskan UUD yang singkat dan supel?",
+                opts: [
+                    "Memberikan keleluasaan bagi generasi masa depan untuk mengatur bangsanya sesuai zamannya",
+                    "Mempercepat waktu rapat agar lekas selesai",
+                    "Menghindari tanggung jawab menyusun hukum yang lengkap",
+                    "Meniru konstitusi negara penjajah tanpa pemikiran mendalam"
+                ],
+                ans: 0,
+                explain: "Para pendiri bangsa berpandangan jauh ke depan dengan memberi ruang gerak bagi generasi penerus membangun Indonesia."
+            }
+        ];
+
+        let currentQIndex = 0;
+        let correctCount = 0;
+        let isAnswered = false;
+        const totalQ = quizQuestions.length;
+        const letters = ["A", "B", "C", "D"];
+
+        document.getElementById('q-total').textContent = totalQ;
+
+        function loadQuestion() {
+            isAnswered = false;
+            const q = quizQuestions[currentQIndex];
+
+            // Progress bar & counters
+            document.getElementById('q-current').textContent = currentQIndex + 1;
+            const pct = ((currentQIndex + 1) / totalQ) * 100;
+            document.getElementById('progress-bar-fill').style.width = pct + '%';
+            document.getElementById('session-score').textContent = Math.round(correctCount * 2.5);
+
+            // Tag & text
+            document.getElementById('question-tag').textContent = q.tag;
+            document.getElementById('question-text').textContent = q.q;
+
+            // Options Grid
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = '';
+            q.opts.forEach((optText, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn w-full text-left p-4 rounded-2xl flex items-start gap-3 text-sm font-medium';
+                btn.innerHTML = `
+                    <span class="w-7 h-7 rounded-xl bg-gray-800 text-purple-400 font-bold flex items-center justify-center shrink-0 text-xs border border-gray-700">
+                        ${letters[index]}
+                    </span>
+                    <span class="pt-0.5">${optText}</span>
+                `;
+                btn.onclick = () => selectOption(index, btn);
+                grid.appendChild(btn);
+            });
+
+            document.getElementById('feedback-box').classList.add('hidden');
+            document.getElementById('next-action').classList.add('hidden');
+        }
+
+        function selectOption(selectedIndex, btnEl) {
+            if (isAnswered) return;
+            isAnswered = true;
+
+            const q = quizQuestions[currentQIndex];
+            const isCorrect = (selectedIndex === q.ans);
+
+            const allBtns = document.querySelectorAll('.option-btn');
+            allBtns.forEach(b => b.disabled = true);
+
+            const feedbackBox = document.getElementById('feedback-box');
+            feedbackBox.classList.remove('hidden');
+
+            if (isCorrect) {
+                correctCount++;
+                btnEl.classList.add('correct');
+                playSound('correct');
+                feedbackBox.className = 'mt-6 p-4 rounded-2xl text-sm font-medium bg-green-500/20 border border-green-500/40 text-green-300 fade-in';
+                feedbackBox.innerHTML = `
+                    <div class="flex items-center gap-2 font-bold mb-1">
+                        <i class="fa-solid fa-circle-check text-green-400"></i> Jawaban Kamu Benar! (+2.5 Poin)
+                    </div>
+                    <p class="text-xs text-green-200/90 leading-relaxed">${q.explain}</p>
+                `;
+            } else {
+                btnEl.classList.add('wrong');
+                allBtns[q.ans].classList.add('correct');
+                playSound('wrong');
+                feedbackBox.className = 'mt-6 p-4 rounded-2xl text-sm font-medium bg-red-500/20 border border-red-500/40 text-red-300 fade-in';
+                feedbackBox.innerHTML = `
+                    <div class="flex items-center gap-2 font-bold mb-1">
+                        <i class="fa-solid fa-circle-xmark text-red-400"></i> Jawaban Kurang Tepat!
+                    </div>
+                    <p class="text-xs text-red-200/90 leading-relaxed">${q.explain}</p>
+                `;
+            }
+
+            document.getElementById('session-score').textContent = Math.round(correctCount * 2.5);
+            document.getElementById('next-action').classList.remove('hidden');
+        }
+
+        function handleNextQuestion() {
+            currentQIndex++;
+            if (currentQIndex < totalQ) {
+                loadQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        function finishQuiz() {
+            document.getElementById('quiz-screen').classList.add('hidden');
+            const resultsScreen = document.getElementById('results-screen');
+            resultsScreen.classList.remove('hidden');
+
+            const totalEarnedPoints = Math.round((correctCount / totalQ) * 25);
+            document.getElementById('final-points').textContent = `+${totalEarnedPoints}`;
+            document.getElementById('final-correct').textContent = `${correctCount} dari ${totalQ} Soal Benar`;
+
+            // Save progress
+            const currentProg = getProgress();
+            if (!currentProg.completedLevels.includes('d4l1')) {
+                currentProg.completedLevels.push('d4l1');
+            if (typeof recordLevelCompleted === "function") recordLevelCompleted("d4l1", totalEarnedPoints);
+            }
+            currentProg.poin = (currentProg.poin || 0) + totalEarnedPoints;
+            if (currentProg.level < 14) currentProg.level = 14;
+            
+            localStorage.setItem('edukacivic_progress', JSON.stringify(currentProg));
+            document.getElementById('nav-poin').textContent = currentProg.poin;
+
+            // Trigger Victory Sound & Confetti
+            playSound('victory');
+            triggerConfetti();
+        }
+
+        function restartQuiz() {
+            currentQIndex = 0;
+            correctCount = 0;
+            isAnswered = false;
+            document.getElementById('results-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+            loadQuestion();
+        }
+
+        function triggerConfetti() {
+            try {
+                confetti({
+                    particleCount: 80,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            } catch(e) {}
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadQuestion();
+        });
+    </script>
+</body>
+</html>
+

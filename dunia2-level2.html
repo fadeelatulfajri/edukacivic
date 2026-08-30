@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level 6: Tokoh & Panitia Perancang UUD - EdukaCivic</title>
+    <link rel="icon" type="image/png" href="Logo Edukacivic.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="student-system.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: {
+                        brand: { red: '#DC2626', redLight: '#EF4444', redDark: '#B91C1C', dark: '#0F172A', darker: '#020617', light: '#F8FAFC' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0F172A; }
+        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4B5563; }
+
+        .section-card {
+            background: rgba(30, 41, 59, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(75, 85, 99, 0.5);
+            border-radius: 1.5rem;
+        }
+
+        .portrait-card {
+            transition: all 0.25s ease;
+        }
+        .portrait-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(249, 115, 22, 0.25);
+        }
+
+        /* Interactive Select / Inputs */
+        .table-select {
+            background: rgba(15, 23, 42, 0.85);
+            border: 2px solid rgba(75, 85, 99, 0.7);
+            border-radius: 0.75rem;
+            color: white;
+            padding: 0.6rem 0.85rem;
+            width: 100%;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+        .table-select:focus {
+            border-color: #f97316;
+            box-shadow: 0 0 12px rgba(249, 115, 22, 0.3);
+        }
+        .table-select.correct {
+            border-color: #10b981 !important;
+            background: rgba(16, 185, 129, 0.2) !important;
+            color: #ecfdf5 !important;
+        }
+        .table-select.wrong {
+            border-color: #ef4444 !important;
+            background: rgba(239, 68, 68, 0.2) !important;
+            color: #fef2f2 !important;
+            animation: shake 0.35s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+    </style>
+    <script>
+        function getProgress() {
+            try { return JSON.parse(localStorage.getItem('edukacivic_progress')) || { poin: 0, level: 1, dunia: 2, completedLevels: [] }; }
+            catch(e) { return { poin: 0, level: 1, dunia: 2, completedLevels: [] }; }
+        }
+        const prog = getProgress();
+        if (!prog.completedLevels || !prog.completedLevels.includes('d2l1')) {
+            window.location.href = 'dunia2.html';
+        }
+    </script>
+<script>
+        if (typeof isLevelUnlocked === "function" && !isLevelUnlocked("d2l2")) {
+            alert("🔒 Level ini masih terkunci! Selesaikan Level 5 terlebih dahulu.");
+            window.location.href = "index.html";
+        }
+    </script>
+</head>
+<body class="bg-brand-darker text-white font-sans antialiased min-h-screen flex flex-col selection:bg-orange-600 selection:text-white">
+
+    <!-- NAVBAR -->
+    <nav class="fixed w-full z-50 bg-brand-dark/90 backdrop-blur-md border-b border-gray-800 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-4">
+                    <a href="dunia2.html" class="flex items-center gap-2 text-gray-400 hover:text-white transition-colors group">
+                        <div class="w-8 h-8 bg-gray-800 rounded-lg flex items-center justify-center group-hover:bg-gray-700 transition-colors">
+                            <i class="fa-solid fa-arrow-left text-sm"></i>
+                        </div>
+                        <span class="text-sm font-medium hidden sm:inline">Peta Dunia 2</span>
+                    </a>
+                    <div class="w-px h-8 bg-gray-700"></div>
+                    <a href="index.html" class="flex items-center gap-2">
+                        <img src="Logo Edukacivic.png" alt="EdukaCivic" class="h-8 w-auto">
+                        <span class="font-bold text-lg text-white hidden sm:inline">Eduka<span class="text-brand-red">Civic</span></span>
+                    </a>
+                </div>
+                
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2 bg-orange-500/10 border border-orange-500/30 px-3 py-1.5 rounded-full">
+                        <i class="fa-solid fa-users-gear text-orange-400 text-xs"></i>
+                        <span class="text-orange-400 font-bold text-xs">Dunia 2 · Level 6</span>
+                    </div>
+                    <div class="flex items-center gap-2 bg-gray-800 px-3 py-1.5 rounded-lg border border-gray-700">
+                        <i class="fa-solid fa-bolt text-yellow-400 text-xs"></i>
+                        <span id="nav-poin" class="text-yellow-400 font-bold text-sm">0</span>
+                        <span class="text-gray-500 text-xs">Poin</span>
+                    </div>
+                    <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-brand-red to-orange-400 p-0.5 cursor-pointer shadow-md" onclick="window.location.href='profil-siswa.html'"><img id="nav-avatar-img" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Student" alt="Avatar" class="w-full h-full rounded-full bg-slate-900 object-cover"></div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <script>document.getElementById('nav-poin').textContent = prog.poin || 0;</script>
+
+    <!-- HERO SECTION -->
+    <section class="relative pt-24 pb-12 overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-orange-950/30 via-brand-darker to-brand-darker pointer-events-none"></div>
+        <div class="absolute top-20 right-10 w-72 h-72 bg-orange-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 relative z-10 text-center">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-500/10 border border-orange-500/30 mb-4">
+                <i class="fa-solid fa-sitemap text-orange-400 text-xs"></i>
+                <span class="text-xs font-bold text-orange-400 tracking-widest uppercase">Level 6 · Dunia 2</span>
+            </div>
+            
+            <h1 class="text-3xl md:text-5xl font-extrabold leading-tight mb-4">
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-amber-300 to-yellow-400">Tokoh & Panitia Perancang UUD</span>
+            </h1>
+            
+            <p class="text-gray-300 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
+                Pelajari pembentukan Tiga Panitia Kerja BPUPK, peran penting Panitia Hukum Dasar (19 Tokoh), dan mandat khusus Panitia Kecil Tim 7 (Prof. Dr. Soepomo) dalam menyusun Batang Tubuh UUD 1945.
+            </p>
+
+            <!-- Reading progress bar -->
+            <div class="mt-6 max-w-sm mx-auto">
+                <div class="flex justify-between text-xs text-gray-500 mb-1">
+                    <span>Progres Membaca</span>
+                    <span id="read-pct">0%</span>
+                </div>
+                <div class="w-full h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                    <div id="read-bar" class="h-full bg-gradient-to-r from-orange-500 to-amber-400 rounded-full transition-all duration-300" style="width:0%"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-grow pb-16 px-4">
+        <div class="max-w-4xl mx-auto space-y-10">
+
+            <!-- ===== SECTION 1: PEMBENTUKAN TIGA PANITIA KERJA ===== -->
+            <section class="section-card p-6 md:p-8">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-12 h-12 rounded-2xl bg-orange-500/20 text-orange-400 flex items-center justify-center text-xl border border-orange-500/30">
+                        <i class="fa-solid fa-users-viewfinder"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-orange-400">Bagian 1</span>
+                        <h2 class="text-xl md:text-2xl font-bold text-white">Pembentukan Tiga Panitia Kerja (11 Juli 1945)</h2>
+                    </div>
+                </div>
+
+                <p class="text-gray-300 text-sm md:text-base leading-relaxed mb-6">
+                    Pada Sidang BPUPKI Kedua tanggal <strong>11 Juli 1945</strong>, untuk mempercepat kerja penyusunan perangkat negara merdeka secara efektif dan terorganisasi, BPUPK membentuk <strong>Tiga Panitia Kerja Khusus</strong>:
+                </p>
+
+                <!-- 3 Committee Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <!-- Panitia 1: Perancang UUD -->
+                    <div class="portrait-card bg-gradient-to-b from-orange-950/40 to-gray-900 border-2 border-orange-500/50 rounded-2xl p-5 shadow-lg flex flex-col items-center text-center">
+                        <div class="w-20 h-24 rounded-2xl overflow-hidden bg-black/50 border-2 border-orange-500/50 mb-3 shadow-md">
+                            <img src="soekarno.jpg" alt="Ir. Sukarno" class="w-full h-full object-cover">
+                        </div>
+                        <span class="bg-orange-500/20 text-orange-300 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase mb-2">Panitia Utama</span>
+                        <h3 class="text-base font-bold text-white mb-1">Panitia Perancang UUD</h3>
+                        <p class="text-xs text-orange-300 font-semibold mb-2">Ketua: Ir. Sukarno</p>
+                        <p class="text-gray-400 text-xs leading-relaxed mt-auto pt-2 border-t border-gray-800">
+                            Beranggotakan <strong>19 tokoh bangsa</strong> yang bertugas membahas dan menyepakati rancangan garis besar UUD.
+                        </p>
+                    </div>
+
+                    <!-- Panitia 2: Pembelaan Tanah Air -->
+                    <div class="portrait-card bg-gradient-to-b from-slate-900 to-gray-900 border border-gray-700 hover:border-amber-500/50 rounded-2xl p-5 shadow-lg flex flex-col items-center text-center">
+                        <div class="w-20 h-24 rounded-2xl overflow-hidden bg-black/50 border-2 border-amber-500/50 mb-3 shadow-md">
+                            <img src="abikusno-tjokrosujoso.jpg" alt="Abikoesno Tjokrosoejoso" class="w-full h-full object-cover">
+                        </div>
+                        <span class="bg-slate-800 text-gray-400 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase mb-2">Pertahanan</span>
+                        <h3 class="text-base font-bold text-white mb-1">Panitia Pembelaan Tanah Air</h3>
+                        <p class="text-xs text-amber-300 font-semibold mb-2">Ketua: Abikoesno Tjokrosoejoso</p>
+                        <p class="text-gray-400 text-xs leading-relaxed mt-auto pt-2 border-t border-gray-800">
+                            Bertugas merancang strategi pertahanan, militer, dan keamanan wilayah negara Indonesia merdeka.
+                        </p>
+                    </div>
+
+                    <!-- Panitia 3: Keuangan dan Ekonomi -->
+                    <div class="portrait-card bg-gradient-to-b from-slate-900 to-gray-900 border border-gray-700 hover:border-blue-500/50 rounded-2xl p-5 shadow-lg flex flex-col items-center text-center">
+                        <div class="w-20 h-24 rounded-2xl overflow-hidden bg-black/50 border-2 border-blue-500/50 mb-3 shadow-md">
+                            <img src="Moh. Hatta.webp" alt="Drs. Mohammad Hatta" class="w-full h-full object-cover">
+                        </div>
+                        <span class="bg-slate-800 text-gray-400 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase mb-2">Perekonomian</span>
+                        <h3 class="text-base font-bold text-white mb-1">Panitia Keuangan & Ekonomi</h3>
+                        <p class="text-xs text-blue-300 font-semibold mb-2">Ketua: Drs. Mohammad Hatta</p>
+                        <p class="text-gray-400 text-xs leading-relaxed mt-auto pt-2 border-t border-gray-800">
+                            Bertugas merancang sistem moneter, perbendaharaan, perpajakan, dan kesejahteraan ekonomi rakyat.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== SECTION 2: PANITIA HUKUM DASAR & PANITIA KECIL PERANCANG UUD ===== -->
+            <section class="section-card p-6 md:p-8">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl border border-amber-500/30">
+                        <i class="fa-solid fa-file-signature"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-amber-400">Bagian 2</span>
+                        <h2 class="text-xl md:text-2xl font-bold text-white">Panitia Hukum Dasar & Panitia Kecil (Tim 7)</h2>
+                    </div>
+                </div>
+
+                <div class="space-y-6 text-gray-300 text-sm md:text-base leading-relaxed">
+                    <p>
+                        <strong>Panitia Hukum Dasar</strong> yang dipimpin oleh <strong>Ir. Sukarno</strong> beranggotakan 19 tokoh penting bangsa, di antaranya: <em>Mr. A.A. Maramis, Otto Iskandar Dinata, Prof. Dr. Soepomo, Mr. Achmad Soebardjo, H. Agus Salim, K.H. Wahid Hasjim, Ny. Maria Ulfah Santoso, dan Mr. Latuharhary</em>.
+                    </p>
+
+                    <!-- Mandat Sore 11 Juli 1945 -->
+                    <div class="bg-gradient-to-r from-orange-950/60 via-gray-900 to-gray-900 border border-orange-500/40 rounded-2xl p-6 shadow-md">
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 bg-orange-500 text-black rounded-xl flex items-center justify-center font-black text-xl shrink-0 mt-1 shadow-lg">
+                                7
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-white mb-2">Pembentukan Panitia Kecil Perancang UUD (Sore, 11 Juli 1945)</h3>
+                                <p class="text-sm text-gray-300 leading-relaxed mb-3">
+                                    Pada sore hari 11 Juli 1945, Panitia Hukum Dasar menunjuk sebuah <strong>Panitia Kecil (Tim 7)</strong> yang diketuai oleh ahli hukum tata negara <strong>Prof. Dr. Soepomo</strong>. Tim 7 inilah yang diberi mandat merancang <strong>teks batang tubuh (pasal demi pasal) UUD</strong> dalam batas waktu kerja dua hari.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Anggota Tim 7 -->
+                    <div>
+                        <h3 class="text-base font-bold text-white mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-id-card-clip text-orange-400"></i> Susunan Lengkap Anggota Panitia Kecil (Tim 7):
+                        </h3>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                            <div class="bg-gray-900/90 border border-orange-500/40 rounded-xl p-3.5 flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg overflow-hidden bg-black/40 border border-orange-500/50 shrink-0">
+                                    <img src="Soepomo.jpg" alt="Prof. Dr. Soepomo" class="w-full h-full object-cover">
+                                </div>
+                                <div>
+                                    <p class="text-xs text-orange-300 font-bold uppercase">Ketua Tim 7</p>
+                                    <p class="text-white font-bold text-sm">Prof. Dr. Soepomo</p>
+                                </div>
+                            </div>
+                            <div class="bg-gray-900/90 border border-gray-700 rounded-xl p-3.5 flex items-center gap-3">
+                                <span class="w-8 h-8 rounded-lg bg-gray-800 text-gray-300 font-bold flex items-center justify-center text-xs shrink-0">1</span>
+                                <div>
+                                    <p class="text-[11px] text-gray-400 font-medium">Anggota</p>
+                                    <p class="text-white font-bold text-sm">Mr. K.R.M.T. Wongsonegoro</p>
+                                </div>
+                            </div>
+                            <div class="bg-gray-900/90 border border-gray-700 rounded-xl p-3.5 flex items-center gap-3">
+                                <span class="w-8 h-8 rounded-lg bg-gray-800 text-gray-300 font-bold flex items-center justify-center text-xs shrink-0">2</span>
+                                <div>
+                                    <p class="text-[11px] text-gray-400 font-medium">Anggota</p>
+                                    <p class="text-white font-bold text-sm">Mr. Achmad Soebardjo</p>
+                                </div>
+                            </div>
+                            <div class="bg-gray-900/90 border border-gray-700 rounded-xl p-3.5 flex items-center gap-3">
+                                <span class="w-8 h-8 rounded-lg bg-gray-800 text-gray-300 font-bold flex items-center justify-center text-xs shrink-0">3</span>
+                                <div>
+                                    <p class="text-[11px] text-gray-400 font-medium">Anggota</p>
+                                    <p class="text-white font-bold text-sm">Mr. A.A. Maramis</p>
+                                </div>
+                            </div>
+                            <div class="bg-gray-900/90 border border-gray-700 rounded-xl p-3.5 flex items-center gap-3">
+                                <span class="w-8 h-8 rounded-lg bg-gray-800 text-gray-300 font-bold flex items-center justify-center text-xs shrink-0">4</span>
+                                <div>
+                                    <p class="text-[11px] text-gray-400 font-medium">Anggota</p>
+                                    <p class="text-white font-bold text-sm">Dr. Soekiman</p>
+                                </div>
+                            </div>
+                            <div class="bg-gray-900/90 border border-gray-700 rounded-xl p-3.5 flex items-center gap-3">
+                                <span class="w-8 h-8 rounded-lg bg-gray-800 text-gray-300 font-bold flex items-center justify-center text-xs shrink-0">5</span>
+                                <div>
+                                    <p class="text-[11px] text-gray-400 font-medium">Anggota</p>
+                                    <p class="text-white font-bold text-sm">H. Agus Salim</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== SECTION 3: PEMBEDAAN PENTING (DUA PANITIA KECIL) ===== -->
+            <section class="section-card p-6 md:p-8">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-12 h-12 rounded-2xl bg-red-500/20 text-red-400 flex items-center justify-center text-xl border border-red-500/30">
+                        <i class="fa-solid fa-code-compare"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-red-400">Pembedaan Penting</span>
+                        <h2 class="text-xl md:text-2xl font-bold text-white">Jangan Tertukar! Dua Panitia Kecil BPUPK</h2>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Panitia Kecil 1 Juni 1945 -->
+                    <div class="bg-gray-900/90 border-2 border-red-500/40 rounded-2xl p-5 shadow-lg relative overflow-hidden">
+                        <div class="flex items-center gap-2 text-red-400 font-bold text-sm uppercase tracking-wider mb-2">
+                            <i class="fa-solid fa-calendar-day"></i> Bentukan 1 Juni 1945
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Panitia Kecil (Panitia 8 / Panitia 9)</h3>
+                        <div class="space-y-2 text-xs text-gray-300">
+                            <p><strong>Ketua:</strong> Ir. Sukarno</p>
+                            <p><strong>Waktu:</strong> Sidang I BPUPKI (1 Juni 1945)</p>
+                            <p class="text-red-300 font-semibold pt-1 border-t border-gray-800">
+                                🎯 <strong>Tugas Pokok:</strong> Menampung usulan anggota & merumuskan <strong>Dasar Negara</strong> (melahirkan Piagam Jakarta).
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Panitia Kecil 11 Juli 1945 -->
+                    <div class="bg-gray-900/90 border-2 border-orange-500/40 rounded-2xl p-5 shadow-lg relative overflow-hidden">
+                        <div class="flex items-center gap-2 text-orange-400 font-bold text-sm uppercase tracking-wider mb-2">
+                            <i class="fa-solid fa-calendar-day"></i> Bentukan 11 Juli 1945
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Panitia Kecil Perancang UUD (Tim 7)</h3>
+                        <div class="space-y-2 text-xs text-gray-300">
+                            <p><strong>Ketua:</strong> Prof. Dr. Soepomo</p>
+                            <p><strong>Waktu:</strong> Sidang II BPUPKI (11 Juli 1945)</p>
+                            <p class="text-orange-300 font-semibold pt-1 border-t border-gray-800">
+                                🎯 <strong>Tugas Pokok:</strong> Merancang teks <strong>Batang Tubuh (Pasal demi Pasal) UUD</strong> selama 2 hari kerja.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== SECTION 4: BAGAN HIERARKI & GALERI VISUAL TOKOH ===== -->
+            <section class="section-card p-6 md:p-8">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-12 h-12 rounded-2xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-xl border border-blue-500/30">
+                        <i class="fa-solid fa-sitemap"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-blue-400">Bagan Struktur Organisasi</span>
+                        <h2 class="text-xl md:text-2xl font-bold text-white">Hierarki Pembagian Panitia Kerja BPUPK</h2>
+                    </div>
+                </div>
+
+                <!-- Visual Tree Hierarchy Diagram -->
+                <div class="bg-gray-900/90 rounded-2xl p-6 border border-gray-700 shadow-xl mb-8">
+                    <!-- Root Node -->
+                    <div class="bg-gradient-to-r from-orange-600 to-amber-600 p-3.5 rounded-2xl text-center font-bold text-white shadow-lg max-w-sm mx-auto border border-orange-400/50">
+                        <i class="fa-solid fa-landmark mr-2"></i> Sidang BPUPKI II (11 Juli 1945)
+                    </div>
+
+                    <!-- Vertical Line -->
+                    <div class="w-0.5 h-6 bg-orange-500 mx-auto"></div>
+
+                    <!-- 3 Branch Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- Branch 1: Panitia Hukum Dasar -->
+                        <div class="bg-slate-950/80 border-2 border-orange-500/60 rounded-xl p-4 text-center">
+                            <span class="text-[10px] font-bold text-orange-400 uppercase">Panitia 1 (19 Anggota)</span>
+                            <h4 class="text-sm font-bold text-white mt-1">Panitia Hukum Dasar</h4>
+                            <p class="text-xs text-orange-300 mt-1">Ketua: Ir. Sukarno</p>
+
+                            <!-- Sub-branch connector -->
+                            <div class="w-0.5 h-4 bg-orange-500 mx-auto my-2"></div>
+                            
+                            <!-- Sub-node: Panitia Kecil Tim 7 -->
+                            <div class="bg-orange-950/60 border border-orange-500/50 rounded-lg p-2.5 text-center">
+                                <span class="text-[9px] font-bold text-amber-300 uppercase">Sub-Panitia Kerja</span>
+                                <h5 class="text-xs font-bold text-white mt-0.5">Panitia Kecil (Tim 7)</h5>
+                                <p class="text-[11px] text-amber-200">Ketua: Prof. Dr. Soepomo</p>
+                                <p class="text-[10px] text-gray-400 mt-1">Tugas: Batang Tubuh UUD</p>
+                            </div>
+                        </div>
+
+                        <!-- Branch 2: Panitia Pembelaan Tanah Air -->
+                        <div class="bg-slate-950/80 border border-gray-700 rounded-xl p-4 text-center flex flex-col justify-center">
+                            <span class="text-[10px] font-bold text-gray-400 uppercase">Panitia 2</span>
+                            <h4 class="text-sm font-bold text-white mt-1">Panitia Pembelaan Tanah Air</h4>
+                            <p class="text-xs text-amber-300 mt-1">Ketua: Abikoesno Tjokrosoejoso</p>
+                            <p class="text-[10px] text-gray-400 mt-2">Tugas: Pertahanan & Keamanan Negara</p>
+                        </div>
+
+                        <!-- Branch 3: Panitia Keuangan & Ekonomi -->
+                        <div class="bg-slate-950/80 border border-gray-700 rounded-xl p-4 text-center flex flex-col justify-center">
+                            <span class="text-[10px] font-bold text-gray-400 uppercase">Panitia 3</span>
+                            <h4 class="text-sm font-bold text-white mt-1">Panitia Keuangan & Ekonomi</h4>
+                            <p class="text-xs text-blue-300 mt-1">Ketua: Drs. Moh. Hatta</p>
+                            <p class="text-[10px] text-gray-400 mt-2">Tugas: Perekonomian & Keuangan</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tokoh Galeri Visual -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+                    <div class="portrait-card bg-gray-900/80 p-3 rounded-2xl border border-orange-500/40">
+                        <div class="w-20 h-24 bg-black/40 rounded-xl overflow-hidden mx-auto mb-2 border border-gray-700 shadow-md">
+                            <img src="soekarno.jpg" alt="Ir. Sukarno" class="w-full h-full object-cover">
+                        </div>
+                        <h4 class="text-xs font-bold text-white">Ir. Sukarno</h4>
+                        <p class="text-[10px] text-orange-400 font-semibold">Ketua Panitia Hukum Dasar</p>
+                    </div>
+
+                    <div class="portrait-card bg-gray-900/80 p-3 rounded-2xl border border-amber-500/40">
+                        <div class="w-20 h-24 bg-black/40 rounded-xl overflow-hidden mx-auto mb-2 border border-amber-500/50 shadow-md">
+                            <img src="Soepomo.jpg" alt="Prof. Dr. Soepomo" class="w-full h-full object-cover">
+                        </div>
+                        <h4 class="text-xs font-bold text-white">Prof. Dr. Soepomo</h4>
+                        <p class="text-[10px] text-amber-400 font-semibold">Ketua Tim 7 Perancang UUD</p>
+                    </div>
+
+                    <div class="portrait-card bg-gray-900/80 p-3 rounded-2xl border border-blue-500/40">
+                        <div class="w-20 h-24 bg-black/40 rounded-xl overflow-hidden mx-auto mb-2 border border-blue-500/50 shadow-md">
+                            <img src="Moh. Hatta.webp" alt="Drs. Mohammad Hatta" class="w-full h-full object-cover">
+                        </div>
+                        <h4 class="text-xs font-bold text-white">Drs. Moh. Hatta</h4>
+                        <p class="text-[10px] text-blue-400 font-semibold">Ketua Panitia Keuangan</p>
+                    </div>
+
+                    <div class="portrait-card bg-gray-900/80 p-3 rounded-2xl border border-gray-700">
+                        <div class="w-20 h-24 bg-black/40 rounded-xl overflow-hidden mx-auto mb-2 border border-gray-600 shadow-md">
+                            <img src="abikusno-tjokrosujoso.jpg" alt="Abikoesno Tjokrosoejoso" class="w-full h-full object-cover">
+                        </div>
+                        <h4 class="text-xs font-bold text-white">Abikoesno T.</h4>
+                        <p class="text-[10px] text-gray-300 font-semibold">Ketua Panitia Pertahanan</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== SECTION 5: AKTIVITAS MELENGKAPI TABEL PANITIA PERANCANG UUD ===== -->
+            <section class="section-card p-6 md:p-8 border-2 border-orange-500/50">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 rounded-2xl bg-orange-500/20 text-orange-400 flex items-center justify-center text-2xl border border-orange-500/30">
+                        <i class="fa-solid fa-table-list"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-orange-400">Aktivitas Interaktif</span>
+                        <h2 class="text-2xl font-bold text-white">Melengkapi Tabel Panitia Perancang UUD</h2>
+                    </div>
+                </div>
+                
+                <p class="text-gray-300 text-sm mb-6 leading-relaxed">
+                    Lengkapi tabel perbandingan antara <strong>Panitia Hukum Dasar</strong> dan <strong>Panitia Kecil (Tim 7) Perancang UUD</strong> dengan memilih opsi yang benar pada setiap kolom dropdown di bawah ini:
+                </p>
+
+                <!-- Responsive Interactive Table -->
+                <div class="overflow-x-auto rounded-2xl border border-gray-700 bg-gray-900/90 shadow-xl mb-6">
+                    <table class="w-full text-left text-xs sm:text-sm">
+                        <thead class="bg-gray-800 text-gray-300 uppercase tracking-wider border-b border-gray-700">
+                            <tr>
+                                <th class="py-3.5 px-4 font-bold text-orange-400">Parameter Perbandingan</th>
+                                <th class="py-3.5 px-4 font-bold text-white">Panitia Hukum Dasar (Utama)</th>
+                                <th class="py-3.5 px-4 font-bold text-amber-400">Panitia Kecil Perancang UUD (Tim 7)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-800 text-gray-200">
+                            <!-- Row 1: Ketua Panitia -->
+                            <tr>
+                                <td class="py-4 px-4 font-semibold text-gray-400">1. Ketua Panitia</td>
+                                <td class="py-3 px-4">
+                                    <select id="sel-ketua-1" class="table-select" data-answer="sukarno">
+                                        <option value="">-- Pilih Ketua --</option>
+                                        <option value="soepomo">Prof. Dr. Soepomo</option>
+                                        <option value="sukarno">Ir. Sukarno</option>
+                                        <option value="hatta">Drs. Mohammad Hatta</option>
+                                    </select>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <select id="sel-ketua-2" class="table-select" data-answer="soepomo">
+                                        <option value="">-- Pilih Ketua --</option>
+                                        <option value="sukarno">Ir. Sukarno</option>
+                                        <option value="soepomo">Prof. Dr. Soepomo</option>
+                                        <option value="radjiman">Dr. K.R.T. Radjiman</option>
+                                    </select>
+                                </td>
+                            </tr>
+
+                            <!-- Row 2: Jumlah Anggota -->
+                            <tr>
+                                <td class="py-4 px-4 font-semibold text-gray-400">2. Jumlah Anggota</td>
+                                <td class="py-3 px-4">
+                                    <select id="sel-anggota-1" class="table-select" data-answer="19">
+                                        <option value="">-- Pilih Jumlah --</option>
+                                        <option value="8">8 Tokoh</option>
+                                        <option value="9">9 Tokoh</option>
+                                        <option value="19">19 Tokoh Bangsa</option>
+                                        <option value="21">21 Tokoh</option>
+                                    </select>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <select id="sel-anggota-2" class="table-select" data-answer="7">
+                                        <option value="">-- Pilih Jumlah --</option>
+                                        <option value="3">3 Tokoh</option>
+                                        <option value="7">7 Tokoh (Tim 7)</option>
+                                        <option value="19">19 Tokoh</option>
+                                    </select>
+                                </td>
+                            </tr>
+
+                            <!-- Row 3: Waktu Pembentukan -->
+                            <tr>
+                                <td class="py-4 px-4 font-semibold text-gray-400">3. Waktu Pembentukan</td>
+                                <td class="py-3 px-4">
+                                    <select id="sel-waktu-1" class="table-select" data-answer="pagi">
+                                        <option value="">-- Pilih Waktu --</option>
+                                        <option value="pagi">11 Juli 1945 (Sidang Pleno BPUPK)</option>
+                                        <option value="reses">22 Juni 1945 (Masa Reses)</option>
+                                        <option value="ppki">18 Agustus 1945 (Sidang PPKI)</option>
+                                    </select>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <select id="sel-waktu-2" class="table-select" data-answer="sore">
+                                        <option value="">-- Pilih Waktu --</option>
+                                        <option value="1juni">1 Juni 1945</option>
+                                        <option value="sore">Sore Hari, 11 Juli 1945</option>
+                                        <option value="17juli">17 Juli 1945</option>
+                                    </select>
+                                </td>
+                            </tr>
+
+                            <!-- Row 4: Tugas Pokok -->
+                            <tr>
+                                <td class="py-4 px-4 font-semibold text-gray-400">4. Tugas Pokok</td>
+                                <td class="py-3 px-4">
+                                    <select id="sel-tugas-1" class="table-select" data-answer="garis-besar">
+                                        <option value="">-- Pilih Tugas Pokok --</option>
+                                        <option value="garis-besar">Membahas dan menyepakati rancangan UUD secara garis besar</option>
+                                        <option value="dasar-negara">Merumuskan dasar negara Pancasila</option>
+                                        <option value="pertahanan">Merancang strategi pertahanan dan militer</option>
+                                    </select>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <select id="sel-tugas-2" class="table-select" data-answer="batang-tubuh">
+                                        <option value="">-- Pilih Tugas Pokok --</option>
+                                        <option value="pembukaan">Merumuskan Pembukaan UUD saja</option>
+                                        <option value="batang-tubuh">Merancang teks Batang Tubuh (pasal demi pasal) UUD selama 2 hari</option>
+                                        <option value="keuangan">Menyusun sistem keuangan negara</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <button onclick="checkTableAnswers()" class="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-bold rounded-xl shadow-lg shadow-orange-600/30 transition transform hover:scale-105 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-circle-check"></i> Cek Jawaban Tabel
+                    </button>
+                    <button onclick="resetTable()" class="w-full sm:w-auto px-6 py-3.5 bg-gray-800 hover:bg-gray-700 text-gray-300 font-semibold rounded-xl border border-gray-700 transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-rotate-left"></i> Reset Tabel
+                    </button>
+                </div>
+
+                <!-- Feedback Message -->
+                <div id="table-feedback" class="hidden mt-6 p-4 rounded-xl text-center font-bold text-sm"></div>
+            </section>
+
+            <div id="quiz-cta-container"></div>
+
+        <!-- NAVIGASI LEVEL (SEBELUMNYA & SELANJUTNYA) -->
+            <div class="mt-8 pt-6 border-t border-gray-800">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <a href="dunia2-level1.html" class="w-full sm:w-auto px-5 py-3 bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white font-bold rounded-xl border border-gray-700 transition flex items-center justify-center gap-2 text-xs sm:text-sm">
+                        <i class="fa-solid fa-chevron-left"></i> Sebelumnya: Level 5
+                    </a>
+                    
+                    <a href="dunia2.html" class="text-xs text-gray-400 hover:text-white flex items-center gap-1.5 font-semibold">
+                        <i class="fa-solid fa-map"></i> Peta Dunia 2 (Level 6/20)
+                    </a>
+
+                    <a href="dunia2-level3.html" class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-bold rounded-xl shadow-lg shadow-orange-600/30 transition transform hover:scale-105 flex items-center justify-center gap-2 text-xs sm:text-sm">
+                        Selanjutnya: Level 7 <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-brand-dark text-gray-400 py-8 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-sm text-center flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-2">
+                <img src="Logo Edukacivic.png" alt="EdukaCivic" class="h-6 w-auto">
+                <span class="font-bold text-white">Eduka<span class="text-brand-red">Civic</span></span>
+            </div>
+            <p>&copy; 2026 EdukaCivic | Fadilatul Fajri</p>
+        </div>
+    </footer>
+
+    <script>
+        // Reading progress tracker
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const pct = docHeight > 0 ? Math.min(100, Math.round((scrollTop / docHeight) * 100)) : 0;
+            document.getElementById('read-bar').style.width = pct + '%';
+            document.getElementById('read-pct').textContent = pct + '%';
+        });
+
+        // Table Activity Validation Logic
+        function checkTableAnswers() {
+            const selects = document.querySelectorAll('.table-select');
+            let correctCount = 0;
+            let filledCount = 0;
+
+            selects.forEach(sel => {
+                sel.classList.remove('correct', 'wrong');
+                const val = sel.value;
+                const expected = sel.dataset.answer;
+
+                if (val !== "") {
+                    filledCount++;
+                    if (val === expected) {
+                        sel.classList.add('correct');
+                        correctCount++;
+                    } else {
+                        sel.classList.add('wrong');
+                    }
+                }
+            });
+
+            const fb = document.getElementById('table-feedback');
+            fb.classList.remove('hidden');
+
+            if (correctCount === selects.length) {
+                setQuizButtonUnlocked("d2l2", "dunia2-level2-kuis.html");
+                playCelebrationFanfare();
+                triggerCelebrationConfetti();
+                fb.className = 'mt-6 p-4 rounded-xl text-center font-bold text-sm bg-green-500/20 border border-green-500/40 text-green-300';
+                fb.innerHTML = '🎉 Sempurna! Seluruh data pada tabel perbandingan Panitia Perancang UUD telah terisi dengan 100% tepat!';
+            } else if (filledCount < selects.length) {
+                fb.className = 'mt-6 p-4 rounded-xl text-center font-bold text-sm bg-yellow-500/20 border border-yellow-500/40 text-yellow-300';
+                fb.innerHTML = `⚠️ Baru ${filledCount} dari ${selects.length} kolom yang dipilih (${correctCount} benar). Lengkapi seluruh pilihan ya!`;
+            } else {
+                fb.className = 'mt-6 p-4 rounded-xl text-center font-bold text-sm bg-red-500/20 border border-red-500/40 text-red-300';
+                fb.innerHTML = `💪 ${correctCount} dari ${selects.length} pilihan sudah tepat. Periksa dan ganti pilihan pada kotak bertanda merah!`;
+            }
+        }
+
+        function resetTable() {
+            const selects = document.querySelectorAll('.table-select');
+            selects.forEach(sel => {
+                sel.value = "";
+                sel.classList.remove('correct', 'wrong');
+            });
+            document.getElementById('table-feedback').classList.add('hidden');
+        }
+    
+        document.addEventListener("DOMContentLoaded", () => {
+            initInteractiveActivityGating("d2l2", "dunia2-level2-kuis.html");
+        });
+    </script>
+</body>
+</html>
+
+
+

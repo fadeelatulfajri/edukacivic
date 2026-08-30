@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level 1 - Apa Itu Konstitusi? | EdukaCivic</title>
+    <link rel="icon" type="image/png" href="Logo Edukacivic.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="student-system.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            red: '#DC2626', redLight: '#EF4444', redDark: '#B91C1C',
+                            dark: '#0F172A', darker: '#020617', light: '#F8FAFC'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .highlight {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: #EF4444;
+            padding: 0 0.25rem;
+            border-radius: 0.25rem;
+            font-weight: 600;
+        }
+
+        /* Drag and drop activity styles */
+        .drop-zone {
+            min-height: 80px;
+            border: 2px dashed #475569;
+            transition: all 0.25s ease;
+        }
+        .drop-zone.drag-over {
+            border-color: #3b82f6;
+            background-color: rgba(59, 130, 246, 0.15);
+        }
+        .drop-zone.filled-correct {
+            border-color: #10b981;
+            background-color: rgba(16, 185, 129, 0.15);
+            border-style: solid;
+        }
+        .drop-zone.filled-wrong {
+            border-color: #ef4444;
+            background-color: rgba(239, 68, 68, 0.15);
+            border-style: solid;
+        }
+
+        .drag-item {
+            cursor: grab;
+            user-select: none;
+            touch-action: manipulation;
+            transition: all 0.2s ease;
+        }
+        .drag-item:active {
+            cursor: grabbing;
+            transform: scale(0.98);
+        }
+        .drag-item.selected {
+            ring: 3px solid #f59e0b;
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-brand-darker text-white font-sans min-h-screen flex flex-col">
+    <!-- Navbar -->
+    <nav class="bg-brand-dark border-b border-slate-800 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Left: Back Button & Logo -->
+                <div class="flex items-center gap-4">
+                    <a href="dunia1.html" class="text-slate-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-slate-800 flex items-center justify-center">
+                        <i class="fas fa-arrow-left text-xl"></i>
+                    </a>
+                    <img src="Logo Edukacivic.png" alt="EdukaCivic" class="h-8">
+                </div>
+
+                <!-- Center: Title -->
+                <div class="hidden md:flex flex-col items-center">
+                    <h1 class="text-white font-bold text-lg">Level 1 &mdash; Apa Itu Konstitusi?</h1>
+                    <span class="text-brand-redLight text-xs">Dunia 1: Mengenal Konstitusi</span>
+                </div>
+
+                <!-- Right: Profile & Points -->
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2 bg-slate-800 rounded-full px-3 py-1 border border-slate-700">
+                        <i class="fas fa-bolt text-yellow-400"></i>
+                        <span id="user-points" class="font-bold text-white">0</span>
+                        <span class="text-xs text-gray-400">Poin</span>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-brand-red to-orange-400 p-0.5 cursor-pointer shadow-md" onclick="window.location.href='profil-siswa.html'"><img id="nav-avatar-img" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Student" alt="Avatar" class="w-full h-full rounded-full bg-slate-900 object-cover"></div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow w-full max-w-4xl mx-auto p-4 md:p-8 space-y-8">
+        
+        <!-- Hero Section -->
+        <div class="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 rounded-2xl p-8 border border-blue-800/60 shadow-xl text-center relative overflow-hidden">
+            <div class="absolute top-0 right-0 opacity-10 transform translate-x-1/4 -translate-y-1/4">
+                <i class="fas fa-book-open text-9xl"></i>
+            </div>
+            <div class="relative z-10">
+                <div class="inline-block bg-blue-800/80 text-blue-200 text-xs font-bold px-3 py-1 rounded-full mb-4 border border-blue-600/40">MATERI LEVEL 1</div>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-white mb-2">Apa Itu Konstitusi?</h2>
+                <p class="text-blue-200 md:text-lg">Pelajari pengertian konstitusi, bentuk, dan contoh-contoh penerapannya</p>
+            </div>
+        </div>
+
+        <!-- Video Pengantar -->
+        <div class="bg-brand-dark rounded-2xl border border-slate-800 p-6 md:p-8 shadow-lg">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 bg-red-500/20 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-play-circle text-red-400 text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-white">Video Pengantar Level 1</h3>
+                    <p class="text-slate-400 text-xs">Tonton video berikut sebelum mempelajari materi</p>
+                </div>
+            </div>
+            <div class="rounded-xl overflow-hidden border border-slate-700 bg-black shadow-inner">
+                <video controls class="w-full" preload="metadata" poster="">
+                    <source src="Video Level 1 fiks.mp4" type="video/mp4">
+                    Browser Anda tidak mendukung pemutaran video.
+                </video>
+            </div>
+        </div>
+
+        <!-- Content Section 1: Pengertian -->
+        <div class="bg-brand-dark rounded-2xl border border-slate-800 p-6 md:p-8 hover:border-slate-700 transition-colors shadow-lg">
+            <div class="flex items-start gap-4">
+                <div class="bg-slate-800 p-4 rounded-xl text-brand-redLight text-2xl flex-shrink-0">
+                    <i class="fas fa-globe"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-white mb-4">Asal Mula Istilah</h3>
+                    <p class="text-slate-300 leading-relaxed mb-4">
+                        Istilah <span class="highlight">konstitusi</span> berasal dari bahasa Inggris <em>Constitution</em> dan bahasa Belanda <em>Constitutie</em> yang memiliki pengertian hukum dasar atau Undang Undang Dasar.
+                    </p>
+                    <p class="text-slate-300 leading-relaxed">
+                        Menurut istilah ketatanegaraan, konstitusi dimaksudkan untuk membentuk, menyusun, atau menyatakan suatu negara. Dari beberapa pengertian tersebut dapat disimpulkan bahwa konstitusi merupakan <strong>hukum dasar yang dijadikan pegangan dalam penyelenggaraan suatu negara</strong>.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Section 2: Visual Diagram -->
+        <div class="bg-brand-dark rounded-2xl border border-slate-800 p-6 md:p-8 hover:border-slate-700 transition-colors shadow-lg">
+            <div class="text-center mb-8">
+                <h3 class="text-xl font-bold text-white">Bentuk-Bentuk Konstitusi</h3>
+                <p class="text-slate-400 text-sm mt-2">Menurut bentuknya, konstitusi terbagi menjadi dua jenis</p>
+            </div>
+            
+            <div class="flex flex-col md:flex-row items-center justify-center gap-6">
+                <!-- Tertulis -->
+                <div class="bg-slate-800 border border-slate-700 p-6 rounded-xl flex-1 w-full text-center hover:border-blue-500 transition-colors shadow-md">
+                    <i class="fas fa-book text-4xl text-blue-400 mb-4"></i>
+                    <h4 class="text-lg font-bold text-white mb-2">Konstitusi Tertulis</h4>
+                    <p class="text-slate-300 text-sm mb-4">Biasa disebut dengan <span class="highlight">Undang-Undang Dasar (UUD)</span></p>
+                    <span class="inline-block bg-blue-900/50 text-blue-300 text-xs px-2.5 py-1 rounded-full border border-blue-700">Contoh: UUD NRI 1945</span>
+                </div>
+
+                <!-- Plus/Split Icon -->
+                <div class="text-slate-600 text-2xl">
+                    <i class="fas fa-plus md:hidden"></i>
+                    <i class="fas fa-arrows-left-right hidden md:block"></i>
+                </div>
+
+                <!-- Tidak Tertulis -->
+                <div class="bg-slate-800 border border-slate-700 p-6 rounded-xl flex-1 w-full text-center hover:border-green-500 transition-colors shadow-md">
+                    <i class="fas fa-comments text-4xl text-green-400 mb-4"></i>
+                    <h4 class="text-lg font-bold text-white mb-2">Konstitusi Tidak Tertulis</h4>
+                    <p class="text-slate-300 text-sm mb-4">Biasa disebut dengan <span class="highlight">konvensi</span> dan <span class="highlight">hukum adat</span></p>
+                    <span class="inline-block bg-green-900/50 text-green-300 text-xs px-2.5 py-1 rounded-full border border-green-700">Contoh: Pidato Presiden</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Box: Contoh Konvensi -->
+        <div class="bg-brand-redDark/20 border border-brand-redDark/50 rounded-2xl p-6 md:p-8 flex items-start gap-4 shadow-lg">
+            <div class="text-brand-redLight text-2xl flex-shrink-0 mt-1">
+                <i class="fas fa-lightbulb"></i>
+            </div>
+            <div>
+                <h4 class="text-lg font-bold text-brand-redLight mb-2">Contoh Konvensi di Indonesia</h4>
+                <p class="text-slate-300 leading-relaxed text-sm md:text-base">
+                    Contoh konvensi dalam ketatanegaraan Republik Indonesia adalah <strong>pidato kenegaraan Presiden</strong> di hadapan sidang paripurna Dewan Perwakilan Rakyat (DPR) sebelum tanggal 17 Agustus tentang penyampaian RAPBN (rancangan anggaran belanja negara).
+                </p>
+            </div>
+        </div>
+
+        <!-- GAMBAR LEVEL 1 (Setelah contoh konvensi di Indonesia) -->
+        <div class="bg-brand-dark rounded-2xl border border-slate-800 p-6 md:p-8 shadow-xl text-center">
+            <div class="flex items-center gap-2 justify-center mb-4 text-blue-400">
+                <i class="fa-solid fa-image"></i>
+                <span class="text-xs font-bold uppercase tracking-wider">Infografis Pembelajaran</span>
+            </div>
+            <div class="overflow-hidden rounded-xl border border-slate-700 bg-slate-900/60 shadow-lg">
+                <img src="Level 1.jpg" alt="Gambar Level 1" class="w-full max-h-[420px] object-contain mx-auto rounded-lg hover:scale-[1.01] transition-transform duration-300">
+            </div>
+            <p class="text-slate-400 text-xs mt-3 italic">Visualisasi Pengertian dan Klasifikasi Konstitusi</p>
+        </div>
+
+        <!-- AKTIVITAS 1: BAGAN KONSEP KONSTITUSI (Sebelum Kuis) -->
+        <div class="bg-slate-900/90 border-2 border-blue-500/40 rounded-3xl p-6 md:p-8 shadow-2xl relative">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-12 h-12 bg-blue-500/20 text-blue-400 rounded-2xl flex items-center justify-center text-2xl border border-blue-500/30">
+                    <i class="fa-solid fa-puzzle-piece"></i>
+                </div>
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-blue-400">Aktivitas Interaktif 1</span>
+                    <h3 class="text-2xl font-bold text-white">Bagan Konsep Konstitusi</h3>
+                </div>
+            </div>
+            <p class="text-slate-300 text-sm mb-6 leading-relaxed">
+                Tarik label pilihan di bawah atau klik label lalu klik kotak tujuan yang sesuai untuk melengkapi bagan klasifikasi konstitusi!
+            </p>
+
+            <!-- Bank of Draggable / Selectable Labels -->
+            <div class="bg-slate-800/80 p-4 rounded-2xl border border-slate-700 mb-8">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Pilihan Label (Klik / Drag ke Bagan):</p>
+                <div id="label-bank" class="flex flex-wrap gap-2.5 min-h-[50px] p-2 bg-slate-900/60 rounded-xl border border-slate-700/50">
+                    <div id="item-1" draggable="true" ondragstart="handleDragStart(event)" onclick="handleLabelClick(this)" data-target="slot-tertulis-pengertian" class="drag-item bg-blue-600/80 hover:bg-blue-600 text-white text-xs font-semibold px-3.5 py-2.5 rounded-xl border border-blue-400 shadow-md">
+                        📄 Naskah resmi tertulis hukum dasar negara
+                    </div>
+                    <div id="item-2" draggable="true" ondragstart="handleDragStart(event)" onclick="handleLabelClick(this)" data-target="slot-tertulis-contoh" class="drag-item bg-indigo-600/80 hover:bg-indigo-600 text-white text-xs font-semibold px-3.5 py-2.5 rounded-xl border border-indigo-400 shadow-md">
+                        🇮🇩 UUD NRI Tahun 1945
+                    </div>
+                    <div id="item-3" draggable="true" ondragstart="handleDragStart(event)" onclick="handleLabelClick(this)" data-target="slot-tidaktertulis-pengertian" class="drag-item bg-green-600/80 hover:bg-green-600 text-white text-xs font-semibold px-3.5 py-2.5 rounded-xl border border-green-400 shadow-md">
+                        🗣️ Kebiasaan ketatanegaraan (Konvensi / Hukum Adat)
+                    </div>
+                    <div id="item-4" draggable="true" ondragstart="handleDragStart(event)" onclick="handleLabelClick(this)" data-target="slot-tidaktertulis-contoh" class="drag-item bg-emerald-600/80 hover:bg-emerald-600 text-white text-xs font-semibold px-3.5 py-2.5 rounded-xl border border-emerald-400 shadow-md">
+                        🎙️ Pidato Kenegaraan Presiden menjelang 17 Agustus
+                    </div>
+                </div>
+            </div>
+
+            <!-- Conceptual Tree Diagram (Drop Targets) -->
+            <div class="space-y-6">
+                <!-- Root Node -->
+                <div class="bg-gradient-to-r from-blue-700 to-indigo-700 p-4 rounded-2xl text-center font-bold text-white shadow-lg border border-blue-400/40 max-w-sm mx-auto">
+                    <i class="fa-solid fa-scale-balanced mr-2"></i> KONSTITUSI NEGARA
+                </div>
+
+                <!-- Connector Line -->
+                <div class="w-0.5 h-6 bg-slate-600 mx-auto"></div>
+
+                <!-- Two Main Branches -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Branch 1: Konstitusi Tertulis -->
+                    <div class="bg-slate-800/90 border border-blue-500/40 rounded-2xl p-5 shadow-lg">
+                        <div class="flex items-center gap-2 mb-4 pb-3 border-b border-slate-700">
+                            <span class="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold">1</span>
+                            <h4 class="text-base font-bold text-blue-300">Konstitusi Tertulis</h4>
+                        </div>
+
+                        <!-- Drop Zone: Pengertian -->
+                        <div class="mb-4">
+                            <label class="block text-xs font-medium text-slate-400 mb-1.5">Pengertian:</label>
+                            <div id="slot-tertulis-pengertian" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(this)" class="drop-zone bg-slate-900/80 rounded-xl p-3 flex items-center justify-center text-center text-xs text-slate-500">
+                                Letakkan label Pengertian di sini
+                            </div>
+                        </div>
+
+                        <!-- Drop Zone: Contoh -->
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-1.5">Contoh di Indonesia:</label>
+                            <div id="slot-tertulis-contoh" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(this)" class="drop-zone bg-slate-900/80 rounded-xl p-3 flex items-center justify-center text-center text-xs text-slate-500">
+                                Letakkan label Contoh di sini
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Branch 2: Konstitusi Tidak Tertulis -->
+                    <div class="bg-slate-800/90 border border-green-500/40 rounded-2xl p-5 shadow-lg">
+                        <div class="flex items-center gap-2 mb-4 pb-3 border-b border-slate-700">
+                            <span class="w-8 h-8 rounded-lg bg-green-500/20 text-green-400 flex items-center justify-center font-bold">2</span>
+                            <h4 class="text-base font-bold text-green-300">Konstitusi Tidak Tertulis</h4>
+                        </div>
+
+                        <!-- Drop Zone: Pengertian -->
+                        <div class="mb-4">
+                            <label class="block text-xs font-medium text-slate-400 mb-1.5">Pengertian:</label>
+                            <div id="slot-tidaktertulis-pengertian" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(this)" class="drop-zone bg-slate-900/80 rounded-xl p-3 flex items-center justify-center text-center text-xs text-slate-500">
+                                Letakkan label Pengertian di sini
+                            </div>
+                        </div>
+
+                        <!-- Drop Zone: Contoh -->
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-1.5">Contoh di Indonesia:</label>
+                            <div id="slot-tidaktertulis-contoh" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(this)" class="drop-zone bg-slate-900/80 rounded-xl p-3 flex items-center justify-center text-center text-xs text-slate-500">
+                                Letakkan label Contoh di sini
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+                <button onclick="checkBaganKonsep()" class="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-blue-600/30 transition transform hover:scale-105 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-circle-check"></i> Cek Jawaban Bagan
+                </button>
+                <button onclick="resetBaganKonsep()" class="w-full sm:w-auto px-6 py-3.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl border border-slate-700 transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-rotate-left"></i> Reset Bagan
+                </button>
+            </div>
+
+            <!-- Feedback Message -->
+            <div id="bagan-feedback" class="hidden mt-6 p-4 rounded-xl text-center font-bold text-sm"></div>
+        </div>
+
+                <!-- Bottom CTA Gated -->
+        <div id="quiz-cta-container"></div>
+
+        <!-- NAVIGASI LEVEL (SEBELUMNYA & SELANJUTNYA) -->
+        <div class="mt-8 pt-6 border-t border-slate-800">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <a href="dunia1.html" class="w-full sm:w-auto px-5 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold rounded-xl border border-slate-700 transition flex items-center justify-center gap-2 text-xs sm:text-sm">
+                    <i class="fa-solid fa-chevron-left"></i> Peta Dunia 1
+                </a>
+                
+                <div class="flex items-center gap-2 text-xs text-slate-500 font-semibold">
+                    <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Level 1 dari 20
+                </div>
+
+                <a href="dunia1-level2.html" class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-blue-600/30 transition transform hover:scale-105 flex items-center justify-center gap-2 text-xs sm:text-sm">
+                    Selanjutnya: Level 2 <i class="fa-solid fa-chevron-right"></i>
+                </a>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-brand-dark border-t border-slate-800 py-6 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col items-center justify-center gap-2">
+            <p class="text-slate-500 text-sm">&copy; 2026 EdukaCivic | Fadilatul Fajri</p>
+            <a href="dunia1.html" class="text-slate-400 hover:text-white text-sm transition-colors flex items-center gap-2">
+                <i class="fas fa-arrow-left"></i> Kembali ke Dunia 1
+            </a>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load points from progress
+            const progress = JSON.parse(localStorage.getItem('edukacivic_progress')) || { poin: 0 };
+            document.getElementById('user-points').textContent = progress.poin || 0;
+        });
+
+        // Drag & Drop / Click to place logic
+        let draggedElement = null;
+        let selectedElement = null;
+
+        function handleDragStart(e) {
+            draggedElement = e.target;
+            e.dataTransfer.setData('text/plain', e.target.id);
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+            const targetZone = e.currentTarget;
+            
+            if (draggedElement) {
+                placeItemInZone(draggedElement, targetZone);
+                draggedElement = null;
+            }
+        }
+
+        function handleLabelClick(el) {
+            if (selectedElement === el) {
+                el.classList.remove('selected');
+                selectedElement = null;
+            } else {
+                document.querySelectorAll('.drag-item').forEach(item => item.classList.remove('selected'));
+                el.classList.add('selected');
+                selectedElement = el;
+            }
+        }
+
+        function handleSlotClick(slot) {
+            if (selectedElement) {
+                placeItemInZone(selectedElement, slot);
+                selectedElement.classList.remove('selected');
+                selectedElement = null;
+            }
+        }
+
+        function placeItemInZone(item, zone) {
+            // If zone already has a label, return it to bank
+            if (zone.children.length > 0) {
+                const existing = zone.children[0];
+                document.getElementById('label-bank').appendChild(existing);
+            }
+            zone.innerHTML = '';
+            zone.appendChild(item);
+        }
+
+        function checkBaganKonsep() {
+            const slots = [
+                'slot-tertulis-pengertian',
+                'slot-tertulis-contoh',
+                'slot-tidaktertulis-pengertian',
+                'slot-tidaktertulis-contoh'
+            ];
+
+            let correctCount = 0;
+            let filledCount = 0;
+
+            slots.forEach(slotId => {
+                const zone = document.getElementById(slotId);
+                zone.classList.remove('filled-correct', 'filled-wrong');
+
+                if (zone.children.length > 0) {
+                    filledCount++;
+                    const child = zone.children[0];
+                    if (child.dataset.target === slotId) {
+                        zone.classList.add('filled-correct');
+                        correctCount++;
+                    } else {
+                        zone.classList.add('filled-wrong');
+                    }
+                }
+            });
+
+            const fb = document.getElementById('bagan-feedback');
+            fb.classList.remove('hidden');
+
+            if (correctCount === 4) {
+                setQuizButtonUnlocked("d1l1", "dunia1-level1-kuis.html");
+                playCelebrationFanfare();
+                triggerCelebrationConfetti();
+                fb.className = 'mt-6 p-4 rounded-xl text-center font-bold text-sm bg-green-500/20 border border-green-500/40 text-green-300';
+                fb.innerHTML = '🎉 Luar Biasa! Semua label pada bagan konsep diletakkan dengan benar!';
+            } else if (filledCount < 4) {
+                fb.className = 'mt-6 p-4 rounded-xl text-center font-bold text-sm bg-yellow-500/20 border border-yellow-500/40 text-yellow-300';
+                fb.innerHTML = `⚠️ Baru ${filledCount} dari 4 slot yang terisi (${correctCount} benar). Lengkapi seluruh slot ya!`;
+            } else {
+                fb.className = 'mt-6 p-4 rounded-xl text-center font-bold text-sm bg-red-500/20 border border-red-500/40 text-red-300';
+                fb.innerHTML = `💪 ${correctCount} dari 4 label tepat. Periksa kembali kotak bertanda merah!`;
+            }
+        }
+
+        function resetBaganKonsep() {
+            const bank = document.getElementById('label-bank');
+            const items = document.querySelectorAll('.drag-item');
+            items.forEach(item => {
+                item.classList.remove('selected');
+                bank.appendChild(item);
+            });
+
+            const zones = document.querySelectorAll('.drop-zone');
+            zones.forEach(z => {
+                z.classList.remove('filled-correct', 'filled-wrong', 'drag-over');
+                const defaultText = z.id.includes('pengertian') ? 'Letakkan label Pengertian di sini' : 'Letakkan label Contoh di sini';
+                z.innerHTML = defaultText;
+            });
+
+            document.getElementById('bagan-feedback').classList.add('hidden');
+            selectedElement = null;
+            draggedElement = null;
+        }
+    
+        document.addEventListener("DOMContentLoaded", () => {
+            initInteractiveActivityGating("d1l1", "dunia1-level1-kuis.html");
+        });
+    </script>
+</body>
+</html>
+
+

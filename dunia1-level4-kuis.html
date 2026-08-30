@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EdukaCivic - Kuis Level 4: Indonesia Membutuhkan UUD 1945</title>
+    
+    <link rel="icon" type="image/png" href="Logo Edukacivic.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="student-system.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            red: '#DC2626', redLight: '#EF4444', redDark: '#B91C1C',
+                            dark: '#0F172A', darker: '#020617', light: '#F8FAFC'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        .animate-shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        
+        .fade-in { animation: fadeIn 0.3s ease-in forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .pg-btn {
+            transition: all 0.2s;
+        }
+        .pg-btn:hover:not(:disabled) {
+            background-color: rgba(59, 130, 246, 0.2);
+            border-color: #3b82f6;
+        }
+        .pg-btn.correct {
+            background-color: rgba(34, 197, 94, 0.2);
+            border-color: #22c55e;
+            color: #4ade80;
+        }
+        .pg-btn.wrong {
+            background-color: rgba(239, 68, 68, 0.2);
+            border-color: #ef4444;
+            color: #f87171;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body class="bg-brand-darker text-white min-h-screen flex flex-col">
+
+    <!-- NAVBAR -->
+    <nav class="glass-panel sticky top-0 z-50 py-4 px-6 shadow-lg border-b border-gray-800">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <a href="dunia1-level4.html" class="text-gray-400 hover:text-white transition-colors flex items-center gap-2">
+                <i class="fas fa-arrow-left"></i>
+                <span class="hidden sm:inline">Kembali ke Materi</span>
+            </a>
+            
+            <div class="flex items-center gap-4">
+                <img src="Logo Edukacivic.png" alt="EdukaCivic" class="h-8 object-contain">
+                <h1 class="font-bold text-lg hidden md:block">Kuis Level 4: Indonesia Membutuhkan UUD 1945</h1>
+            </div>
+            
+            <div class="flex items-center gap-6 font-semibold bg-gray-800 px-4 py-2 rounded-full border border-gray-700">
+                <div class="flex items-center gap-2 text-blue-400" title="Waktu">
+                    <i class="fas fa-clock"></i>
+                    <span id="timer-display">00:00</span>
+                </div>
+                <div class="w-px h-5 bg-gray-600"></div>
+                <div class="flex items-center gap-2 text-brand-redLight" title="Skor">
+                    <i class="fas fa-star"></i>
+                    <span id="score-display">0/25</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-grow flex items-center justify-center p-6 w-full max-w-4xl mx-auto">
+        
+        <!-- INTRO CARD -->
+        <div id="intro-card" class="glass-panel w-full p-8 md:p-12 rounded-3xl shadow-2xl text-center fade-in max-w-2xl">
+            <div class="w-24 h-24 bg-sky-500/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-sky-500/50">
+                <i class="fas fa-scroll text-5xl text-sky-400 drop-shadow-[0_0_15px_rgba(56,189,248,0.8)]"></i>
+            </div>
+            
+            <h2 class="text-3xl md:text-4xl font-extrabold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-cyan-300">Kuis: Indonesia Membutuhkan UUD 1945</h2>
+            <p class="text-gray-300 text-sm md:text-base mb-8">Uji pemahamanmu mengenai alasan pentingnya UUD 1945, langkah awal perumusan konstitusi, dan sejarah lahirnya Piagam Jakarta!</p>
+            
+            <div class="flex justify-center gap-8 mb-10 text-gray-400 bg-gray-800/50 p-4 rounded-xl border border-gray-700">
+                <div><i class="fas fa-list-ol mr-2 text-blue-400"></i>10 Soal</div>
+                <div class="w-px bg-gray-600"></div>
+                <div><i class="fas fa-medal mr-2 text-yellow-400"></i>25 Poin Maks</div>
+            </div>
+            
+            <button onclick="startQuiz()" class="bg-gradient-to-r from-sky-600 to-cyan-600 hover:from-sky-500 hover:to-cyan-500 text-white font-bold py-4 px-10 rounded-full shadow-lg shadow-sky-600/30 transition-all hover:scale-105 active:scale-95 text-lg w-full sm:w-auto">
+                <i class="fas fa-play mr-2"></i> Mulai Kuis Level 4
+            </button>
+        </div>
+
+        <!-- QUIZ CONTAINER -->
+        <div id="quiz-container" class="w-full hidden flex-col gap-6 fade-in max-w-3xl">
+            <!-- Progress Bar -->
+            <div class="glass-panel p-4 rounded-2xl flex items-center gap-4">
+                <span class="font-bold text-gray-400 whitespace-nowrap" id="progress-text">Soal 1 / 10</span>
+                <div class="w-full bg-gray-800 rounded-full h-3 overflow-hidden">
+                    <div id="progress-bar" class="bg-gradient-to-r from-sky-500 to-cyan-400 h-3 rounded-full transition-all duration-300" style="width: 10%"></div>
+                </div>
+            </div>
+            
+            <!-- Question Card -->
+            <div class="glass-panel p-6 md:p-8 rounded-3xl relative overflow-hidden shadow-2xl">
+                <!-- Question Header -->
+                <div class="mb-6">
+                    <span class="inline-block px-3 py-1 bg-sky-500/20 text-sky-400 text-sm font-semibold rounded-lg mb-3 border border-sky-500/30" id="question-type-badge">Pilihan Ganda</span>
+                    <h3 class="text-xl md:text-2xl font-bold leading-relaxed" id="question-text">Instruction</h3>
+                </div>
+
+                <!-- Interactive Area -->
+                <div id="interactive-area" class="mb-8 w-full flex flex-col gap-3">
+                    <!-- Dynamic content (PG buttons) goes here -->
+                </div>
+
+                <!-- Explanation / Next Button Area -->
+                <div id="post-answer-area" class="mt-8 hidden border-t border-gray-700 pt-6">
+                    <div id="explanation-box" class="mb-6 p-4 rounded-xl border border-green-500/30 bg-green-500/10 hidden">
+                        <h4 class="font-bold flex items-center gap-2 mb-2 text-green-400">
+                            <i class="fas fa-check-circle"></i> Tepat Sekali!
+                        </h4>
+                        <p class="text-gray-300 text-sm leading-relaxed" id="explanation-text">Jawabanmu benar.</p>
+                        <p class="text-yellow-400 text-sm font-bold mt-2" id="earned-points-text">+2.5 Poin</p>
+                    </div>
+                    
+                    <button id="next-btn" onclick="nextQuestion()" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition-colors flex justify-center items-center gap-2">
+                        <span>Selanjutnya</span> <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESULT MODAL -->
+        <div id="result-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-[100] hidden backdrop-blur-sm">
+            <div class="glass-panel w-full max-w-md p-8 rounded-3xl shadow-2xl text-center border border-gray-700 transform scale-95 transition-transform duration-300" id="result-content">
+                <!-- Injected dynamically by renderQuizCelebration -->
+            </div>
+        </div>
+    </main>
+
+    <footer class="glass-panel py-4 text-center text-sm text-gray-500 border-t border-gray-800 mt-auto">
+        <p>&copy; 2026 EdukaCivic | Fadilatul Fajri</p>
+    </footer>
+
+    <script>
+        // QUIZ DATA LEVEL 4 (10 SOAL LENGKAP)
+        const questions = [
+            {
+                type: "pg",
+                instruction: "Mengapa sebuah negara yang merdeka sangat membutuhkan Undang-Undang Dasar (hukum dasar tertulis)?",
+                explanation: "UUD berfungsi agar tata pemerintahan berjalan tertib, mencegah kesewenang-wenangan penguasa, dan melindungi HAM seluruh warga negara.",
+                options: [
+                    { text: "A. Agar pemerintahan berjalan tertib, mencegah kekuasaan absolut, dan melindungi HAM warga", isCorrect: true },
+                    { text: "B. Agar negara bisa diakui tanpa perlu menjalankan aturan hukum", isCorrect: false },
+                    { text: "C. Hanya untuk memenuhi syarat formalitas dari bangsa penjajah", isCorrect: false },
+                    { text: "D. Supaya pemerintah memiliki kekuasaan mutlak tanpa batas", isCorrect: false }
+                ]
+            },
+            {
+                type: "pg",
+                instruction: "Apa langkah awal penting yang diambil setelah Sidang I BPUPK selesai pada masa reses?",
+                explanation: "Pada masa reses dibentuk Panitia Kecil dan Panitia Sembilan untuk menampung dan menyerap aspirasi dasar negara.",
+                options: [
+                    { text: "A. Membubarkan BPUPK secara sepihak", isCorrect: false },
+                    { text: "B. Membentuk Panitia Kecil dan Panitia Sembilan untuk menyerap aspirasi dasar negara", isCorrect: true },
+                    { text: "C. Langsung menetapkan Presiden tanpa naskah dasar negara", isCorrect: false },
+                    { text: "D. Menyerahkan urusan kemerdekaan kepada pihak Sekutu", isCorrect: false }
+                ]
+            },
+            {
+                type: "pg",
+                instruction: "Kapan Panitia Sembilan berhasil merumuskan naskah Piagam Jakarta (Jakarta Charter)?",
+                explanation: "Piagam Jakarta ditandatangani oleh 9 tokoh pendiri bangsa pada tanggal 22 Juni 1945.",
+                options: [
+                    { text: "A. 29 Mei 1945", isCorrect: false },
+                    { text: "B. 1 Juni 1945", isCorrect: false },
+                    { text: "C. 22 Juni 1945", isCorrect: true },
+                    { text: "D. 18 Agustus 1945", isCorrect: false }
+                ]
+            },
+            {
+                type: "pg",
+                instruction: "Naskah Piagam Jakarta (Jakarta Charter) yang dirumuskan pada 22 Juni 1945 menjadi fondasi awal dari...",
+                explanation: "Piagam Jakarta merupakan cikal bakal naskah rancangan Pembukaan Undang-Undang Dasar 1945.",
+                options: [
+                    { text: "A. Batang Tubuh Pasal-Pasal UUD", isCorrect: false },
+                    { text: "B. Rancangan Pembukaan Undang-Undang Dasar 1945", isCorrect: true },
+                    { text: "C. Peraturan Pemerintah Pengganti Undang-Undang", isCorrect: false },
+                    { text: "D. Teks Proklamasi Kemerdekaan", isCorrect: false }
+                ]
+            },
+            {
+                type: "pg",
+                instruction: "Siapakah tokoh nasional yang mengusulkan nama 'Jakarta Charter' atau 'Piagam Jakarta'?",
+                explanation: "Mr. Mohammad Yamin adalah tokoh yang pertama kali memberikan nama 'Piagam Jakarta' (Jakarta Charter) pada naskah 22 Juni 1945.",
+                options: [
+                    { text: "A. Ir. Soekarno", isCorrect: false },
+                    { text: "B. Drs. Mohammad Hatta", isCorrect: false },
+                    { text: "C. Mr. Mohammad Yamin", isCorrect: true },
+                    { text: "D. Mr. A.A. Maramis", isCorrect: false }
+                ]
+            },
+            {
+                type: "pg",
+                instruction: "Siapakah yang menjabat sebagai Ketua dan Wakil Ketua dalam Panitia Sembilan?",
+                explanation: "Ir. Soekarno bertindak sebagai Ketua dan Drs. Moh. Hatta bertindak sebagai Wakil Ketua Panitia Sembilan.",
+                options: [
+                    { text: "A. Ir. Soekarno (Ketua) dan Drs. Moh. Hatta (Wakil Ketua)", isCorrect: true },
+                    { text: "B. Dr. Radjiman Wedyodiningrat (Ketua) dan R.P. Soeroso (Wakil Ketua)", isCorrect: false },
+                    { text: "C. Mr. Supomo (Ketua) dan Mr. Moh. Yamin (Wakil Ketua)", isCorrect: false },
+                    { text: "D. K.H. Wahid Hasjim (Ketua) dan H. Agus Salim (Wakil Ketua)", isCorrect: false }
+                ]
+            },
+            {
+                type: "pg",
+                instruction: "Apa yang akan terjadi pada suatu negara jika menjalankan pemerintahan tanpa adanya Undang-Undang Dasar?",
+                explanation: "Tanpa UUD, penguasa berpotensi bertindak absolut/otoriter, hak rakyat terabaikan, dan terjadi anarki atau kekacauan sosial.",
+                options: [
+                    { text: "A. Negara akan semakin makmur dan sejahtera tanpa beban aturan", isCorrect: false },
+                    { text: "B. Penguasa berpotensi bertindak absolut, hak rakyat terabaikan, dan timbul anarki", isCorrect: true },
+                    { text: "C. Seluruh rakyat otomatis hidup rukun tanpa perselisihan", isCorrect: false },
+                    { text: "D. Hubungan antarlembaga negara akan berjalan dengan sendirinya", isCorrect: false }
+                ]
+            },
+            {
+                type: "pg",
+                instruction: "Salah satu fungsi utama UUD 1945 dalam perlindungan warga negara adalah...",
+                explanation: "UUD 1945 menjamin dan melindungi hak asasi manusia (HAM) setiap warga negara secara adil di mata hukum.",
+                options: [
+                    { text: "A. Memberikan kekebalan hukum penuh bagi pejabat negara", isCorrect: false },
+                    { text: "B. Menjamin dan melindungi hak asasi setiap warga negara di hadapan hukum", isCorrect: true },
+                    { text: "C. Membatasi warga negara dalam mengemukakan pendapat", isCorrect: false },
+                    { text: "D. Mengutamakan hak kelompok penguasa di atas hak rakyat", isCorrect: false }
+                ]
+            },
+            {
+                type: "pg",
+                instruction: "Panitia Sembilan dibentuk sebagai representasi kompromi luhur antara dua kelompok pendiri bangsa, yaitu...",
+                explanation: "Panitia Sembilan terdiri dari perwakilan golongan Kebangsaan (Nasionalis) dan golongan Islam.",
+                options: [
+                    { text: "A. Golongan Kebangsaan (Nasionalis) dan Golongan Islam", isCorrect: true },
+                    { text: "B. Golongan Tua dan Golongan Muda", isCorrect: false },
+                    { text: "C. Golongan Sipil dan Golongan Militer", isCorrect: false },
+                    { text: "D. Golongan Pribumi dan Golongan Asing", isCorrect: false }
+                ]
+            },
+            {
+                type: "pg",
+                instruction: "Mengapa rumusan sila pertama Piagam Jakarta disepakati disesuaikan menjadi 'Ketuhanan Yang Maha Esa' pada 18 Agustus 1945?",
+                explanation: "Perubahan tersebut demi menjaga persatuan, kesatuan, dan integrasi seluruh rakyat Indonesia yang majemuk dari Sabang sampai Merauke.",
+                options: [
+                    { text: "A. Demi menjaga persatuan, kesatuan, dan keutuhan bangsa Indonesia yang majemuk", isCorrect: true },
+                    { text: "B. Karena ada desakan dari pemerintah kolonial Belanda", isCorrect: false },
+                    { text: "C. Karena naskah lama hilang dan harus diganti", isCorrect: false },
+                    { text: "D. Karena rumusan lama tidak memiliki makna filosofis", isCorrect: false }
+                ]
+            }
+        ];
+
+        let currentQuestion = 0;
+        let totalScore = 0;
+        let correctCount = 0;
+        let timerSeconds = 0;
+        let timerInterval;
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function startQuiz() {
+            document.getElementById('intro-card').classList.add('hidden');
+            const quizContainer = document.getElementById('quiz-container');
+            quizContainer.classList.remove('hidden');
+            quizContainer.classList.add('flex');
+            
+            // Timer Start
+            timerInterval = setInterval(() => {
+                timerSeconds++;
+                document.getElementById('timer-display').innerText = formatTime(timerSeconds);
+            }, 1000);
+
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const q = questions[currentQuestion];
+            
+            // Update Headers & Progress
+            document.getElementById('progress-text').innerText = `Soal ${currentQuestion + 1} / ${questions.length}`;
+            const progressPct = ((currentQuestion + 1) / questions.length) * 100;
+            document.getElementById('progress-bar').style.width = `${progressPct}%`;
+            document.getElementById('question-text').innerText = q.instruction;
+            
+            // Reset Post-Answer Area
+            document.getElementById('post-answer-area').classList.add('hidden');
+            document.getElementById('explanation-box').classList.add('hidden');
+            
+            const interactiveArea = document.getElementById('interactive-area');
+            interactiveArea.innerHTML = '';
+
+            // Render Multiple Choice
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'pg-btn w-full text-left p-4 rounded-2xl bg-gray-800/80 border border-gray-700 text-white font-medium flex items-center justify-between text-xs sm:text-sm shadow-md';
+                btn.innerHTML = `<span>${opt.text}</span> <i class="far fa-circle text-gray-500"></i>`;
+                btn.onclick = () => selectPGOption(btn, opt.isCorrect, q.explanation);
+                interactiveArea.appendChild(btn);
+            });
+        }
+
+        function selectPGOption(btnElement, isCorrect, explanation) {
+            const buttons = document.querySelectorAll('.pg-btn');
+            buttons.forEach(btn => btn.disabled = true);
+
+            const q = questions[currentQuestion];
+            const pointsPerQuestion = 25 / questions.length;
+            let pointsEarned = 0;
+
+            if (isCorrect) {
+                btnElement.classList.add('correct');
+                btnElement.querySelector('i').className = 'fas fa-check-circle text-green-400';
+                totalScore += pointsPerQuestion;
+                correctCount++;
+                pointsEarned = pointsPerQuestion;
+                try { playCelebrationFanfare(); } catch(e) {}
+            } else {
+                btnElement.classList.add('wrong');
+                btnElement.querySelector('i').className = 'fas fa-times-circle text-red-400';
+                
+                // Highlight correct answer
+                buttons.forEach(btn => {
+                    const optText = btn.querySelector('span').innerText;
+                    const optObj = q.options.find(o => o.text === optText);
+                    if (optObj && optObj.isCorrect) {
+                        btn.classList.add('correct');
+                        btn.querySelector('i').className = 'fas fa-check-circle text-green-400';
+                    }
+                });
+            }
+
+            document.getElementById('score-display').innerText = `${Math.round(totalScore)}/25`;
+            
+            // Show Explanation Box
+            const explBox = document.getElementById('explanation-box');
+            const explText = document.getElementById('explanation-text');
+            explText.innerText = explanation || (isCorrect ? 'Jawabanmu benar!' : 'Jawaban belum tepat.');
+            explBox.classList.remove('hidden');
+            document.getElementById('earned-points-text').innerText = `+${pointsEarned.toFixed(1)} Poin`;
+            
+            document.getElementById('post-answer-area').classList.remove('hidden');
+
+            // Change button to "Selesai" if last
+            if (currentQuestion === questions.length - 1) {
+                const nextBtn = document.getElementById('next-btn');
+                nextBtn.innerHTML = '<span>Selesai Kuis</span> <i class="fas fa-check"></i>';
+                nextBtn.classList.replace('bg-sky-600', 'bg-green-600');
+                nextBtn.classList.replace('hover:bg-sky-500', 'hover:bg-green-500');
+            }
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                loadQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        function finishQuiz() {
+            if (typeof timerInterval !== 'undefined') clearInterval(timerInterval);
+            const qc = document.getElementById('quiz-container');
+            if (qc) qc.classList.add('hidden');
+
+            const earnedScore = Math.min(25, Math.round(totalScore));
+            const timeStr = formatTime(timerSeconds);
+
+            renderQuizCelebration({
+                levelKey: 'd1l4',
+                score: earnedScore,
+                maxScore: 25,
+                correctCount: correctCount,
+                totalQuestions: questions.length,
+                timeText: timeStr,
+                modalId: 'result-modal',
+                containerId: 'result-content'
+            });
+        }
+    </script>
+</body>
+</html>

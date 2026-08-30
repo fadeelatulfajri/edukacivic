@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panduan Siswa EdukaCivic</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="Logo Edukacivic.png">
+    <!-- Google Fonts Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="student-system.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            red: '#DC2626', redLight: '#EF4444', redDark: '#B91C1C',
+                            dark: '#0F172A', darker: '#020617', light: '#F8FAFC'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-brand-light text-brand-dark min-h-screen font-sans">
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <a href="index.html" class="flex items-center gap-3">
+                <img src="Logo Edukacivic.png" alt="EdukaCivic" class="h-10">
+                <span class="font-bold text-xl text-brand-dark">EdukaCivic</span>
+            </a>
+            <a href="index.html" class="text-brand-red hover:text-brand-redDark font-medium transition flex items-center gap-2">
+                <i class="fas fa-arrow-left"></i> Kembali ke Beranda
+            </a>
+        </div>
+    </header>
+
+    <main class="max-w-3xl mx-auto px-4 py-12">
+        <div class="text-center mb-10">
+            <h1 class="text-3xl md:text-4xl font-bold text-brand-dark mb-4">Panduan Siswa</h1>
+            <p class="text-gray-600">Ikuti langkah-langkah mudah berikut untuk mulai belajar dengan EdukaCivic!</p>
+        </div>
+
+        <!-- Langkah-langkah -->
+        <div class="space-y-6 mb-12">
+            <!-- Step 1 -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-brand-red flex items-start gap-4">
+                <div class="bg-brand-red text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-xl shrink-0">1</div>
+                <div>
+                    <h3 class="text-lg font-bold text-brand-dark mb-1">Login Akun</h3>
+                    <p class="text-gray-600">Klik "Mulai Belajar" dan masuk menggunakan nama lengkap serta nomor absen Anda.</p>
+                </div>
+            </div>
+            <!-- Step 2 -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-brand-red flex items-start gap-4">
+                <div class="bg-brand-red text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-xl shrink-0">2</div>
+                <div>
+                    <h3 class="text-lg font-bold text-brand-dark mb-1">Pilih Dunia</h3>
+                    <p class="text-gray-600">Pilih Dunia yang ingin dipelajari (disarankan mulai dari Dunia 1 untuk memahami dasar-dasarnya terlebih dahulu).</p>
+                </div>
+            </div>
+            <!-- Step 3 -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-brand-red flex items-start gap-4">
+                <div class="bg-brand-red text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-xl shrink-0">3</div>
+                <div>
+                    <h3 class="text-lg font-bold text-brand-dark mb-1">Mainkan Level</h3>
+                    <p class="text-gray-600">Mainkan level secara berurutan. Setiap level memiliki tantangan interaktif yang harus Anda selesaikan.</p>
+                </div>
+            </div>
+            <!-- Step 4 -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-brand-red flex items-start gap-4">
+                <div class="bg-brand-red text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-xl shrink-0">4</div>
+                <div>
+                    <h3 class="text-lg font-bold text-brand-dark mb-1">Kumpulkan Poin</h3>
+                    <p class="text-gray-600">Setiap level yang diselesaikan akan memberikan Anda poin. Kumpulkan poin sebanyak mungkin untuk menaikkan lencana Anda.</p>
+                </div>
+            </div>
+            <!-- Step 5 -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-brand-red flex items-start gap-4">
+                <div class="bg-brand-red text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-xl shrink-0">5</div>
+                <div>
+                    <h3 class="text-lg font-bold text-brand-dark mb-1">Menjadi Penjaga Konstitusi!</h3>
+                    <p class="text-gray-600">Selesaikan semua dunia dan raih lencana tertinggi untuk membuktikan diri Anda sebagai Penjaga Konstitusi yang sesungguhnya.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sistem Lencana -->
+        <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-100 mb-10 text-center">
+            <h2 class="text-2xl font-bold text-brand-dark mb-2">Tingkatan Lencana Poin</h2>
+            <p class="text-xs text-gray-500 mb-6">Kumpulkan poin di setiap dunia untuk menaikkan pangkat konstitusi kelasmu!</p>
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+                <div class="bg-brand-light p-4 rounded-xl border border-gray-200 text-center">
+                    <i class="fas fa-seedling text-3xl text-gray-500 mb-2"></i>
+                    <p class="font-bold text-brand-dark text-sm">Pemula</p>
+                    <span class="text-[10px] text-gray-500 font-semibold block">&lt; 100 Poin</span>
+                </div>
+                <div class="bg-brand-light p-4 rounded-xl border border-gray-200 text-center">
+                    <i class="fas fa-user text-3xl text-sky-500 mb-2"></i>
+                    <p class="font-bold text-brand-dark text-sm">Warga</p>
+                    <span class="text-[10px] text-sky-600 font-semibold block">100 - 200 Poin</span>
+                </div>
+                <div class="bg-brand-light p-4 rounded-xl border border-gray-200 text-center">
+                    <i class="fas fa-bullhorn text-3xl text-emerald-500 mb-2"></i>
+                    <p class="font-bold text-brand-dark text-sm">Aktivis</p>
+                    <span class="text-[10px] text-emerald-600 font-semibold block">200 - 300 Poin</span>
+                </div>
+                <div class="bg-brand-light p-4 rounded-xl border border-gray-200 text-center">
+                    <i class="fas fa-user-tie text-3xl text-blue-500 mb-2"></i>
+                    <p class="font-bold text-brand-dark text-sm">Pejabat</p>
+                    <span class="text-[10px] text-blue-600 font-semibold block">300 - 400 Poin</span>
+                </div>
+                <div class="bg-brand-light p-4 rounded-xl border border-gray-200 text-center">
+                    <i class="fas fa-gavel text-3xl text-purple-500 mb-2"></i>
+                    <p class="font-bold text-brand-dark text-sm">Menteri</p>
+                    <span class="text-[10px] text-purple-600 font-semibold block">400 - 500 Poin</span>
+                </div>
+                <div class="bg-brand-light p-4 rounded-xl border border-amber-300 border-b-4 border-b-amber-500 text-center shadow-sm">
+                    <i class="fas fa-crown text-3xl text-amber-500 mb-2"></i>
+                    <p class="font-bold text-brand-dark text-sm">Presiden</p>
+                    <span class="text-[10px] text-amber-600 font-black block">&gt; 500 Poin</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tips -->
+        <div class="bg-blue-50 p-6 rounded-xl border border-blue-100">
+            <h3 class="text-lg font-bold text-blue-800 mb-2 flex items-center gap-2">
+                <i class="fas fa-lightbulb text-yellow-500"></i> Tips Belajar
+            </h3>
+            <ul class="list-disc list-inside text-blue-700 space-y-2">
+                <li>Baca materi dengan seksama sebelum menjawab pertanyaan.</li>
+                <li>Jangan ragu untuk mengulang level jika ingin memperbaiki nilai.</li>
+                <li>Gunakan perangkat yang sama untuk menyimpan progres Anda dengan aman (localStorage).</li>
+            </ul>
+        </div>
+    </main>
+
+    <footer class="bg-brand-dark text-white py-8 mt-12">
+        <div class="max-w-7xl mx-auto px-4 text-center text-sm text-gray-400">
+            &copy; 2026 EdukaCivic by Fadilatul Fajri. Semua hak dilindungi.
+        </div>
+    </footer>
+</body>
+</html>
+

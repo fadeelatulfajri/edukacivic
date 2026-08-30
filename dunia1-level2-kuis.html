@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EdukaCivic - Kuis Level 2</title>
+    <link rel="icon" type="image/png" href="Logo Edukacivic.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="student-system.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            red: '#DC2626', redLight: '#EF4444', redDark: '#B91C1C',
+                            dark: '#0F172A', darker: '#020617', light: '#F8FAFC'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0F172A;
+            color: #F8FAFC;
+            overflow-x: hidden;
+        }
+
+        /* Platformer CSS */
+        #game-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            background: linear-gradient(to bottom, #1E293B, #0F172A);
+            overflow: hidden;
+            border-radius: 1rem;
+            border: 4px solid #334155;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        .platform {
+            position: absolute;
+            bottom: 20px;
+            height: 40px;
+            background-color: #4ade80; /* Grass top */
+            border-bottom: 20px solid #8B4513; /* Dirt bottom */
+            border-radius: 4px;
+            box-shadow: inset 0 4px rgba(255,255,255,0.2), 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        #center-platform {
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            z-index: 10;
+        }
+
+        #left-platform {
+            left: -100px; /* Initially hidden */
+            width: 40%;
+            transition: left 0.5s ease-out;
+        }
+
+        #right-platform {
+            right: -100px; /* Initially hidden */
+            width: 40%;
+            transition: right 0.5s ease-out;
+        }
+        
+        .platform.visible {
+            left: 0 !important;
+        }
+        
+        .platform.visible-right {
+            right: 0 !important;
+        }
+
+        /* Pit indicators */
+        .pit {
+            position: absolute;
+            bottom: 0;
+            width: 30%;
+            height: 20px;
+            background-color: rgba(0, 0, 0, 0.8);
+            box-shadow: inset 0 10px 10px rgba(0,0,0,0.9);
+            z-index: 5;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        
+        .pit-left { left: 20%; }
+        .pit-right { right: 20%; }
+
+        .show-pit {
+            opacity: 1;
+        }
+
+        #character {
+            position: absolute;
+            bottom: 60px; /* Stands on platform */
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 3rem;
+            line-height: 1;
+            z-index: 20;
+            transition: all 0.5s ease;
+        }
+
+        /* Animations */
+        .walk-left {
+            animation: walkLeft 1s forwards;
+        }
+        @keyframes walkLeft {
+            0% { left: 50%; bottom: 60px; transform: translateX(-50%) rotate(0deg); }
+            50% { left: 25%; bottom: 80px; transform: translateX(-50%) rotate(-10deg); } /* Jump */
+            100% { left: 20%; bottom: 60px; transform: translateX(-50%) rotate(0deg); }
+        }
+
+        .walk-right {
+            animation: walkRight 1s forwards;
+        }
+        @keyframes walkRight {
+            0% { left: 50%; bottom: 60px; transform: translateX(-50%) rotate(0deg) scaleX(-1); }
+            50% { left: 75%; bottom: 80px; transform: translateX(-50%) rotate(10deg) scaleX(-1); }
+            100% { left: 80%; bottom: 60px; transform: translateX(-50%) rotate(0deg) scaleX(-1); }
+        }
+
+        .fall-left {
+            animation: fallLeft 1.5s forwards;
+        }
+        @keyframes fallLeft {
+            0% { left: 50%; bottom: 60px; transform: translateX(-50%); }
+            40% { left: 30%; bottom: 80px; transform: translateX(-50%) rotate(-45deg); } /* jump towards pit */
+            100% { left: 30%; bottom: -100px; transform: translateX(-50%) rotate(-180deg); opacity: 0; }
+        }
+
+        .fall-right {
+            animation: fallRight 1.5s forwards;
+        }
+        @keyframes fallRight {
+            0% { left: 50%; bottom: 60px; transform: translateX(-50%) scaleX(-1); }
+            40% { left: 70%; bottom: 80px; transform: translateX(-50%) rotate(45deg) scaleX(-1); }
+            100% { left: 70%; bottom: -100px; transform: translateX(-50%) rotate(180deg) scaleX(-1); opacity: 0; }
+        }
+
+        .flip-correct {
+            animation: flipCorrect 1s forwards;
+        }
+        @keyframes flipCorrect {
+            0% { transform: translateX(-50%) rotate(0deg); }
+            100% { transform: translateX(-50%) rotate(360deg); }
+        }
+
+        /* Scenery */
+        .cloud {
+            position: absolute;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50px;
+            animation: moveClouds linear infinite;
+        }
+        .cloud::before, .cloud::after {
+            content: '';
+            position: absolute;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+        }
+        .cloud1 { width: 100px; height: 30px; top: 30px; left: -100px; animation-duration: 25s; }
+        .cloud1::before { width: 50px; height: 50px; top: -25px; left: 10px; }
+        .cloud1::after { width: 40px; height: 40px; top: -15px; right: 15px; }
+
+        .cloud2 { width: 120px; height: 40px; top: 80px; left: -150px; animation-duration: 35s; animation-delay: 10s; }
+        .cloud2::before { width: 60px; height: 60px; top: -30px; left: 15px; }
+        .cloud2::after { width: 50px; height: 50px; top: -20px; right: 20px; }
+
+        @keyframes moveClouds {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(1000px); } /* Adjust based on width */
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- Navbar -->
+    <nav class="bg-brand-darker border-b border-brand-red p-4 shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <img src="Logo Edukacivic.png" alt="EdukaCivic Logo" class="h-10 w-10">
+                <h1 class="text-xl font-bold text-white tracking-wider">Eduka<span class="text-brand-red">Civic</span></h1>
+            </div>
+            <div class="flex items-center gap-4 text-sm font-medium">
+                <div class="bg-brand-dark px-4 py-2 rounded-full border border-gray-700 flex items-center gap-2">
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <span id="score-display">0</span> Poin
+                </div>
+                <button onclick="window.location.href='dunia1.html'" class="text-gray-400 hover:text-white transition">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-8 max-w-4xl flex flex-col justify-center">
+        
+        <!-- Game Area -->
+        <div id="game-section" class="flex flex-col gap-6">
+            
+            <!-- Header Info -->
+            <div class="flex justify-between items-center">
+                <h2 class="text-2xl font-bold text-white">
+                    <i class="fas fa-gamepad text-brand-red mr-2"></i>Kuis Platformer: Konstitusi
+                </h2>
+                <div class="bg-gray-800 px-4 py-1 rounded-full text-sm">
+                    Pertanyaan <span id="q-current">1</span>/5
+                </div>
+            </div>
+
+            <!-- Platformer Scene -->
+            <div id="game-container">
+                <div class="cloud cloud1"></div>
+                <div class="cloud cloud2"></div>
+                
+                <!-- Platforms -->
+                <div id="left-platform" class="platform" style="left: 0;"></div>
+                <div id="center-platform" class="platform"></div>
+                <div id="right-platform" class="platform" style="right: 0;"></div>
+                
+                <div id="pit-left" class="pit pit-left"></div>
+                <div id="pit-right" class="pit pit-right"></div>
+                
+                <!-- Character -->
+                <div id="character">🧑‍🎓</div>
+
+                <!-- Floating Labels -->
+                <div id="label-a" class="absolute top-1/2 left-[20%] transform -translate-y-1/2 -translate-x-1/2 text-4xl font-bold text-white opacity-20 pointer-events-none">A</div>
+                <div id="label-b" class="absolute top-1/2 right-[20%] transform -translate-y-1/2 translate-x-1/2 text-4xl font-bold text-white opacity-20 pointer-events-none">B</div>
+
+                <!-- Feedback Overlay -->
+                <div id="feedback-overlay" class="absolute inset-0 bg-black/60 hidden flex-col items-center justify-center z-30 opacity-0 transition-opacity duration-300">
+                    <div id="feedback-icon" class="text-6xl mb-4"></div>
+                    <div id="feedback-text" class="text-2xl font-bold text-center px-6"></div>
+                </div>
+            </div>
+
+            <!-- Question Box -->
+            <div class="bg-gray-800 border-2 border-gray-700 rounded-xl p-6 shadow-xl relative mt-4">
+                <div class="absolute -top-5 left-1/2 transform -translate-x-1/2 bg-brand-red text-white px-6 py-1 rounded-full font-bold shadow-lg">
+                    PERTANYAAN
+                </div>
+                <p id="question-text" class="text-xl text-center font-medium mt-4 mb-8 text-white min-h-[60px] flex items-center justify-center">
+                    Memuat pertanyaan...
+                </p>
+
+                <!-- Choices -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <button id="btn-a" onclick="answerQuestion('A')" class="group relative overflow-hidden bg-gradient-to-br from-blue-600 to-blue-800 hover:from-blue-500 hover:to-blue-700 text-white rounded-xl p-4 shadow-md transition-all transform hover:scale-[1.02] active:scale-95 border-2 border-blue-400">
+                        <div class="absolute top-0 left-0 w-full h-full bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                        <div class="flex items-center gap-4">
+                            <div class="bg-white/20 w-10 h-10 rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0">
+                                A
+                            </div>
+                            <span id="text-a" class="text-left font-medium">Opsi A</span>
+                        </div>
+                    </button>
+
+                    <button id="btn-b" onclick="answerQuestion('B')" class="group relative overflow-hidden bg-gradient-to-br from-purple-600 to-purple-800 hover:from-purple-500 hover:to-purple-700 text-white rounded-xl p-4 shadow-md transition-all transform hover:scale-[1.02] active:scale-95 border-2 border-purple-400">
+                        <div class="absolute top-0 left-0 w-full h-full bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                        <div class="flex items-center gap-4">
+                            <div class="bg-white/20 w-10 h-10 rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0">
+                                B
+                            </div>
+                            <span id="text-b" class="text-left font-medium">Opsi B</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result Section (Hidden initially) -->
+        <div id="result-section" class="hidden flex-col items-center justify-center py-10">
+            <div class="bg-gray-800 p-8 rounded-3xl shadow-2xl border border-gray-700 w-full max-w-md text-center">
+                <div class="w-20 h-20 bg-green-500/20 text-green-400 rounded-3xl flex items-center justify-center text-4xl mx-auto mb-4 border border-green-500/30 shadow-lg shadow-green-500/10">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-1">Kuis Level 2 Selesai!</h2>
+                <p class="text-gray-400 text-xs sm:text-sm mb-6">Mengapa Negara Membutuhkan Konstitusi?</p>
+                
+                <div class="bg-brand-darker rounded-2xl p-5 mb-6 border border-gray-700 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-brand-red to-orange-500"></div>
+                    <div class="text-4xl font-extrabold text-yellow-400 mb-1" id="final-score">0</div>
+                    <div class="text-[11px] text-gray-400 font-bold uppercase tracking-widest">Poin XP Diperoleh</div>
+                    
+                    <div class="flex justify-between mt-4 pt-3 border-t border-gray-700/80">
+                        <div>
+                            <div class="text-lg font-bold text-green-400" id="correct-count">0</div>
+                            <div class="text-[10px] text-gray-400">Benar</div>
+                        </div>
+                        <div>
+                            <div class="text-lg font-bold text-red-400" id="wrong-count">0</div>
+                            <div class="text-[10px] text-gray-400">Salah</div>
+                        </div>
+                        <div>
+                            <div class="text-lg font-bold text-blue-400" id="time-taken">0s</div>
+                            <div class="text-[10px] text-gray-400">Waktu</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-3">
+                    <a href="dunia1-level3.html" class="w-full py-3.5 px-6 bg-gradient-to-r from-brand-red to-orange-600 hover:from-brand-redLight hover:to-orange-500 text-white font-bold rounded-2xl transition-all shadow-xl shadow-red-600/30 hover:scale-[1.02] flex items-center justify-center gap-2 text-sm">
+                        <span>Lanjut ke Level 3</span> <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                    <a href="dunia1.html" class="w-full py-3 px-6 bg-gray-700/70 hover:bg-gray-700 text-gray-300 hover:text-white font-semibold rounded-2xl border border-gray-600 transition flex items-center justify-center gap-2 text-xs">
+                        <i class="fa-solid fa-map"></i> Kembali ke Peta Level
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-brand-darker border-t border-gray-800 py-6 text-center mt-auto">
+        <p class="text-gray-500 text-sm">
+            &copy; 2026 EdukaCivic | Fadilatul Fajri
+        </p>
+    </footer>
+
+    <script>
+        // Check access
+        document.addEventListener('DOMContentLoaded', () => {
+            const progress = JSON.parse(localStorage.getItem('edukacivic_progress') || '{}');
+            if (!progress.completedLevels || !progress.completedLevels.includes('d1l1')) {
+                alert("Selesaikan Level 1 terlebih dahulu!");
+                window.location.href = 'dunia1.html';
+                return;
+            }
+            initGame();
+        });
+
+        // Quiz Data
+        const questions = [
+            {
+                q: "Apa yang dapat terjadi jika sebuah negara tidak memiliki konstitusi?",
+                a: "Negara menjadi tertib dan aman",
+                b: "Negara dapat mengalami kekacauan dan kekuasaan pemerintah menjadi tanpa batas",
+                correct: 'B'
+            },
+            {
+                q: "Salah satu fungsi konstitusi adalah membebaskan kekuasaan penguasa.",
+                a: "Benar",
+                b: "Salah",
+                correct: 'B'
+            },
+            {
+                q: "Konstitusi berfungsi untuk melindungi Hak Asasi Manusia (HAM).",
+                a: "Benar",
+                b: "Salah",
+                correct: 'A'
+            },
+            {
+                q: "Apakah konstitusi memberikan pedoman dalam penyelenggaraan negara?",
+                a: "Ya",
+                b: "Tidak",
+                correct: 'A'
+            },
+            {
+                q: "Konstitusi membuat pemerintah dapat bertindak sewenang-wenang terhadap rakyat.",
+                a: "Benar",
+                b: "Salah",
+                correct: 'B'
+            }
+        ];
+
+        let currentQIndex = 0;
+        let score = 0;
+        let correctAnswers = 0;
+        let wrongAnswers = 0;
+        let startTime = 0;
+        let isAnimating = false;
+
+        const maxPointsPerQuestion = 5;
+
+        // Elements
+        const elQText = document.getElementById('question-text');
+        const elTextA = document.getElementById('text-a');
+        const elTextB = document.getElementById('text-b');
+        const elQCurrent = document.getElementById('q-current');
+        const elScoreDisplay = document.getElementById('score-display');
+        
+        const elChar = document.getElementById('character');
+        const elLeftPlatform = document.getElementById('left-platform');
+        const elRightPlatform = document.getElementById('right-platform');
+        const elPitLeft = document.getElementById('pit-left');
+        const elPitRight = document.getElementById('pit-right');
+        
+        const elFeedback = document.getElementById('feedback-overlay');
+        const elFeedbackIcon = document.getElementById('feedback-icon');
+        const elFeedbackText = document.getElementById('feedback-text');
+
+        function initGame() {
+            startTime = Date.now();
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (currentQIndex >= questions.length) {
+                endGame();
+                return;
+            }
+
+            const q = questions[currentQIndex];
+            elQText.textContent = q.q;
+            elTextA.textContent = q.a;
+            elTextB.textContent = q.b;
+            elQCurrent.textContent = currentQIndex + 1;
+
+            // Reset character and platforms
+            elChar.className = '';
+            elChar.style = '';
+            elChar.innerHTML = '🧑‍🎓';
+            
+            // Randomly configure pits for visual flair, but logically answer is what matters
+            // Actually, we make the WRONG path look like a pit AFTER they click
+            elLeftPlatform.className = 'platform visible';
+            elRightPlatform.className = 'platform visible-right';
+            elPitLeft.classList.remove('show-pit');
+            elPitRight.classList.remove('show-pit');
+
+            // Hide feedback
+            elFeedback.classList.add('hidden');
+            elFeedback.classList.remove('flex');
+            elFeedback.style.opacity = '0';
+            
+            enableButtons(true);
+            isAnimating = false;
+        }
+
+        function enableButtons(enabled) {
+            document.getElementById('btn-a').disabled = !enabled;
+            document.getElementById('btn-b').disabled = !enabled;
+            if(enabled) {
+                document.getElementById('btn-a').classList.remove('opacity-50', 'cursor-not-allowed');
+                document.getElementById('btn-b').classList.remove('opacity-50', 'cursor-not-allowed');
+            } else {
+                document.getElementById('btn-a').classList.add('opacity-50', 'cursor-not-allowed');
+                document.getElementById('btn-b').classList.add('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        function answerQuestion(choice) {
+            if (isAnimating) return;
+            isAnimating = true;
+            enableButtons(false);
+
+            const q = questions[currentQIndex];
+            const isCorrect = choice === q.correct;
+
+            if (isCorrect) {
+                score += maxPointsPerQuestion;
+                correctAnswers++;
+                elScoreDisplay.textContent = score;
+                animateCorrect(choice);
+            } else {
+                wrongAnswers++;
+                animateWrong(choice, q.correct);
+            }
+        }
+
+        function animateCorrect(choice) {
+            // Character walks to the correct side
+            if (choice === 'A') {
+                elChar.classList.add('walk-left');
+                // flip character to face right after walk
+                setTimeout(() => elChar.style.transform = "translateX(-50%) rotate(0deg) scaleX(-1)", 1000);
+            } else {
+                elChar.classList.add('walk-right');
+            }
+
+            // Show feedback
+            setTimeout(() => {
+                showFeedback(true, "Jawaban Benar! +5 Poin");
+                
+                // Small confetti
+                confetti({
+                    particleCount: 50,
+                    spread: 60,
+                    origin: { y: 0.6 },
+                    colors: ['#4ade80', '#10b981']
+                });
+
+                setTimeout(() => {
+                    currentQIndex++;
+                    loadQuestion();
+                }, 1500);
+            }, 1000);
+        }
+
+        function animateWrong(choice, correctChoice) {
+            // Reveal pit on the chosen side
+            if (choice === 'A') {
+                elLeftPlatform.classList.remove('visible');
+                elPitLeft.classList.add('show-pit');
+                elChar.classList.add('fall-left');
+            } else {
+                elRightPlatform.classList.remove('visible-right');
+                elPitRight.classList.add('show-pit');
+                elChar.classList.add('fall-right');
+            }
+
+            // Change character face to panic
+            setTimeout(() => {
+                elChar.innerHTML = '😱';
+            }, 400);
+
+            // Show feedback with correct answer
+            setTimeout(() => {
+                const correctText = correctChoice === 'A' ? questions[currentQIndex].a : questions[currentQIndex].b;
+                showFeedback(false, `Salah! Jawaban tepat: ${correctText}`);
+                
+                setTimeout(() => {
+                    currentQIndex++;
+                    loadQuestion();
+                }, 2500);
+            }, 1500);
+        }
+
+        function showFeedback(isSuccess, text) {
+            elFeedback.classList.remove('hidden');
+            elFeedback.classList.add('flex');
+            
+            // tiny delay for display block to apply before opacity
+            setTimeout(() => {
+                elFeedback.style.opacity = '1';
+            }, 10);
+
+            if (isSuccess) {
+                elFeedbackIcon.innerHTML = '<i class="fas fa-check-circle text-green-400 shadow-glow"></i>';
+                elFeedbackText.className = 'text-2xl font-bold text-center px-6 text-green-400';
+            } else {
+                elFeedbackIcon.innerHTML = '<i class="fas fa-times-circle text-red-500 shadow-glow"></i>';
+                elFeedbackText.className = 'text-2xl font-bold text-center px-6 text-red-100 bg-red-900/50 p-4 rounded-xl backdrop-blur-sm border border-red-500';
+            }
+            elFeedbackText.textContent = text;
+        }
+
+        function endGame() {
+            document.getElementById('game-section').classList.add('hidden');
+            document.getElementById('result-section').classList.remove('hidden');
+            document.getElementById('result-section').classList.add('flex');
+
+            const timeTaken = Math.floor((Date.now() - startTime) / 1000);
+            
+            // UI Updates
+            document.getElementById('final-score').textContent = score;
+            document.getElementById('correct-count').textContent = correctAnswers;
+            document.getElementById('wrong-count').textContent = wrongAnswers;
+            document.getElementById('time-taken').textContent = timeTaken + 's';
+
+            // Save & Record Progress
+            if (typeof recordLevelCompleted === "function") {
+                recordLevelCompleted("d1l2", score);
+            } else {
+                let progress = JSON.parse(localStorage.getItem('edukacivic_progress') || '{"poin":0,"level":1,"dunia":1,"completedLevels":[]}');
+                progress.poin = (progress.poin || 0) + score;
+                if (!progress.completedLevels.includes('d1l2')) {
+                    progress.completedLevels.push('d1l2');
+                }
+                if (progress.level < 3) {
+                    progress.level = 3;
+                }
+                localStorage.setItem('edukacivic_progress', JSON.stringify(progress));
+            }
+
+            // Celebration Confetti
+            if (correctAnswers >= 3) {
+                const duration = 3000;
+                const animationEnd = Date.now() + duration;
+                const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 100 };
+
+                const interval = setInterval(function() {
+                    const timeLeft = animationEnd - Date.now();
+
+                    if (timeLeft <= 0) {
+                        return clearInterval(interval);
+                    }
+
+                    const particleCount = 50 * (timeLeft / duration);
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+                }, 250);
+            }
+        }
+
+        function randomInRange(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+    </script>
+</body>
+</html>
+

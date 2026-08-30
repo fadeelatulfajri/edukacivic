@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Guru PPKn - EdukaCivic</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="Logo Edukacivic.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="student-system.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            red: '#DC2626', redLight: '#EF4444', redDark: '#B91C1C',
+                            emerald: '#10B981', emeraldLight: '#34D399', emeraldDark: '#059669',
+                            teal: '#14B8A6',
+                            gold: '#F59E0B',
+                            dark: '#0F172A', darker: '#020617', light: '#F8FAFC'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #F1F5F9; }
+        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+
+        .stat-card {
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            border-radius: 1.25rem;
+            box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.05);
+            transition: all 0.25s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+        }
+
+        .progress-pill {
+            transition: all 0.2s ease;
+        }
+        .progress-pill:hover {
+            transform: scale(1.06);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            padding: 1rem;
+        }
+
+        .modal-pop {
+            animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes modalPop {
+            0% { opacity: 0; transform: scale(0.92) translateY(20px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .spinning {
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        @media print {
+            body { background: white !important; color: black !important; font-size: 11px !important; }
+            header button, #filter-box, #toolbar-actions, #token-box, #analytics-box, .no-print { display: none !important; }
+            .stat-card, table, tr, th, td { box-shadow: none !important; border-color: #CBD5E1 !important; }
+            table { font-size: 10px !important; width: 100% !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col justify-between selection:bg-brand-red selection:text-white relative">
+    
+    <!-- Toast Notification -->
+    <div id="toast-notify" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none flex items-center gap-3 bg-slate-900 text-white px-5 py-3.5 rounded-2xl shadow-2xl border border-slate-700 text-xs font-bold">
+        <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+        <span id="toast-message">Pesan notifikasi</span>
+    </div>
+
+    <!-- AUTH CHECK -->
+    <script>
+        const guruData = localStorage.getItem('edukacivic_guru');
+        if (!guruData) {
+            window.location.href = 'login-guru.html';
+        } else {
+            try {
+                const parsed = JSON.parse(guruData);
+                if (!parsed.loggedIn) {
+                    window.location.href = 'login-guru.html';
+                }
+            } catch (e) {
+                window.location.href = 'login-guru.html';
+            }
+        }
+        
+        function logout() {
+            localStorage.removeItem('edukacivic_guru');
+            window.location.href = 'index.html';
+        }
+    </script>
+
+    <!-- HEADER PORTAL GURU -->
+    <header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            
+            <!-- Left Branding & Teacher Info -->
+            <div class="flex items-center space-x-4">
+                <a href="index.html" class="flex items-center gap-2.5 group">
+                    <img src="Logo Edukacivic.png" alt="EdukaCivic" class="h-10 w-auto group-hover:scale-105 transition transform">
+                    <div class="flex flex-col">
+                        <span class="font-black text-xl text-slate-900 leading-none">Eduka<span class="text-brand-red">Civic</span></span>
+                        <span class="text-[10px] font-bold text-gray-400 tracking-wider uppercase mt-0.5">Guru PPKn Portal</span>
+                    </div>
+                </a>
+
+                <div class="h-8 w-px bg-gray-200 hidden sm:block"></div>
+
+                <div class="hidden sm:flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-red-50 border border-red-100 flex items-center justify-center text-brand-red text-sm font-bold shadow-xs">
+                        <i class="fa-solid fa-chalkboard-user"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xs sm:text-sm font-extrabold text-slate-900 leading-tight">Fadilatul Fajri, S.Pd.</h1>
+                        <p class="text-[11px] text-gray-500 font-medium">Guru PPKn · SMP Negeri 5 Purwokerto</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Actions -->
+            <div class="flex items-center justify-between md:justify-end gap-3">
+                <div class="text-right hidden lg:block mr-2">
+                    <span class="text-[11px] text-emerald-600 font-extrabold bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full flex items-center gap-1.5 shadow-xs">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Sinkronisasi Real-Time
+                    </span>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                    <a href="review-guru.html" class="flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition text-xs font-bold border border-slate-300 shadow-xs">
+                        <i class="fa-solid fa-unlock-keyhole text-orange-500"></i> <span>Mode Review</span>
+                    </a>
+                    <button onclick="logout()" class="flex items-center gap-1.5 px-3.5 py-2 bg-brand-red hover:bg-brand-redDark text-white rounded-xl transition-all shadow-md shadow-red-500/20 text-xs font-bold cursor-pointer">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Keluar</span>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full space-y-8">
+        
+        <!-- Mobile Header Info -->
+        <div class="sm:hidden bg-white p-4 rounded-2xl shadow-sm border border-gray-200 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-red-50 text-brand-red flex items-center justify-center text-base font-bold">
+                    <i class="fa-solid fa-chalkboard-user"></i>
+                </div>
+                <div>
+                    <h2 class="text-sm font-bold text-slate-900">Fadilatul Fajri, S.Pd.</h2>
+                    <p class="text-xs text-gray-500">SMP Negeri 5 Purwokerto</p>
+                </div>
+            </div>
+            <span class="text-[10px] bg-emerald-100 text-emerald-700 font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Online
+            </span>
+        </div>
+
+        <!-- 1. STAT CARDS (KPI KELAS) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            
+            <!-- Card 1: Total Siswa Login -->
+            <div class="stat-card p-5 border-l-4 border-l-blue-500 flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Siswa Terdaftar / Login</p>
+                    <div class="flex items-baseline gap-2">
+                        <span id="stat-total-siswa" class="text-3xl font-black text-slate-900">0</span>
+                        <span class="text-xs font-bold text-gray-400">Peserta</span>
+                    </div>
+                    <p class="text-[11px] text-blue-600 font-bold mt-1 flex items-center gap-1">
+                        <i class="fa-solid fa-user-check text-[10px]"></i> Aktif di Database
+                    </p>
+                </div>
+                <div class="w-13 h-13 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-2xl border border-blue-100 shadow-xs">
+                    <i class="fas fa-users"></i>
+                </div>
+            </div>
+            
+            <!-- Card 2: Rata-rata Poin -->
+            <div class="stat-card p-5 border-l-4 border-l-amber-500 flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Rata-rata Poin Kelas</p>
+                    <div class="flex items-baseline gap-2">
+                        <span id="stat-avg-poin" class="text-3xl font-black text-slate-900">0</span>
+                        <span class="text-xs font-bold text-gray-400">/ 500 XP</span>
+                    </div>
+                    <p class="text-[11px] text-amber-600 font-bold mt-1 flex items-center gap-1">
+                        <i class="fa-solid fa-bolt text-[10px]"></i> Capaian Kolektif
+                    </p>
+                </div>
+                <div class="w-13 h-13 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-2xl border border-amber-100 shadow-xs">
+                    <i class="fas fa-bolt text-yellow-500"></i>
+                </div>
+            </div>
+
+            <!-- Card 3: Lulusan Duta Konstitusi -->
+            <div class="stat-card p-5 border-l-4 border-l-emerald-500 flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Lulus Final Boss (Duta)</p>
+                    <div class="flex items-baseline gap-2">
+                        <span id="stat-lulus-boss" class="text-3xl font-black text-slate-900">0</span>
+                        <span class="text-xs font-bold text-gray-400">Siswa</span>
+                    </div>
+                    <p class="text-[11px] text-emerald-600 font-bold mt-1 flex items-center gap-1">
+                        <i class="fa-solid fa-crown text-[10px]"></i> Menuntaskan 20 Level
+                    </p>
+                </div>
+                <div class="w-13 h-13 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl border border-emerald-100 shadow-xs">
+                    <i class="fas fa-crown text-emerald-600"></i>
+                </div>
+            </div>
+
+            <!-- Card 4: Total Misi Dikerjakan -->
+            <div class="stat-card p-5 border-l-4 border-l-red-500 flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Total Level Dikerjakan</p>
+                    <div class="flex items-baseline gap-2">
+                        <span id="stat-total-misi" class="text-3xl font-black text-slate-900">0</span>
+                        <span class="text-xs font-bold text-gray-400">Aktivitas</span>
+                    </div>
+                    <p class="text-[11px] text-brand-red font-bold mt-1 flex items-center gap-1">
+                        <i class="fa-solid fa-chart-line text-[10px]"></i> Total Misi 5 Dunia
+                    </p>
+                </div>
+                <div class="w-13 h-13 rounded-2xl bg-rose-50 text-brand-red flex items-center justify-center text-2xl border border-rose-100 shadow-xs">
+                    <i class="fas fa-gamepad"></i>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 2. TOKEN RAHASIA PEMBELAJARAN PER PERTEMUAN (GURU ONLY) -->
+        <div id="token-box" class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-6 sm:p-7 text-white shadow-xl border border-slate-700 relative overflow-hidden">
+            <div class="absolute -right-8 -top-8 w-40 h-40 bg-orange-500/15 rounded-full blur-2xl pointer-events-none"></div>
+            
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-12 h-12 rounded-2xl bg-orange-500/20 text-orange-400 flex items-center justify-center text-xl shrink-0 border border-orange-500/40 shadow-inner">
+                        <i class="fa-solid fa-key"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base sm:text-lg font-black text-white flex items-center gap-2">
+                            Token Rahasia Gerbang Antar-Dunia
+                            <span class="bg-orange-500/25 text-orange-400 border border-orange-500/40 text-[10px] font-extrabold px-3 py-0.5 rounded-full uppercase tracking-wider">1 Dunia = 1 Pertemuan</span>
+                        </h3>
+                        <p class="text-xs text-gray-300 mt-0.5 leading-relaxed">
+                            Bagikan token rahasia di bawah ini kepada siswa saat memulai sesi pembelajaran di setiap pertemuan kelas:
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                
+                <!-- Pertemuan 2: Dunia 2 -->
+                <div class="bg-slate-950/90 border border-orange-500/40 rounded-2xl p-4 flex flex-col justify-between hover:border-orange-400 transition shadow-md">
+                    <div>
+                        <div class="flex items-center justify-between text-xs mb-1">
+                            <span class="text-orange-400 font-extrabold">Pertemuan 2 (Dunia 2)</span>
+                            <span class="text-[10px] text-gray-400">Level 5 - 8</span>
+                        </div>
+                        <p class="text-white text-xs font-bold truncate mb-3">Perumusan UUD 1945</p>
+                    </div>
+                    <div class="flex items-center justify-between bg-slate-900 px-3.5 py-2 rounded-xl border border-gray-700">
+                        <span class="font-mono text-sm font-black text-yellow-400 tracking-wider">uudnri1945</span>
+                        <button onclick="copyTokenText('uudnri1945', this)" class="text-gray-400 hover:text-white text-xs p-1 cursor-pointer transition" title="Salin Token">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Pertemuan 3: Dunia 3 -->
+                <div class="bg-slate-950/90 border border-rose-500/40 rounded-2xl p-4 flex flex-col justify-between hover:border-rose-400 transition shadow-md">
+                    <div>
+                        <div class="flex items-center justify-between text-xs mb-1">
+                            <span class="text-rose-400 font-extrabold">Pertemuan 3 (Dunia 3)</span>
+                            <span class="text-[10px] text-gray-400">Level 9 - 12</span>
+                        </div>
+                        <p class="text-white text-xs font-bold truncate mb-3">Pengesahan UUD 1945</p>
+                    </div>
+                    <div class="flex items-center justify-between bg-slate-900 px-3.5 py-2 rounded-xl border border-gray-700">
+                        <span class="font-mono text-sm font-black text-yellow-400 tracking-wider">ppki1945</span>
+                        <button onclick="copyTokenText('ppki1945', this)" class="text-gray-400 hover:text-white text-xs p-1 cursor-pointer transition" title="Salin Token">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Pertemuan 4: Dunia 4 -->
+                <div class="bg-slate-950/90 border border-purple-500/40 rounded-2xl p-4 flex flex-col justify-between hover:border-purple-400 transition shadow-md">
+                    <div>
+                        <div class="flex items-center justify-between text-xs mb-1">
+                            <span class="text-purple-400 font-extrabold">Pertemuan 4 (Dunia 4)</span>
+                            <span class="text-[10px] text-gray-400">Level 13 - 16</span>
+                        </div>
+                        <p class="text-white text-xs font-bold truncate mb-3">Tata Urutan Peraturan</p>
+                    </div>
+                    <div class="flex items-center justify-between bg-slate-900 px-3.5 py-2 rounded-xl border border-gray-700">
+                        <span class="font-mono text-sm font-black text-yellow-400 tracking-wider">hierarkiuud</span>
+                        <button onclick="copyTokenText('hierarkiuud', this)" class="text-gray-400 hover:text-white text-xs p-1 cursor-pointer transition" title="Salin Token">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Pertemuan 5: Dunia 5 -->
+                <div class="bg-slate-950/90 border border-emerald-500/40 rounded-2xl p-4 flex flex-col justify-between hover:border-emerald-400 transition shadow-md">
+                    <div>
+                        <div class="flex items-center justify-between text-xs mb-1">
+                            <span class="text-emerald-400 font-extrabold">Pertemuan 5 (Dunia 5)</span>
+                            <span class="text-[10px] text-gray-400">Level 17 - 20</span>
+                        </div>
+                        <p class="text-white text-xs font-bold truncate mb-3">Taat Konstitusi (Puncak)</p>
+                    </div>
+                    <div class="flex items-center justify-between bg-slate-900 px-3.5 py-2 rounded-xl border border-gray-700">
+                        <span class="font-mono text-sm font-black text-yellow-400 tracking-wider">patuhhukum</span>
+                        <button onclick="copyTokenText('patuhhukum', this)" class="text-gray-400 hover:text-white text-xs p-1 cursor-pointer transition" title="Salin Token">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 3. DISTRIBUSI KELULUSAN PER DUNIA (ANALYTICS SUMMARY) -->
+        <div id="analytics-box" class="bg-white p-6 rounded-3xl shadow-sm border border-gray-200">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+                <div>
+                    <h3 class="text-sm font-extrabold text-slate-900 uppercase tracking-wider">Distribusi Ketuntasan 5 Pertemuan Dunia</h3>
+                    <p class="text-xs text-gray-500">Jumlah siswa yang telah menyelesaikan seluruh 4 level di setiap dunia game</p>
+                </div>
+                <span class="text-xs font-bold text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                    Bab 2 PPKn Kelas VIII
+                </span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-5 gap-3" id="world-distribution-grid">
+                <!-- Dynamic injected by JS -->
+            </div>
+        </div>
+
+        <!-- 4. FILTER & TOOLBAR PENCARIAN -->
+        <div id="filter-box" class="bg-white p-5 rounded-3xl shadow-sm border border-gray-200 flex flex-col lg:flex-row items-center justify-between gap-4">
+            
+            <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+                <!-- Search Input -->
+                <div class="relative flex-grow sm:flex-grow-0 sm:w-64">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-gray-400 text-xs"></i>
+                    <input type="text" id="searchStudent" oninput="applyFilters()" placeholder="Cari nama, absen, atau kelas..." class="w-full bg-gray-50 border border-gray-300 rounded-xl pl-9 pr-3 py-2.5 text-xs text-slate-800 placeholder-gray-400 focus:outline-none focus:border-brand-red focus:bg-white transition font-medium">
+                </div>
+
+                <!-- Filter Kelas -->
+                <select id="filterKelas" onchange="applyFilters()" class="bg-gray-50 border border-gray-300 rounded-xl px-3 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-brand-red focus:bg-white transition font-bold">
+                    <option value="ALL">Semua Kelas</option>
+                    <option value="VIII A">Kelas VIII A</option>
+                    <option value="VIII B">Kelas VIII B</option>
+                    <option value="VIII C">Kelas VIII C</option>
+                    <option value="VIII D">Kelas VIII D</option>
+                    <option value="VIII E">Kelas VIII E</option>
+                    <option value="VIII F">Kelas VIII F</option>
+                    <option value="VIII G">Kelas VIII G</option>
+                    <option value="VIII H">Kelas VIII H</option>
+                    <option value="VIII">Kelas VIII (Umum)</option>
+                </select>
+
+                <!-- Filter Status Belajar -->
+                <select id="filterStatus" onchange="applyFilters()" class="bg-gray-50 border border-gray-300 rounded-xl px-3 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-brand-red focus:bg-white transition font-bold">
+                    <option value="ALL">Semua Status</option>
+                    <option value="LULUS">🏆 Tamat Final Boss (Duta)</option>
+                    <option value="PROG">⚡ Sedang Belajar (Aktif)</option>
+                </select>
+
+                <!-- Filter Gender -->
+                <select id="filterGender" onchange="applyFilters()" class="bg-gray-50 border border-gray-300 rounded-xl px-3 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-brand-red focus:bg-white transition font-bold">
+                    <option value="ALL">Semua Gender</option>
+                    <option value="L">👦 Laki-laki</option>
+                    <option value="P">👧 Perempuan</option>
+                </select>
+
+                <!-- Urutkan Berdasarkan -->
+                <select id="sortBy" onchange="applyFilters()" class="bg-gray-50 border border-gray-300 rounded-xl px-3 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-brand-red focus:bg-white transition font-bold">
+                    <option value="poin_desc">🏆 Poin Tertinggi (Ranking)</option>
+                    <option value="poin_asc">Poin Terendah</option>
+                    <option value="absen_asc">No. Absen (1 - 40)</option>
+                    <option value="nama_asc">Nama Siswa (A - Z)</option>
+                    <option value="login_desc">Waktu Login Terbaru</option>
+                </select>
+            </div>
+
+            <!-- Action Buttons -->
+            <div id="toolbar-actions" class="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-end">
+                <button onclick="exportToCSV()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm shadow-emerald-600/20 cursor-pointer" title="Unduh data Excel / CSV">
+                    <i class="fa-solid fa-file-excel"></i> Ekspor CSV
+                </button>
+                <button onclick="window.print()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm cursor-pointer" title="Cetak Rapor">
+                    <i class="fa-solid fa-print"></i> Cetak / PDF
+                </button>
+                <button onclick="refreshData()" id="btn-refresh" class="px-4 py-2.5 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm shadow-sky-600/20 cursor-pointer">
+                    <i class="fa-solid fa-rotate" id="refresh-icon"></i> Segarkan
+                </button>
+                <button onclick="confirmResetAllStudents()" class="px-3.5 py-2.5 bg-rose-50 hover:bg-rose-100 text-brand-red border border-rose-200 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer">
+                    <i class="fa-solid fa-trash-can"></i> Reset
+                </button>
+            </div>
+
+        </div>
+
+        <!-- 5. STUDENT PROGRESS TABLE -->
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden">
+            
+            <div class="px-6 py-4.5 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 bg-slate-50/80">
+                <div>
+                    <h3 class="text-base font-extrabold text-slate-900">Daftar Rapor Belajar Siswa per Dunia</h3>
+                    <p class="text-xs text-gray-500">Mencatat aktivitas login, avatar pilihan, akumulasi poin XP, dan capaian di setiap 5 Dunia Game</p>
+                </div>
+                <span id="studentCountBadge" class="text-xs bg-slate-200 text-slate-700 font-bold px-3 py-1 rounded-full">
+                    Memuat data...
+                </span>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse min-w-[1020px]">
+                    <thead>
+                        <tr class="bg-white border-b border-gray-200 text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                            <th class="px-4 py-3.5 text-center w-16">Rank</th>
+                            <th class="px-4 py-3.5">Identitas Siswa</th>
+                            <th class="px-4 py-3.5">Waktu Login</th>
+                            <th class="px-4 py-3.5 text-center">Poin & Lencana</th>
+                            <th class="px-3 py-3.5 text-center">Dunia 1<br><span class="text-[9px] font-normal lowercase text-gray-400">Perumusan</span></th>
+                            <th class="px-3 py-3.5 text-center">Dunia 2<br><span class="text-[9px] font-normal lowercase text-gray-400">BPUPKI</span></th>
+                            <th class="px-3 py-3.5 text-center">Dunia 3<br><span class="text-[9px] font-normal lowercase text-gray-400">Pengesahan</span></th>
+                            <th class="px-3 py-3.5 text-center">Dunia 4<br><span class="text-[9px] font-normal lowercase text-gray-400">Hierarki</span></th>
+                            <th class="px-3 py-3.5 text-center">Dunia 5<br><span class="text-[9px] font-normal lowercase text-gray-400">Final Boss</span></th>
+                            <th class="px-4 py-3.5 text-center w-40">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 text-xs" id="studentTableBody">
+                        <!-- Dynamic Injected by JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyTableState" class="hidden py-16 text-center px-4">
+                <div class="w-20 h-20 bg-slate-100 rounded-3xl flex items-center justify-center text-slate-400 text-3xl mx-auto mb-4 border border-slate-200">
+                    <i class="fa-solid fa-users-slash"></i>
+                </div>
+                <h4 class="text-lg font-black text-slate-800 mb-1">Belum Ada Data Siswa Tercatat</h4>
+                <p class="text-xs text-gray-500 max-w-md mx-auto leading-relaxed mb-6">
+                    Saat siswa mengisi nama dan memilih avatar di halaman <a href="login-siswa.html" class="text-brand-red font-bold underline">Masuk Siswa</a>, data dan progres belajar mereka akan otomatis tersinkronisasi di dasbor ini.
+                </p>
+                <div class="flex items-center justify-center gap-3">
+                    <button onclick="generateDemoStudents()" class="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold rounded-xl shadow-md transition transform hover:scale-105 flex items-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Muat 5 Data Contoh Siswa (Demo)
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-gray-200 py-6 text-center text-xs text-gray-500">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
+            <p>&copy; 2026 EdukaCivic | Dashboard Pembelajaran Guru PPKn · Fadilatul Fajri, S.Pd.</p>
+            <p>SMP Negeri 5 Purwokerto</p>
+        </div>
+    </footer>
+
+    <!-- MODAL DETAIL PROGRES SISWA -->
+    <div id="detailModal" class="modal-overlay hidden" onclick="closeDetailModal()">
+        <div class="modal-pop bg-white rounded-3xl p-6 sm:p-8 max-w-xl w-full shadow-2xl border border-gray-200 relative max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+            <button onclick="closeDetailModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 flex items-center justify-center font-bold transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <!-- Modal Header -->
+            <div class="flex items-center gap-4 mb-6 pb-4 border-b border-gray-100">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-500 via-yellow-400 to-emerald-400 p-0.5 shadow-md shrink-0">
+                    <img id="m-avatar" src="" alt="Avatar" class="w-full h-full rounded-2xl bg-slate-900 object-cover">
+                </div>
+                <div>
+                    <h3 id="m-nama" class="text-lg font-black text-slate-900 leading-tight">Nama Siswa</h3>
+                    <p id="m-identitas" class="text-xs text-gray-500 mt-0.5">Kelas VIII · No. Absen -</p>
+                    <div class="flex items-center gap-2 mt-2">
+                        <span id="m-lencana" class="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-red-100 text-brand-red">Presiden</span>
+                        <span id="m-poin" class="text-[10px] font-black text-yellow-600 bg-yellow-100 px-2.5 py-0.5 rounded-full">420 Poin</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detail Per Dunia -->
+            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Rincian Capaian 5 Dunia:</h4>
+            <div class="space-y-2.5 mb-6" id="m-dunia-breakdown">
+                <!-- Injected by JS -->
+            </div>
+
+            <!-- Level Completed Checklist Grid -->
+            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Daftar Status 20 Level Pembelajaran:</h4>
+            <div class="grid grid-cols-4 sm:grid-cols-5 gap-2 mb-6" id="m-levels-pills">
+                <!-- Injected by JS -->
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-gray-100">
+                <button id="m-btn-delete" class="w-full sm:w-auto px-4 py-2.5 bg-rose-50 hover:bg-rose-100 text-brand-red border border-rose-200 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer">
+                    <i class="fa-solid fa-trash-can"></i> Hapus Siswa Ini
+                </button>
+                <button onclick="closeDetailModal()" class="w-full sm:w-auto px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition cursor-pointer">
+                    Tutup Rincian
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DASHBOARD JAVASCRIPT ENGINE -->
+    <script>
+        let allStudents = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDashboardData();
+        });
+
+        function showToast(message, isSuccess = true) {
+            const toast = document.getElementById('toast-notify');
+            const icon = document.getElementById('toast-icon');
+            const text = document.getElementById('toast-message');
+
+            text.textContent = message;
+            if (isSuccess) {
+                icon.className = 'fa-solid fa-circle-check text-emerald-400 text-base';
+            } else {
+                icon.className = 'fa-solid fa-triangle-exclamation text-amber-400 text-base';
+            }
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        function loadDashboardData() {
+            // Sinkronkan data active student & progress sebelum load
+            if (typeof syncCurrentStudentProgress === 'function') {
+                syncCurrentStudentProgress();
+            }
+
+            // Ambil data siswa terdaftar
+            allStudents = getRegisteredStudents();
+
+            // Sinkronkan juga siswa yang sedang aktif jika ada
+            const activeSiswa = getActiveStudent();
+            if (activeSiswa && activeSiswa.id) {
+                const idx = allStudents.findIndex(s => s.id === activeSiswa.id);
+                if (idx >= 0) {
+                    allStudents[idx] = activeSiswa;
+                } else if (activeSiswa.nama) {
+                    allStudents.push(activeSiswa);
+                }
+            }
+
+            renderDashboard();
+        }
+
+        function refreshData() {
+            const icon = document.getElementById('refresh-icon');
+            if (icon) icon.classList.add('spinning');
+
+            loadDashboardData();
+
+            setTimeout(() => {
+                if (icon) icon.classList.remove('spinning');
+                showToast('Data progres siswa & dashboard berhasil disegarkan!');
+            }, 500);
+        }
+
+        function getLencanaBadge(poin) {
+            if (poin > 500) return { text: 'Presiden', bg: 'bg-red-100 text-red-700 border-red-200', icon: 'fa-crown' };
+            if (poin >= 400) return { text: 'Menteri', bg: 'bg-purple-100 text-purple-700 border-purple-200', icon: 'fa-gavel' };
+            if (poin >= 300) return { text: 'Pejabat', bg: 'bg-blue-100 text-blue-700 border-blue-200', icon: 'fa-user-tie' };
+            if (poin >= 200) return { text: 'Aktivis', bg: 'bg-emerald-100 text-emerald-700 border-emerald-200', icon: 'fa-bullhorn' };
+            if (poin >= 100) return { text: 'Warga', bg: 'bg-sky-100 text-sky-700 border-sky-200', icon: 'fa-user' };
+            return { text: 'Pemula', bg: 'bg-gray-100 text-gray-700 border-gray-200', icon: 'fa-seedling' };
+        }
+
+        function renderDashboard() {
+            updateStats(allStudents);
+            renderWorldDistribution(allStudents);
+            applyFilters();
+        }
+
+        function updateStats(students) {
+            document.getElementById('stat-total-siswa').textContent = students.length;
+
+            const totalPoin = students.reduce((acc, curr) => acc + (curr.poin || 0), 0);
+            const avgPoin = students.length > 0 ? (totalPoin / students.length).toFixed(1) : 0;
+            document.getElementById('stat-avg-poin').textContent = avgPoin;
+
+            const lulusBoss = students.filter(s => (s.completedLevels || []).includes('d5l4')).length;
+            document.getElementById('stat-lulus-boss').textContent = lulusBoss;
+
+            const totalMisi = students.reduce((acc, curr) => acc + (curr.completedLevels || []).length, 0);
+            document.getElementById('stat-total-misi').textContent = totalMisi;
+        }
+
+        function renderWorldDistribution(students) {
+            const grid = document.getElementById('world-distribution-grid');
+            if (!grid) return;
+
+            const d1Completed = students.filter(s => (s.completedLevels || []).includes('d1l4')).length;
+            const d2Completed = students.filter(s => (s.completedLevels || []).includes('d2l4')).length;
+            const d3Completed = students.filter(s => (s.completedLevels || []).includes('d3l4')).length;
+            const d4Completed = students.filter(s => (s.completedLevels || []).includes('d4l4')).length;
+            const d5Completed = students.filter(s => (s.completedLevels || []).includes('d5l4')).length;
+
+            const total = Math.max(students.length, 1);
+
+            const worlds = [
+                { title: 'Dunia 1', desc: 'Perumusan', count: d1Completed, color: 'blue' },
+                { title: 'Dunia 2', desc: 'BPUPKI', count: d2Completed, color: 'orange' },
+                { title: 'Dunia 3', desc: 'Pengesahan', count: d3Completed, color: 'rose' },
+                { title: 'Dunia 4', desc: 'Hierarki', count: d4Completed, color: 'purple' },
+                { title: 'Dunia 5', desc: 'Final Boss', count: d5Completed, color: 'emerald' }
+            ];
+
+            grid.innerHTML = worlds.map(w => {
+                const pct = Math.round((w.count / total) * 100);
+                return `
+                    <div class="bg-gray-50 border border-gray-200 rounded-2xl p-3.5 text-center">
+                        <div class="flex justify-between items-center text-[11px] font-bold text-gray-500 mb-1">
+                            <span>${w.title}</span>
+                            <span class="text-${w.color}-600">${pct}%</span>
+                        </div>
+                        <p class="text-xs font-bold text-slate-800 mb-2 truncate">${w.desc}</p>
+                        <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden mb-1.5">
+                            <div class="bg-${w.color}-500 h-full rounded-full transition-all duration-300" style="width: ${pct}%"></div>
+                        </div>
+                        <span class="text-[10px] font-semibold text-gray-500">${w.count} Siswa Tuntas</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function applyFilters() {
+            const searchVal = document.getElementById('searchStudent').value.toLowerCase().trim();
+            const kelasVal = document.getElementById('filterKelas').value;
+            const statusVal = document.getElementById('filterStatus').value;
+            const genderVal = document.getElementById('filterGender').value;
+            const sortVal = document.getElementById('sortBy').value;
+
+            let filtered = allStudents.filter(s => {
+                const matchSearch = (s.nama || '').toLowerCase().includes(searchVal) || 
+                                    String(s.noAbsen || '').includes(searchVal) ||
+                                    (s.kelas || '').toLowerCase().includes(searchVal);
+                
+                const matchKelas = kelasVal === 'ALL' || (s.kelas || 'VIII') === kelasVal || (s.kelas && s.kelas.includes(kelasVal));
+                const matchGender = genderVal === 'ALL' || s.gender === genderVal;
+                
+                let matchStatus = true;
+                if (statusVal === 'LULUS') {
+                    matchStatus = (s.completedLevels || []).includes('d5l4');
+                } else if (statusVal === 'PROG') {
+                    matchStatus = (s.completedLevels || []).length > 0 && !(s.completedLevels || []).includes('d5l4');
+                }
+
+                return matchSearch && matchKelas && matchGender && matchStatus;
+            });
+
+            // Sorting logic
+            filtered.sort((a, b) => {
+                if (sortVal === 'poin_desc') return (b.poin || 0) - (a.poin || 0);
+                if (sortVal === 'poin_asc') return (a.poin || 0) - (b.poin || 0);
+                if (sortVal === 'absen_asc') return (a.noAbsen || 0) - (b.noAbsen || 0);
+                if (sortVal === 'nama_asc') return (a.nama || '').localeCompare(b.nama || '');
+                if (sortVal === 'login_desc') return (b.waktuLogin || '').localeCompare(a.waktuLogin || '');
+                return 0;
+            });
+
+            document.getElementById('studentCountBadge').textContent = `Menampilkan ${filtered.length} dari ${allStudents.length} Siswa`;
+
+            renderStudentRows(filtered);
+        }
+
+        function renderDuniaPill(duniaData, duniaNum) {
+            const count = duniaData ? duniaData.count : 0;
+            const total = duniaData ? duniaData.total : 4;
+            const pct = duniaData ? duniaData.pct : 0;
+
+            let colorClasses = 'bg-gray-100 text-gray-500 border-gray-200';
+            let icon = '<i class="fa-solid fa-lock text-[8px]"></i>';
+
+            if (count === total) {
+                colorClasses = 'bg-emerald-100 text-emerald-700 border-emerald-300 font-bold';
+                icon = '<i class="fa-solid fa-circle-check text-[10px] text-emerald-600"></i>';
+            } else if (count > 0) {
+                colorClasses = 'bg-amber-100 text-amber-800 border-amber-300 font-semibold';
+                icon = `<span class="text-[9px]">${pct}%</span>`;
+            }
+
+            return `
+                <div class="progress-pill inline-flex items-center gap-1 px-2.5 py-1 rounded-xl border text-[11px] ${colorClasses}" title="Dunia ${duniaNum}: ${count}/${total} Level Selesai (${pct}%)">
+                    ${icon} <span>${count}/${total}</span>
+                </div>
+            `;
+        }
+
+        function renderStudentRows(students) {
+            const tbody = document.getElementById('studentTableBody');
+            const emptyState = document.getElementById('emptyTableState');
+            tbody.innerHTML = '';
+
+            if (students.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            students.forEach((st, idx) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition-colors";
+
+                const lencana = getLencanaBadge(st.poin || 0);
+                const progres = st.progresDunia || calculateWorldProgress(st.completedLevels || []);
+                const avatarUrl = st.avatarUrl || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(st.nama || 'Student')}&backgroundColor=b6e3f4`;
+                const isLulusFinal = (st.completedLevels || []).includes('d5l4');
+
+                // Rank Medal
+                let rankDisplay = `<span class="font-bold text-gray-400 text-xs">${idx + 1}</span>`;
+                if (idx === 0) rankDisplay = `<span class="inline-flex items-center justify-center w-7 h-7 rounded-xl bg-amber-100 text-amber-700 font-black text-sm border border-amber-300 shadow-xs">🥇</span>`;
+                else if (idx === 1) rankDisplay = `<span class="inline-flex items-center justify-center w-7 h-7 rounded-xl bg-slate-200 text-slate-700 font-black text-sm border border-slate-300 shadow-xs">🥈</span>`;
+                else if (idx === 2) rankDisplay = `<span class="inline-flex items-center justify-center w-7 h-7 rounded-xl bg-orange-100 text-orange-700 font-black text-sm border border-orange-300 shadow-xs">🥉</span>`;
+
+                tr.innerHTML = `
+                    <td class="px-4 py-3.5 text-center">
+                        ${rankDisplay}
+                    </td>
+
+                    <!-- Identitas Siswa -->
+                    <td class="px-4 py-3.5 whitespace-nowrap">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-emerald-400 p-0.5 shadow-xs shrink-0">
+                                <img src="${avatarUrl}" alt="Avatar" class="w-full h-full rounded-xl bg-slate-900 object-cover">
+                            </div>
+                            <div>
+                                <div class="font-bold text-slate-900 flex items-center gap-1.5">
+                                    <span>${st.nama}</span>
+                                    <span class="text-[10px] px-1.5 py-0.2 rounded font-bold ${st.gender === 'L' ? 'bg-blue-100 text-blue-700' : 'bg-pink-100 text-pink-700'}">
+                                        ${st.gender === 'L' ? 'L' : 'P'}
+                                    </span>
+                                    ${isLulusFinal ? '<span class="text-[10px] bg-amber-100 text-amber-800 border border-amber-300 px-1.5 py-0.2 rounded font-extrabold" title="Lulus Duta Konstitusi">★ DUTA</span>' : ''}
+                                </div>
+                                <p class="text-[11px] text-gray-500 font-medium">Absen: <strong>#${st.noAbsen || '-'}</strong> · ${st.kelas || 'Kelas VIII'}</p>
+                            </div>
+                        </div>
+                    </td>
+
+                    <!-- Waktu Login / Aktif -->
+                    <td class="px-4 py-3.5 whitespace-nowrap text-gray-600 font-medium text-[11px]">
+                        <div class="flex items-center gap-1.5">
+                            <i class="fa-regular fa-clock text-gray-400"></i>
+                            <span>${st.waktuLogin || 'Baru Saja'}</span>
+                        </div>
+                    </td>
+
+                    <!-- Poin & Lencana -->
+                    <td class="px-4 py-3.5 whitespace-nowrap text-center">
+                        <div class="font-black text-slate-900 text-sm text-yellow-600">
+                            <i class="fa-solid fa-bolt text-xs"></i> ${st.poin || 0}
+                        </div>
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${lencana.bg} mt-0.5 shadow-xs">
+                            <i class="fas ${lencana.icon} text-[8px]"></i> ${lencana.text}
+                        </span>
+                    </td>
+
+                    <!-- Progres Per Dunia 1-5 -->
+                    <td class="px-3 py-3.5 text-center whitespace-nowrap">${renderDuniaPill(progres.dunia1, 1)}</td>
+                    <td class="px-3 py-3.5 text-center whitespace-nowrap">${renderDuniaPill(progres.dunia2, 2)}</td>
+                    <td class="px-3 py-3.5 text-center whitespace-nowrap">${renderDuniaPill(progres.dunia3, 3)}</td>
+                    <td class="px-3 py-3.5 text-center whitespace-nowrap">${renderDuniaPill(progres.dunia4, 4)}</td>
+                    <td class="px-3 py-3.5 text-center whitespace-nowrap">${renderDuniaPill(progres.dunia5, 5)}</td>
+
+                    <!-- Aksi Detail & Hapus -->
+                    <td class="px-4 py-3.5 text-center whitespace-nowrap">
+                        <div class="flex items-center justify-center gap-1.5">
+                            <button onclick="openDetailModal('${st.id}')" title="Lihat Rincian Siswa" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-800 hover:text-white text-slate-700 font-bold rounded-xl transition text-[11px] border border-slate-300 shadow-xs flex items-center gap-1 cursor-pointer">
+                                <i class="fa-solid fa-eye"></i> Detail
+                            </button>
+                            <button onclick="confirmDeleteStudent('${st.id}', '${st.nama}')" title="Hapus Siswa" class="p-1.5 bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-600 rounded-xl transition text-[11px] border border-rose-200 cursor-pointer">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        // HAPUS SISWA TUNGGAL
+        function confirmDeleteStudent(studentId, studentName) {
+            if (confirm(`Apakah Anda yakin ingin menghapus data siswa "${studentName}" dari dashboard?`)) {
+                if (typeof deleteStudentById === 'function') {
+                    deleteStudentById(studentId);
+                } else {
+                    allStudents = allStudents.filter(s => s.id !== studentId);
+                    localStorage.setItem('edukacivic_registered_students', JSON.stringify(allStudents));
+                }
+                loadDashboardData();
+                showToast(`Data siswa "${studentName}" berhasil dihapus.`);
+            }
+        }
+
+        // RESET SEMUA DATA SISWA
+        function confirmResetAllStudents() {
+            if (allStudents.length === 0) {
+                alert('Belum ada data siswa yang tersimpan.');
+                return;
+            }
+            if (confirm(`PERINGATAN: Apakah Anda yakin ingin menghapus seluruh (${allStudents.length}) data siswa di dashboard?\n\nTindakan ini akan mereset data siswa terdaftar, progres game, dan membebaskan seluruh avatar.`)) {
+                if (typeof clearAllStudents === 'function') {
+                    clearAllStudents();
+                } else {
+                    localStorage.setItem('edukacivic_registered_students', JSON.stringify([]));
+                    localStorage.removeItem('edukacivic_siswa');
+                    localStorage.setItem('edukacivic_progress', JSON.stringify({ poin: 0, level: 1, dunia: 1, completedLevels: [] }));
+                }
+                loadDashboardData();
+                showToast('✅ Seluruh data siswa berhasil direset.');
+            }
+        }
+
+        // EKSPOR CSV
+        function exportToCSV() {
+            if (allStudents.length === 0) {
+                alert('Tidak ada data siswa untuk diekspor.');
+                return;
+            }
+
+            let csv = 'No,Nama Siswa,No Absen,Kelas,Gender,Sekolah,Poin,Lencana,Waktu Login,Dunia 1 (Perumusan),Dunia 2 (BPUPKI),Dunia 3 (Pengesahan),Dunia 4 (Hierarki),Dunia 5 (Final Boss),Total Level Selesai,Status Kelulusan\n';
+
+            allStudents.forEach((st, idx) => {
+                const lencana = getLencanaBadge(st.poin || 0);
+                const progres = st.progresDunia || calculateWorldProgress(st.completedLevels || []);
+                const isLulus = (st.completedLevels || []).includes('d5l4') ? 'Lulus Duta Konstitusi' : 'Belum Selesai';
+                const row = [
+                    idx + 1,
+                    `"${(st.nama || '').replace(/"/g, '""')}"`,
+                    st.noAbsen || '',
+                    `"${st.kelas || 'Kelas VIII'}"`,
+                    st.gender || 'L',
+                    `"${st.sekolah || 'SMP Negeri 5 Purwokerto'}"`,
+                    st.poin || 0,
+                    `"${lencana.text}"`,
+                    `"${st.waktuLogin || ''}"`,
+                    `"${progres.dunia1.count}/4 (${progres.dunia1.pct}%)"`,
+                    `"${progres.dunia2.count}/4 (${progres.dunia2.pct}%)"`,
+                    `"${progres.dunia3.count}/4 (${progres.dunia3.pct}%)"`,
+                    `"${progres.dunia4.count}/4 (${progres.dunia4.pct}%)"`,
+                    `"${progres.dunia5.count}/4 (${progres.dunia5.pct}%)"`,
+                    progres.totalCompleted || (st.completedLevels || []).length,
+                    `"${isLulus}"`
+                ];
+                csv += row.join(',') + '\n';
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Rapor_Siswa_EdukaCivic_${new Date().toISOString().slice(0,10)}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('✅ Berkas CSV berhasil diunduh!');
+        }
+
+        // GENERATE DEMO DATA SISWA
+        function generateDemoStudents() {
+            const demoData = [
+                {
+                    id: 'std_01_VIII_A',
+                    nama: 'Ahmad Fauzi',
+                    noAbsen: 1,
+                    kelas: 'Kelas VIII A',
+                    gender: 'L',
+                    sekolah: 'SMP Negeri 5 Purwokerto',
+                    avatarUrl: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Ahmad&backgroundColor=b6e3f4',
+                    waktuLogin: '25 Agu 2026 07:30',
+                    poin: 550,
+                    completedLevels: [
+                        'd1l1','d1l2','d1l3','d1l4',
+                        'd2l1','d2l2','d2l3','d2l4',
+                        'd3l1','d3l2','d3l3','d3l4',
+                        'd4l1','d4l2','d4l3','d4l4',
+                        'd5l1','d5l2','d5l3','d5l4'
+                    ]
+                },
+                {
+                    id: 'std_12_VIII_A',
+                    nama: 'Citra Kirana',
+                    noAbsen: 12,
+                    kelas: 'Kelas VIII A',
+                    gender: 'P',
+                    sekolah: 'SMP Negeri 5 Purwokerto',
+                    avatarUrl: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Citra&backgroundColor=ffd5dc',
+                    waktuLogin: '25 Agu 2026 07:45',
+                    poin: 475,
+                    completedLevels: [
+                        'd1l1','d1l2','d1l3','d1l4',
+                        'd2l1','d2l2','d2l3','d2l4',
+                        'd3l1','d3l2','d3l3','d3l4',
+                        'd4l1','d4l2','d4l3','d4l4',
+                        'd5l1','d5l2','d5l3'
+                    ]
+                },
+                {
+                    id: 'std_18_VIII_B',
+                    nama: 'Dimas Prasetyo',
+                    noAbsen: 18,
+                    kelas: 'Kelas VIII B',
+                    gender: 'L',
+                    sekolah: 'SMP Negeri 5 Purwokerto',
+                    avatarUrl: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Dimas&backgroundColor=c0aede',
+                    waktuLogin: '25 Agu 2026 08:00',
+                    poin: 350,
+                    completedLevels: [
+                        'd1l1','d1l2','d1l3','d1l4',
+                        'd2l1','d2l2','d2l3','d2l4',
+                        'd3l1','d3l2','d3l3','d3l4',
+                        'd4l1','d4l2'
+                    ]
+                },
+                {
+                    id: 'std_24_VIII_B',
+                    nama: 'Nabila Syakieb',
+                    noAbsen: 24,
+                    kelas: 'Kelas VIII B',
+                    gender: 'P',
+                    sekolah: 'SMP Negeri 5 Purwokerto',
+                    avatarUrl: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Nabila&backgroundColor=ffd5dc',
+                    waktuLogin: '25 Agu 2026 08:15',
+                    poin: 250,
+                    completedLevels: [
+                        'd1l1','d1l2','d1l3','d1l4',
+                        'd2l1','d2l2','d2l3','d2l4',
+                        'd3l1','d3l2'
+                    ]
+                },
+                {
+                    id: 'std_30_VIII_C',
+                    nama: 'Rizky Ramadhan',
+                    noAbsen: 30,
+                    kelas: 'Kelas VIII C',
+                    gender: 'L',
+                    sekolah: 'SMP Negeri 5 Purwokerto',
+                    avatarUrl: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Rizky&backgroundColor=b6e3f4',
+                    waktuLogin: '25 Agu 2026 08:30',
+                    poin: 100,
+                    completedLevels: [
+                        'd1l1','d1l2','d1l3','d1l4'
+                    ]
+                }
+            ];
+
+            demoData.forEach(d => {
+                d.progresDunia = calculateWorldProgress(d.completedLevels);
+            });
+
+            localStorage.setItem('edukacivic_registered_students', JSON.stringify(demoData));
+            loadDashboardData();
+            showToast('✨ 5 data contoh siswa berhasil dimuat!');
+        }
+
+        // MODAL DETAIL HANDLER
+        function openDetailModal(studentId) {
+            const st = allStudents.find(s => s.id === studentId);
+            if (!st) return;
+
+            const lencana = getLencanaBadge(st.poin || 0);
+            const avatarUrl = st.avatarUrl || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(st.nama || 'Student')}&backgroundColor=b6e3f4`;
+            const completed = st.completedLevels || [];
+            const progres = st.progresDunia || calculateWorldProgress(completed);
+
+            document.getElementById('m-avatar').src = avatarUrl;
+            document.getElementById('m-nama').textContent = st.nama;
+            document.getElementById('m-identitas').textContent = `${st.sekolah || 'SMP Negeri 5 Purwokerto'} · ${st.kelas || 'Kelas VIII'} · No. Absen ${st.noAbsen || '-'}`;
+            document.getElementById('m-lencana').textContent = lencana.text;
+            document.getElementById('m-lencana').className = `text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${lencana.bg}`;
+            document.getElementById('m-poin').textContent = `${st.poin || 0} Poin`;
+
+            // Action delete inside modal
+            const btnDel = document.getElementById('m-btn-delete');
+            btnDel.onclick = () => {
+                closeDetailModal();
+                confirmDeleteStudent(st.id, st.nama);
+            };
+
+            const breakdown = document.getElementById('m-dunia-breakdown');
+            breakdown.innerHTML = `
+                <div class="p-3 bg-gray-50 rounded-2xl border border-gray-200 flex items-center justify-between text-xs">
+                    <div>
+                        <strong class="text-slate-900">Dunia 1: Perumusan UUD NRI 1945</strong>
+                        <p class="text-gray-500 text-[11px]">${progres.dunia1.count}/4 Level Selesai</p>
+                    </div>
+                    <span class="font-black ${progres.dunia1.count === 4 ? 'text-emerald-600' : 'text-gray-600'}">${progres.dunia1.pct}%</span>
+                </div>
+
+                <div class="p-3 bg-gray-50 rounded-2xl border border-gray-200 flex items-center justify-between text-xs">
+                    <div>
+                        <strong class="text-slate-900">Dunia 2: Sidang BPUPKI & Tokoh</strong>
+                        <p class="text-gray-500 text-[11px]">${progres.dunia2.count}/4 Level Selesai</p>
+                    </div>
+                    <span class="font-black ${progres.dunia2.count === 4 ? 'text-emerald-600' : 'text-gray-600'}">${progres.dunia2.pct}%</span>
+                </div>
+
+                <div class="p-3 bg-gray-50 rounded-2xl border border-gray-200 flex items-center justify-between text-xs">
+                    <div>
+                        <strong class="text-slate-900">Dunia 3: Pengesahan UUD 1945</strong>
+                        <p class="text-gray-500 text-[11px]">${progres.dunia3.count}/4 Level Selesai</p>
+                    </div>
+                    <span class="font-black ${progres.dunia3.count === 4 ? 'text-emerald-600' : 'text-gray-600'}">${progres.dunia3.pct}%</span>
+                </div>
+
+                <div class="p-3 bg-gray-50 rounded-2xl border border-gray-200 flex items-center justify-between text-xs">
+                    <div>
+                        <strong class="text-slate-900">Dunia 4: Mengenal Kekuatan & Hierarki UUD</strong>
+                        <p class="text-gray-500 text-[11px]">${progres.dunia4.count}/4 Level Selesai</p>
+                    </div>
+                    <span class="font-black ${progres.dunia4.count === 4 ? 'text-emerald-600' : 'text-gray-600'}">${progres.dunia4.pct}%</span>
+                </div>
+
+                <div class="p-3 bg-gray-50 rounded-2xl border border-gray-200 flex items-center justify-between text-xs">
+                    <div>
+                        <strong class="text-slate-900">Dunia 5: Warga Negara Taat Konstitusi (Final Boss)</strong>
+                        <p class="text-gray-500 text-[11px]">${progres.dunia5.count}/4 Level Selesai</p>
+                    </div>
+                    <span class="font-black ${progres.dunia5.count === 4 ? 'text-emerald-600' : 'text-gray-600'}">${progres.dunia5.pct}%</span>
+                </div>
+            `;
+
+            // Render level pills (Level 1 - 20)
+            const pillsContainer = document.getElementById('m-levels-pills');
+            pillsContainer.innerHTML = '';
+            
+            const levelKeys = [
+                'd1l1','d1l2','d1l3','d1l4',
+                'd2l1','d2l2','d2l3','d2l4',
+                'd3l1','d3l2','d3l3','d3l4',
+                'd4l1','d4l2','d4l3','d4l4',
+                'd5l1','d5l2','d5l3','d5l4'
+            ];
+
+            levelKeys.forEach((lvlKey, idx) => {
+                const isDone = completed.includes(lvlKey);
+                const pill = document.createElement('div');
+                pill.className = `p-2 rounded-xl text-center font-bold text-[11px] border ${isDone ? 'bg-emerald-50 text-emerald-700 border-emerald-300' : 'bg-gray-50 text-gray-400 border-gray-200'}`;
+                pill.innerHTML = `
+                    <div>Lvl ${idx + 1}</div>
+                    <div class="text-[9px] font-normal">${isDone ? '✅ Selesai' : '🔒 Belum'}</div>
+                `;
+                pillsContainer.appendChild(pill);
+            });
+
+            document.getElementById('detailModal').classList.remove('hidden');
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detailModal').classList.add('hidden');
+        }
+
+        function copyTokenText(text, btn) {
+            navigator.clipboard.writeText(text).then(() => {
+                const icon = btn.querySelector('i');
+                if (icon) {
+                    icon.className = 'fa-solid fa-check text-green-400';
+                    setTimeout(() => { icon.className = 'fa-regular fa-copy'; }, 1500);
+                }
+                showToast(`Token "${text}" berhasil disalin ke clipboard!`);
+            }).catch(() => {
+                prompt('Salin token rahasia ini:', text);
+            });
+        }
+    </script>
+</body>
+</html>

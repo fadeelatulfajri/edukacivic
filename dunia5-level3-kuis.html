@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Level 19: Misi Warga Negara — Memecahkan Masalah - EdukaCivic</title>
+    <link rel="icon" type="image/png" href="Logo Edukacivic.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="student-system.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            emerald: '#10B981', emeraldLight: '#34D399', emeraldDark: '#059669',
+                            teal: '#14B8A6',
+                            cyan: '#06B6D4',
+                            dark: '#0F172A', darker: '#020617', light: '#F8FAFC'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0F172A; }
+        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4B5563; }
+
+        .quiz-card {
+            background: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(12px);
+            border: 2px solid rgba(20, 184, 166, 0.4);
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 30px -5px rgba(20, 184, 166, 0.15);
+        }
+
+        .opt-btn {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .opt-btn:hover {
+            transform: translateX(4px);
+        }
+    </style>
+    <script>
+        function getProgress() {
+            try { return JSON.parse(localStorage.getItem('edukacivic_progress')) || { poin: 0, level: 1, dunia: 5, completedLevels: [] }; }
+            catch(e) { return { poin: 0, level: 1, dunia: 5, completedLevels: [] }; }
+        }
+        const prog = getProgress();
+        if (!prog.completedLevels || !prog.completedLevels.includes('d5l2')) {
+            window.location.href = 'dunia5.html';
+        }
+    </script>
+</head>
+<body class="bg-brand-darker text-white font-sans antialiased min-h-screen flex flex-col justify-between selection:bg-teal-600 selection:text-white">
+
+    <!-- Web Audio Sound Effects -->
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            try {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'correct') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.setValueAtTime(659.25, now + 0.08);
+                    osc.frequency.setValueAtTime(783.99, now + 0.16);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, now);
+                    osc.frequency.exponentialRampToValueAtTime(130, now + 0.25);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                } else if (type === 'victory') {
+                    [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+                        const o = audioCtx.createOscillator();
+                        const g = audioCtx.createGain();
+                        o.connect(g);
+                        g.connect(audioCtx.destination);
+                        o.type = 'triangle';
+                        o.frequency.setValueAtTime(freq, now + i * 0.1);
+                        g.gain.setValueAtTime(0.3, now + i * 0.1);
+                        g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.1 + 0.4);
+                        o.start(now + i * 0.1);
+                        o.stop(now + i * 0.1 + 0.4);
+                    });
+                }
+            } catch(e) {}
+        }
+    </script>
+
+    <!-- NAVBAR -->
+    <nav class="fixed w-full z-50 bg-brand-dark/90 backdrop-blur-md border-b border-gray-800 transition-all duration-300">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-3">
+                    <a href="dunia5-level3.html" class="flex items-center gap-2 text-gray-400 hover:text-white transition group">
+                        <div class="w-8 h-8 bg-gray-800 rounded-lg flex items-center justify-center group-hover:bg-gray-700">
+                            <i class="fa-solid fa-arrow-left text-sm"></i>
+                        </div>
+                        <span class="text-xs sm:text-sm font-semibold hidden sm:inline">Materi Level 19</span>
+                    </a>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <span class="bg-teal-500/10 border border-teal-500/30 text-teal-400 text-xs font-bold px-3 py-1.5 rounded-full">
+                        Kuis Level 19
+                    </span>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-1.5 bg-gray-800 px-3 py-1.5 rounded-lg border border-gray-700 text-xs font-bold text-yellow-400">
+                        <i class="fa-solid fa-bolt"></i>
+                        <span id="nav-poin">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <script>document.getElementById('nav-poin').textContent = prog.poin || 0;</script>
+
+    <!-- MAIN QUIZ AREA -->
+    <main class="flex-grow pt-24 pb-12 px-4 flex items-center justify-center">
+        <div class="max-w-2xl w-full">
+
+            <!-- QUIZ CONTAINER -->
+            <div id="quiz-container" class="quiz-card p-6 md:p-8">
+                <!-- Header: Step & Score -->
+                <div class="flex items-center justify-between gap-4 mb-4 pb-4 border-b border-gray-700">
+                    <div class="flex items-center gap-2">
+                        <span id="q-badge" class="bg-teal-500/20 text-teal-300 text-xs font-black px-3 py-1 rounded-full uppercase border border-teal-500/40">
+                            Soal 1 / 10
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-3 text-xs">
+                        <span class="text-gray-400">Benar: <strong id="score-correct" class="text-teal-400 font-bold">0</strong></span>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="w-full h-2 bg-gray-900 rounded-full mb-6 overflow-hidden border border-gray-800">
+                    <div id="quiz-bar" class="h-full bg-gradient-to-r from-teal-500 to-emerald-400 transition-all duration-300" style="width: 10%"></div>
+                </div>
+
+                <!-- Question Box -->
+                <div class="mb-6">
+                    <h2 id="q-text" class="text-base sm:text-lg font-bold text-white leading-relaxed">
+                        Memuat pertanyaan...
+                    </h2>
+                </div>
+
+                <!-- Options -->
+                <div id="options-box" class="space-y-3">
+                    <!-- Injected here -->
+                </div>
+
+                <!-- Feedback Toast -->
+                <div id="q-feedback" class="hidden mt-4 p-3.5 rounded-xl text-xs font-bold"></div>
+            </div>
+
+            <!-- VICTORY / RESULT CONTAINER -->
+            <div id="result-container" class="hidden quiz-card p-6 md:p-8 text-center border-2 border-teal-500/70">
+                <div class="w-20 h-20 bg-teal-500/20 text-teal-400 rounded-full flex items-center justify-center text-4xl mx-auto mb-4 border border-teal-500/40 shadow-xl">
+                    🏆
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-black text-white mb-2">Selamat, Kuis Level 19 Selesai!</h2>
+                <p class="text-gray-300 text-xs sm:text-sm mb-6 leading-relaxed">
+                    Kamu telah membuktikan kemampuan memecahkan masalah warga secara bijak, damai, dan taat konstitusi! Gerbang FINAL BOSS Level 20 kini telah terbuka lebar!
+                </p>
+
+                <div class="grid grid-cols-2 gap-3 max-w-sm mx-auto mb-6">
+                    <div class="bg-slate-950/80 p-3 rounded-2xl border border-slate-800">
+                        <p class="text-[11px] text-gray-400 uppercase font-semibold">Skor Jawaban</p>
+                        <p id="final-score" class="text-2xl font-black text-teal-400">10 / 10</p>
+                    </div>
+                    <div class="bg-slate-950/80 p-3 rounded-2xl border border-slate-800">
+                        <p class="text-[11px] text-gray-400 uppercase font-semibold">Bonus Poin</p>
+                        <p class="text-2xl font-black text-yellow-400">+25 Poin</p>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                    <a href="dunia5-level4.html" class="px-6 py-3.5 bg-gradient-to-r from-cyan-600 via-teal-600 to-emerald-600 hover:from-cyan-500 hover:to-emerald-500 text-white font-black rounded-xl text-xs shadow-xl shadow-teal-600/30 transition transform hover:scale-105 flex items-center justify-center gap-2">
+                        👑 Masuk ke FINAL BOSS (Level 20) <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                    <a href="dunia5.html" class="px-5 py-3.5 bg-gray-800 hover:bg-gray-700 text-gray-300 font-semibold rounded-xl text-xs border border-gray-700 transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-map"></i> Peta Dunia 5
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-brand-dark text-gray-400 py-4 border-t border-gray-800 text-center text-xs">
+        <p>&copy; 2026 EdukaCivic | Fadilatul Fajri</p>
+    </footer>
+
+    <!-- QUIZ JAVASCRIPT ENGINE -->
+    <script>
+        const quizData = [
+            {
+                q: "Mengapa tindakan main hakim sendiri (eigenrichting) dilarang keras dalam kehidupan bermasyarakat di Indonesia?",
+                opts: [
+                    "A. Karena Indonesia adalah negara hukum (Pasal 1 ayat 3) sehingga setiap pelanggaran harus diselesaikan melalui jalur hukum yang sah",
+                    "B. Karena tindakan tersebut hanya membuang-buang waktu warga saja",
+                    "C. Karena main hakim sendiri hanya boleh dilakukan oleh warga yang berusia tua",
+                    "D. Karena hukuman dari warga biasanya terlalu ringan"
+                ],
+                ans: 0,
+                exp: "Pasal 1 ayat (3) UUD 1945 menegaskan Indonesia adalah negara hukum, sehingga tidak ada yang berhak menghakimi sendiri tanpa proses peradilan yang sah."
+            },
+            {
+                q: "Saat terjadi perselisihan antarkelompok warga di lingkungan RT mengenai pemanfaatan lahan umum, langkah pertama yang paling bijak adalah...",
+                opts: [
+                    "A. Mempertemukan kedua belah pihak dalam musyawarah mufakat yang dipimpin oleh ketua RT dan tokoh masyarakat",
+                    "B. Membiarkan kedua kelompok saling menyerang hingga salah satu mengalah",
+                    "C. Membuat keributan di media sosial agar menjadi viral",
+                    "D. Mengunci lapangan agar tidak bisa digunakan oleh siapa pun"
+                ],
+                ans: 0,
+                exp: "Musyawarah mufakat yang dipimpin tokoh masyarakat merupakan mekanisme damai dan kekeluargaan yang sesuai dengan nilai Pancasila."
+            },
+            {
+                q: "Prinsip 'Equality Before the Law' dalam penyelesaian masalah kemasyarakatan bermakna...",
+                opts: [
+                    "A. Orang yang memiliki jabatan tinggi boleh diistimewakan dari sanksi aturan",
+                    "B. Setiap warga negara memiliki kedudukan yang sama di depan hukum tanpa memandang kekayaan, suku, atau status sosial (Pasal 27 ayat 1)",
+                    "C. Aturan hukum hanya berlaku bagi masyarakat berekonomi lemah",
+                    "D. Warga yang bersalah bisa bebas jika membayar denda pribadi kepada korban"
+                ],
+                ans: 1,
+                exp: "Pasal 27 ayat (1) menegaskan seluruh warga negara bersamaan kedudukannya di dalam hukum dan pemerintahan tanpa diskriminasi."
+            },
+            {
+                q: "Jika warga memergoki adanya tindak pencurian di lingkungan perumahan, tindakan yang benar dan taat konstitusi adalah...",
+                opts: [
+                    "A. Menghakimi dan memukuli pelaku secara bersama-sama di tempat umum",
+                    "B. Mengamankan pelaku dan segera menyerahkannya kepada pihak kepolisian sesuai prosedur hukum resmi",
+                    "C. Membiarkan pelaku melarikan diri karena takut terlibat masalah",
+                    "D. Menyita barang pelaku untuk dibagi-bagikan kepada warga"
+                ],
+                ans: 1,
+                exp: "Menyerahkan pelaku ke kepolisian adalah langkah menghormati supremasi hukum dan hak asasi manusia untuk diadili secara adil."
+            },
+            {
+                q: "Peran utama ketua RT, RW, dan tokoh masyarakat saat memimpin rembuk musyawarah warga adalah...",
+                opts: [
+                    "A. Memihak kepada salah satu kelompok yang merupakan kerabat dekatnya",
+                    "B. Bertindak sebagai fasilitator netral dan bijaksana untuk memandu tercapainya mufakat damai",
+                    "C. Menentukan keputusan sepihak tanpa mendengar keluhan warga",
+                    "D. Menghindari pertemuan agar tidak terseret konflik"
+                ],
+                ans: 1,
+                exp: "Tokoh masyarakat berperan sebagai penengah yang adil dan netral dalam merajut kembali kerukunan antarwarga."
+            },
+            {
+                q: "Mengapa hasil kesepakatan musyawarah warga sebaiknya dituangkan ke dalam naskah aturan tertulis?",
+                opts: [
+                    "A. Agar menjadi pedoman bersama yang berkekuatan moral dan ditaati seluruh warga secara konsisten",
+                    "B. Hanya sebagai syarat formalitas administrasi kelurahan",
+                    "C. Untuk mempersulit warga yang ingin memanfaatkan fasilitas umum",
+                    "D. Agar pengurus RT dapat menarik denda sebanyak-banyaknya"
+                ],
+                ans: 0,
+                exp: "Aturan tertulis menjamin kepastian norma dan komitmen bersama agar kesepakatan ditaati secara adil oleh seluruh warga."
+            },
+            {
+                q: "Apabila musyawarah mufakat telah menghasilkan sebuah keputusan bersama, sikap warga yang mencerminkan kedewasaan berkonstitusi adalah...",
+                opts: [
+                    "A. Tetap menolak menjalankan aturan jika pendapat pribadinya tidak diterima",
+                    "B. Menerima, menghormati, dan melaksanakan hasil kesepakatan bersama dengan penuh tanggung jawab",
+                    "C. Menghasut tetangga lain untuk memboikot hasil keputusan",
+                    "D. Pura-pura tidak tahu adanya kesepakatan baru"
+                ],
+                ans: 1,
+                exp: "Menerima dan melaksanakan hasil mufakat dengan ikhlas dan tanggung jawab adalah wujud ketaatan terhadap nilai musyawarah."
+            },
+            {
+                q: "Menghargai dan mendengarkan pendapat kelompok minoritas dalam forum musyawarah merupakan cerminan dari...",
+                opts: [
+                    "A. Sila Ke-4 Pancasila dan prinsip keadilan sosial",
+                    "B. Kelemahan pemimpin musyawarah",
+                    "C. Pemborosan waktu dalam berdiskusi",
+                    "D. Hal yang bertentangan dengan kehendak mayoritas"
+                ],
+                ans: 0,
+                exp: "Demokrasi Pancasila bukan sekadar suara terbanyak, melainkan kebijaksanaan dalam merangkul aspirasi semua pihak secara adil."
+            },
+            {
+                q: "Jika terdapat tetangga yang membakar sampah daun kering hingga asap tebalnya mengganggu pernapasan bayi di sebelah rumah, solusi terbaik adalah...",
+                opts: [
+                    "A. Menyiram rumah tetangga tersebut dengan air got sebagai balasan",
+                    "B. Mendatangi tetangga dengan sopan, menjelaskan dampaknya, dan menyepakati pembuatan lubang kompos bersama",
+                    "C. Memviralkan foto tetangga di grup media sosial dengan kata-kata kasar",
+                    "D. Mengungsi tanpa berbicara apa pun"
+                ],
+                ans: 1,
+                exp: "Komunikasi asertif, santun, dan menawarkan solusi bersama merupakan cara terbaik menjaga kerukunan bertetangga."
+            },
+            {
+                q: "Benteng utama masyarakat Indonesia agar tidak mudah dipecah belah oleh provokasi dan berita bohong (hoaks) adalah...",
+                opts: [
+                    "A. Memiliki kesadaran berkonstitusi yang tinggi, sikap toleransi, dan rasa persatuan kebangsaan",
+                    "B. Membatasi pergaulan hanya dengan warga yang satu suku saja",
+                    "C. Mempercayai semua informasi yang beredar di grup percakapan tanpa konfirmasi",
+                    "D. Mengikuti kehendak kelompok mana pun yang paling berkuasa"
+                ],
+                ans: 0,
+                exp: "Kesadaran konstitusi dan persatuan nasional merupakan pilar utama ketahanan sosial bangsa Indonesia."
+            }
+        ];
+
+        let currentIdx = 0;
+        let correctCount = 0;
+        let answered = false;
+
+        function loadQuestion() {
+            answered = false;
+            const q = quizData[currentIdx];
+            document.getElementById('q-badge').textContent = `Soal ${currentIdx + 1} / ${quizData.length}`;
+            document.getElementById('score-correct').textContent = correctCount;
+            document.getElementById('quiz-bar').style.width = `${((currentIdx + 1) / quizData.length) * 100}%`;
+            document.getElementById('q-text').textContent = q.q;
+
+            const fb = document.getElementById('q-feedback');
+            fb.classList.add('hidden');
+
+            const box = document.getElementById('options-box');
+            box.innerHTML = '';
+
+            q.opts.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'opt-btn w-full text-left p-4 bg-slate-900/90 hover:bg-slate-800 border border-gray-700 hover:border-teal-500/50 rounded-2xl text-xs sm:text-sm text-gray-200 shadow-md flex items-start gap-3';
+                btn.innerHTML = `<span class="w-6 h-6 rounded-lg bg-teal-500/20 text-teal-400 font-bold flex items-center justify-center shrink-0 text-xs">${String.fromCharCode(65 + idx)}</span> <span class="leading-relaxed">${opt.substring(3)}</span>`;
+                btn.onclick = () => checkAnswer(idx, btn);
+                box.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedIdx, btnEl) {
+            if (answered) return;
+            answered = true;
+
+            const q = quizData[currentIdx];
+            const allBtns = document.querySelectorAll('.opt-btn');
+            const fb = document.getElementById('q-feedback');
+            fb.classList.remove('hidden');
+
+            if (selectedIdx === q.ans) {
+                correctCount++;
+                document.getElementById('score-correct').textContent = correctCount;
+                playSound('correct');
+                btnEl.classList.remove('bg-slate-900/90', 'border-gray-700');
+                btnEl.classList.add('bg-green-600/30', 'border-green-500', 'text-green-300');
+                fb.className = 'mt-4 p-3.5 rounded-xl text-xs font-bold bg-green-500/20 border border-green-500/40 text-green-300';
+                fb.innerHTML = `✅ <strong>Jawaban Tepat!</strong> ${q.exp}`;
+            } else {
+                playSound('wrong');
+                btnEl.classList.remove('bg-slate-900/90', 'border-gray-700');
+                btnEl.classList.add('bg-red-600/30', 'border-red-500', 'text-red-300');
+                allBtns[q.ans].classList.remove('bg-slate-900/90', 'border-gray-700');
+                allBtns[q.ans].classList.add('bg-green-600/30', 'border-green-500', 'text-green-300');
+                fb.className = 'mt-4 p-3.5 rounded-xl text-xs font-bold bg-red-500/20 border border-red-500/40 text-red-300';
+                fb.innerHTML = `❌ <strong>Kurang Tepat.</strong> ${q.exp}`;
+            }
+
+            setTimeout(() => {
+                currentIdx++;
+                if (currentIdx < quizData.length) {
+                    loadQuestion();
+                } else {
+                    finishQuiz();
+                }
+            }, 2000);
+        }
+
+        function finishQuiz() {
+            document.getElementById('quiz-container').classList.add('hidden');
+            const res = document.getElementById('result-container');
+            res.classList.remove('hidden');
+            document.getElementById('final-score').textContent = `${correctCount} / ${quizData.length}`;
+
+            // Update Progress
+            const earnedPoints = Math.round((correctCount / quizData.length) * 25);
+            if (typeof recordLevelCompleted === "function") {
+                recordLevelCompleted("d5l3", earnedPoints);
+            } else {
+                const currentProg = getProgress();
+                if (!currentProg.completedLevels.includes('d5l3')) {
+                    currentProg.completedLevels.push('d5l3');
+                }
+                currentProg.poin = (currentProg.poin || 0) + earnedPoints;
+                if (currentProg.level < 20) currentProg.level = 20;
+                localStorage.setItem('edukacivic_progress', JSON.stringify(currentProg));
+            }
+            document.getElementById('nav-poin').textContent = (getPlayerProgress().poin || 0);
+
+            playSound('victory');
+            triggerDoubleConfetti();
+        }
+
+        function triggerDoubleConfetti() {
+            try {
+                confetti({ particleCount: 90, spread: 80, origin: { y: 0.6 } });
+                setTimeout(() => {
+                    confetti({ particleCount: 80, spread: 100, origin: { y: 0.4 } });
+                }, 350);
+            } catch(e) {}
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadQuestion();
+        });
+    </script>
+</body>
+</html>
+

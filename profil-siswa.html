@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil & Progres Belajar Siswa - EdukaCivic</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="Logo Edukacivic.png">
+    
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="student-system.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            red: '#DC2626',
+                            redLight: '#EF4444',
+                            redDark: '#B91C1C',
+                            dark: '#0F172A',
+                            darker: '#020617',
+                            light: '#F8FAFC'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0F172A; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        .world-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .world-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .level-badge {
+            transition: all 0.2s ease;
+        }
+        .level-badge:hover {
+            transform: scale(1.05);
+        }
+
+        @media print {
+            body {
+                background: white !important;
+                color: #0f172a !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            .bg-slate-900, .bg-slate-950, .bg-gray-900, .bg-brand-darker {
+                background: white !important;
+                color: #0f172a !important;
+                border-color: #cbd5e1 !important;
+            }
+            .text-white, .text-slate-200, .text-slate-300 {
+                color: #0f172a !important;
+            }
+            .text-slate-400, .text-gray-400 {
+                color: #475569 !important;
+            }
+            .shadow-xl, .shadow-2xl, .shadow-md {
+                box-shadow: none !important;
+            }
+            .print-page-break {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body class="bg-brand-darker text-slate-100 font-sans antialiased min-h-screen flex flex-col justify-between selection:bg-brand-red selection:text-white">
+
+    <!-- 1. NAVBAR / HEADER -->
+    <header class="bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/80 sticky top-0 z-40 no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+            
+            <!-- Brand Logo & Title -->
+            <div class="flex items-center gap-3">
+                <a href="index.html" class="flex items-center gap-3 group">
+                    <img src="Logo Edukacivic.png" alt="EdukaCivic" class="h-10 w-auto group-hover:scale-105 transition-transform">
+                    <div class="hidden sm:block">
+                        <span class="font-bold text-xl tracking-tight text-white">Eduka<span class="text-brand-red">Civic</span></span>
+                        <p class="text-[10px] text-slate-400 font-medium">Buku Rapor & Progres Siswa</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Header Actions -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <a href="index.html" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white rounded-xl text-xs font-bold transition border border-slate-700/60 flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-left"></i> <span class="hidden sm:inline">Beranda</span>
+                </a>
+                <button onclick="window.print()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-2 border border-slate-600 shadow-sm">
+                    <i class="fa-solid fa-print"></i> <span class="hidden sm:inline">Cetak Rapor / PDF</span>
+                </button>
+                <a href="dunia1.html" class="px-4 py-2 bg-brand-red hover:bg-brand-redDark text-white rounded-xl text-xs font-extrabold transition shadow-lg shadow-red-500/20 flex items-center gap-2">
+                    <i class="fa-solid fa-gamepad"></i> <span>Lanjut Main</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- PRINT HEADER (Hanya muncul saat dicetak) -->
+    <div class="hidden print-only p-6 border-b-2 border-slate-900 mb-6">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <img src="Logo Edukacivic.png" alt="EdukaCivic" class="h-14 w-auto">
+                <div>
+                    <h1 class="text-2xl font-black text-slate-900">RAPOR PROGRES BELAJAR PPKn</h1>
+                    <p class="text-xs text-slate-600">Platform Pembelajaran Gamifikasi Konstitusi &bull; EdukaCivic</p>
+                </div>
+            </div>
+            <div class="text-right text-xs text-slate-700">
+                <p class="font-bold">SMP Negeri 5 Purwokerto</p>
+                <p>Mata Pelajaran: Pendidikan Pancasila & Kewarganegaraan</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full space-y-8">
+
+        <!-- KONDISI JIKA BELUM ADA DATA SISWA LOGIN -->
+        <div id="unauthenticatedState" class="hidden text-center py-20 bg-slate-900/60 rounded-3xl border border-slate-800 p-8 shadow-2xl">
+            <div class="w-20 h-20 bg-red-500/10 text-brand-red rounded-3xl flex items-center justify-center text-3xl mx-auto mb-4 border border-red-500/20">
+                <i class="fa-solid fa-user-lock"></i>
+            </div>
+            <h2 class="text-2xl font-extrabold text-white mb-2">Profil Siswa Belum Ditemukan</h2>
+            <p class="text-slate-400 text-sm max-w-md mx-auto mb-6">
+                Kamu belum melengkapi identitas dan memilih avatar belajarmu. Silakan masuk terlebih dahulu untuk memulai catatan petualanganmu!
+            </p>
+            <a href="login-siswa.html" class="inline-flex items-center gap-2 px-6 py-3.5 bg-gradient-to-r from-brand-red to-brand-redDark text-white font-extrabold rounded-2xl shadow-xl shadow-red-600/30 hover:from-brand-redLight hover:to-brand-red transition">
+                <i class="fa-solid fa-user-plus"></i> Isi Profil & Pilih Avatar
+            </a>
+        </div>
+
+        <!-- CONTAINER PROFIL LENGKAP SISWA -->
+        <div id="authenticatedState" class="space-y-8">
+
+            <!-- 2. HERO IDENTITY & RANK CARD -->
+            <div class="bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-2xl relative overflow-hidden print-page-break">
+                <!-- Background ambient glow -->
+                <div class="absolute -top-24 -right-24 w-72 h-72 bg-brand-red/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute -bottom-24 -left-24 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div class="flex flex-col lg:flex-row items-center lg:items-start justify-between gap-6 relative z-10">
+                    
+                    <!-- Left: Avatar & Identity -->
+                    <div class="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-5">
+                        <div class="relative shrink-0">
+                            <img id="p-avatar-img" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Student" id="nav-avatar-img" alt="Avatar Siswa" class="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-slate-950 border-4 border-slate-700 shadow-xl object-cover">
+                            <span id="p-gender-badge" class="absolute -bottom-2 -right-2 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-500 text-white shadow-md">
+                                👦 L
+                            </span>
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
+                                <h1 id="p-nama-siswa" class="text-2xl sm:text-3xl font-black text-white tracking-tight">Nama Siswa</h1>
+                                <span id="p-badge-pill" class="px-3 py-1 text-xs font-black rounded-full bg-red-500/20 text-red-400 border border-red-500/30 flex items-center gap-1.5 shadow-sm">
+                                    <i class="fa-solid fa-crown text-xs"></i> <span id="p-badge-text">Presiden</span>
+                                </span>
+                            </div>
+
+                            <p class="text-sm font-semibold text-slate-300 flex items-center justify-center sm:justify-start gap-2">
+                                <span id="p-kelas-siswa">Kelas VIII</span>
+                                <span>&bull;</span>
+                                <span id="p-absen-siswa">No. Absen 1</span>
+                            </p>
+
+                            <p class="text-xs text-slate-400 flex items-center justify-center sm:justify-start gap-1.5 font-medium">
+                                <i class="fa-solid fa-school text-slate-500"></i> <span id="p-sekolah-siswa">SMP Negeri 5 Purwokerto</span>
+                            </p>
+
+                            <p class="text-[11px] text-slate-500 flex items-center justify-center sm:justify-start gap-1.5 pt-1">
+                                <i class="fa-regular fa-clock"></i> Terakhir Login: <strong id="p-waktu-login" class="text-slate-400 font-semibold">-</strong>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Right: Actions & Cert Badge -->
+                    <div class="flex flex-col sm:flex-row lg:flex-col items-center lg:items-end gap-3 w-full sm:w-auto shrink-0 no-print">
+                        <a href="login-siswa.html" class="w-full sm:w-auto px-4 py-2.5 bg-slate-800/90 hover:bg-slate-700 text-white rounded-2xl text-xs font-bold transition border border-slate-700 flex items-center justify-center gap-2 shadow-sm">
+                            <i class="fa-solid fa-user-pen"></i> Edit Profil & Ganti Avatar
+                        </a>
+                        <button onclick="logoutStudentProfile()" class="w-full sm:w-auto px-4 py-2.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 rounded-2xl text-xs font-bold transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-arrow-right-from-bracket"></i> Keluar Akun
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- 3. STATISTIK UTAMA (4 CARDS) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 print-page-break">
+                
+                <!-- Card 1: Total Poin -->
+                <div class="bg-slate-900/80 rounded-2xl p-5 border border-slate-800 shadow-md flex items-center gap-4">
+                    <div class="w-13 h-13 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-yellow-400 flex items-center justify-center text-2xl shrink-0">
+                        <i class="fa-solid fa-bolt"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Poin</p>
+                        <p class="text-2xl font-black text-white mt-0.5"><span id="stat-poin">0</span> <span class="text-xs text-yellow-400 font-bold">/ 500</span></p>
+                        <p class="text-[11px] text-amber-400 font-semibold" id="stat-poin-pct">0% dari Max Poin</p>
+                    </div>
+                </div>
+
+                <!-- Card 2: Level Saat Ini -->
+                <div class="bg-slate-900/80 rounded-2xl p-5 border border-slate-800 shadow-md flex items-center gap-4">
+                    <div class="w-13 h-13 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center text-2xl shrink-0">
+                        <i class="fa-solid fa-gamepad"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Level Progres</p>
+                        <p class="text-2xl font-black text-white mt-0.5" id="stat-level">Level 1</p>
+                        <p class="text-[11px] text-blue-400 font-semibold" id="stat-dunia-active">Dunia 1 Aktif</p>
+                    </div>
+                </div>
+
+                <!-- Card 3: Total Misi Diselesaikan -->
+                <div class="bg-slate-900/80 rounded-2xl p-5 border border-slate-800 shadow-md flex items-center gap-4">
+                    <div class="w-13 h-13 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center text-2xl shrink-0">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Misi Diselesaikan</p>
+                        <p class="text-2xl font-black text-white mt-0.5"><span id="stat-misi-selesai">0</span> <span class="text-xs text-emerald-400 font-bold">/ 20 Level</span></p>
+                        <p class="text-[11px] text-emerald-400 font-semibold" id="stat-misi-pct">0% Selesai</p>
+                    </div>
+                </div>
+
+                <!-- Card 4: Status Duta Konstitusi -->
+                <div class="bg-slate-900/80 rounded-2xl p-5 border border-slate-800 shadow-md flex items-center gap-4">
+                    <div class="w-13 h-13 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center text-2xl shrink-0">
+                        <i class="fa-solid fa-medal"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Pangkat Konstitusi</p>
+                        <p class="text-xl font-black text-white mt-0.5 truncate" id="stat-pangkat">Pemula</p>
+                        <p class="text-[11px] text-rose-400 font-semibold" id="stat-pangkat-desc">Menuju Warga</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 4. ROADMAP PERJALANAN LENCANA KONSTITUSI -->
+            <div class="bg-slate-900/90 rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-xl space-y-5 print-page-break">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                        <h3 class="text-base sm:text-lg font-extrabold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-route text-brand-red"></i> Roadmap Peringkat & Gelar Konstitusi
+                        </h3>
+                        <p class="text-xs text-slate-400">Tingkatkan terus poinmu dengan menyelesaikan setiap level tantangan di 5 Dunia Game!</p>
+                    </div>
+                    <span id="p-xp-summary" class="text-xs font-extrabold px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-yellow-400 shrink-0">
+                        0 / 100 XP
+                    </span>
+                </div>
+
+                <!-- Visual Linear Milestone -->
+                <div class="relative pt-4 pb-2">
+                    <!-- Progress track -->
+                    <div class="w-full h-3 bg-slate-950 rounded-full overflow-hidden border border-slate-800 p-0.5">
+                        <div id="p-overall-bar" class="h-full bg-gradient-to-r from-brand-red via-orange-500 to-amber-400 rounded-full w-[0%] transition-all duration-1000"></div>
+                    </div>
+
+                    <!-- Milestone Steps (6 Tiers) -->
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 mt-3 text-center">
+                        <div class="space-y-1 bg-slate-950/60 p-2 rounded-xl border border-slate-800">
+                            <div class="text-[10px] font-bold text-slate-400">&lt; 100 XP</div>
+                            <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-300 border border-slate-700">🌱 Pemula</span>
+                        </div>
+                        <div class="space-y-1 bg-slate-950/60 p-2 rounded-xl border border-slate-800">
+                            <div class="text-[10px] font-bold text-slate-400">100 - 200 XP</div>
+                            <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-500/20 text-sky-400 border border-sky-500/30">🛡️ Warga</span>
+                        </div>
+                        <div class="space-y-1 bg-slate-950/60 p-2 rounded-xl border border-slate-800">
+                            <div class="text-[10px] font-bold text-slate-400">200 - 300 XP</div>
+                            <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">🔥 Aktivis</span>
+                        </div>
+                        <div class="space-y-1 bg-slate-950/60 p-2 rounded-xl border border-slate-800">
+                            <div class="text-[10px] font-bold text-slate-400">300 - 400 XP</div>
+                            <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/20 text-blue-400 border border-blue-500/30">🏛️ Pejabat</span>
+                        </div>
+                        <div class="space-y-1 bg-slate-950/60 p-2 rounded-xl border border-slate-800">
+                            <div class="text-[10px] font-bold text-slate-400">400 - 500 XP</div>
+                            <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/20 text-purple-400 border border-purple-500/30">💼 Menteri</span>
+                        </div>
+                        <div class="space-y-1 bg-slate-950/60 p-2 rounded-xl border border-slate-800">
+                            <div class="text-[10px] font-bold text-slate-400">&gt; 500 XP</div>
+                            <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-500/20 text-red-400 border border-red-500/30 font-black">👑 Presiden</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. RINCIAN CAPAIAN 5 DUNIA PETUALANGAN (WORLD CARDS) -->
+            <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-xl font-extrabold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-earth-asia text-emerald-400"></i> Capaian di 5 Dunia Pembelajaran
+                        </h2>
+                        <p class="text-xs text-slate-400">Mencatat kelulusan per bab materi dan mini-game dari Dunia 1 hingga Final Boss</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    
+                    <!-- DUNIA 1 CARD -->
+                    <div class="world-card bg-slate-900/90 rounded-3xl p-6 border border-slate-800 shadow-xl flex flex-col justify-between space-y-4 print-page-break">
+                        <div class="space-y-3">
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="w-12 h-12 rounded-2xl bg-red-500/10 text-brand-red flex items-center justify-center text-xl font-bold border border-red-500/20">
+                                    <i class="fa-solid fa-puzzle-piece"></i>
+                                </div>
+                                <span id="w1-badge" class="px-2.5 py-1 text-[11px] font-extrabold rounded-full bg-slate-800 text-slate-400 border border-slate-700">
+                                    0 / 4 Selesai
+                                </span>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-extrabold text-white leading-tight">Dunia 1: Perumusan UUD NRI 1945</h3>
+                                <p class="text-xs text-slate-400 mt-1">Hukum dasar, gagasan awal kemerdekaan, dan perumusan naskah.</p>
+                            </div>
+                            <!-- World progress bar -->
+                            <div>
+                                <div class="flex justify-between text-[11px] font-bold text-slate-400 mb-1">
+                                    <span>Progres Dunia 1</span>
+                                    <span id="w1-pct" class="text-white">0%</span>
+                                </div>
+                                <div class="w-full h-2 bg-slate-950 rounded-full overflow-hidden">
+                                    <div id="w1-bar" class="h-full bg-brand-red rounded-full w-[0%] transition-all duration-500"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4 Level Badges -->
+                        <div class="space-y-2 pt-3 border-t border-slate-800/80">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Status 4 Level:</p>
+                            <div class="grid grid-cols-2 gap-2 text-[11px]" id="w1-levels-grid">
+                                <!-- Dynamic by JS -->
+                            </div>
+                            <div class="pt-2 no-print">
+                                <a href="dunia1.html" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 border border-slate-700">
+                                    <i class="fa-solid fa-play text-[10px]"></i> Masuk Dunia 1
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DUNIA 2 CARD -->
+                    <div class="world-card bg-slate-900/90 rounded-3xl p-6 border border-slate-800 shadow-xl flex flex-col justify-between space-y-4 print-page-break">
+                        <div class="space-y-3">
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-400 flex items-center justify-center text-xl font-bold border border-blue-500/20">
+                                    <i class="fa-solid fa-landmark"></i>
+                                </div>
+                                <span id="w2-badge" class="px-2.5 py-1 text-[11px] font-extrabold rounded-full bg-slate-800 text-slate-400 border border-slate-700">
+                                    0 / 4 Selesai
+                                </span>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-extrabold text-white leading-tight">Dunia 2: Sidang BPUPKI & Tokoh</h3>
+                                <p class="text-xs text-slate-400 mt-1">Peran Ir. Soekarno, Moh. Yamin, Soepomo, dan Panitia Sembilan.</p>
+                            </div>
+                            <!-- World progress bar -->
+                            <div>
+                                <div class="flex justify-between text-[11px] font-bold text-slate-400 mb-1">
+                                    <span>Progres Dunia 2</span>
+                                    <span id="w2-pct" class="text-white">0%</span>
+                                </div>
+                                <div class="w-full h-2 bg-slate-950 rounded-full overflow-hidden">
+                                    <div id="w2-bar" class="h-full bg-blue-500 rounded-full w-[0%] transition-all duration-500"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4 Level Badges -->
+                        <div class="space-y-2 pt-3 border-t border-slate-800/80">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Status 4 Level:</p>
+                            <div class="grid grid-cols-2 gap-2 text-[11px]" id="w2-levels-grid">
+                                <!-- Dynamic by JS -->
+                            </div>
+                            <div class="pt-2 no-print">
+                                <a href="dunia2.html" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 border border-slate-700">
+                                    <i class="fa-solid fa-play text-[10px]"></i> Masuk Dunia 2
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DUNIA 3 CARD -->
+                    <div class="world-card bg-slate-900/90 rounded-3xl p-6 border border-slate-800 shadow-xl flex flex-col justify-between space-y-4 print-page-break">
+                        <div class="space-y-3">
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-xl font-bold border border-amber-500/20">
+                                    <i class="fa-solid fa-scroll"></i>
+                                </div>
+                                <span id="w3-badge" class="px-2.5 py-1 text-[11px] font-extrabold rounded-full bg-slate-800 text-slate-400 border border-slate-700">
+                                    0 / 4 Selesai
+                                </span>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-extrabold text-white leading-tight">Dunia 3: Pengesahan UUD 1945</h3>
+                                <p class="text-xs text-slate-400 mt-1">Sidang PPKI 18 Agustus 1945 dan penetapan konstitusi negara.</p>
+                            </div>
+                            <!-- World progress bar -->
+                            <div>
+                                <div class="flex justify-between text-[11px] font-bold text-slate-400 mb-1">
+                                    <span>Progres Dunia 3</span>
+                                    <span id="w3-pct" class="text-white">0%</span>
+                                </div>
+                                <div class="w-full h-2 bg-slate-950 rounded-full overflow-hidden">
+                                    <div id="w3-bar" class="h-full bg-amber-500 rounded-full w-[0%] transition-all duration-500"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4 Level Badges -->
+                        <div class="space-y-2 pt-3 border-t border-slate-800/80">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Status 4 Level:</p>
+                            <div class="grid grid-cols-2 gap-2 text-[11px]" id="w3-levels-grid">
+                                <!-- Dynamic by JS -->
+                            </div>
+                            <div class="pt-2 no-print">
+                                <a href="dunia3.html" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 border border-slate-700">
+                                    <i class="fa-solid fa-play text-[10px]"></i> Masuk Dunia 3
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DUNIA 4 CARD -->
+                    <div class="world-card bg-slate-900/90 rounded-3xl p-6 border border-slate-800 shadow-xl flex flex-col justify-between space-y-4 print-page-break">
+                        <div class="space-y-3">
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-xl font-bold border border-purple-500/20">
+                                    <i class="fa-solid fa-layer-group"></i>
+                                </div>
+                                <span id="w4-badge" class="px-2.5 py-1 text-[11px] font-extrabold rounded-full bg-slate-800 text-slate-400 border border-slate-700">
+                                    0 / 4 Selesai
+                                </span>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-extrabold text-white leading-tight">Dunia 4: Hierarki Peraturan Hukum</h3>
+                                <p class="text-xs text-slate-400 mt-1">UU No. 12 Tahun 2011, tata urutan hukum tertinggi sampai perda.</p>
+                            </div>
+                            <!-- World progress bar -->
+                            <div>
+                                <div class="flex justify-between text-[11px] font-bold text-slate-400 mb-1">
+                                    <span>Progres Dunia 4</span>
+                                    <span id="w4-pct" class="text-white">0%</span>
+                                </div>
+                                <div class="w-full h-2 bg-slate-950 rounded-full overflow-hidden">
+                                    <div id="w4-bar" class="h-full bg-purple-500 rounded-full w-[0%] transition-all duration-500"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4 Level Badges -->
+                        <div class="space-y-2 pt-3 border-t border-slate-800/80">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Status 4 Level:</p>
+                            <div class="grid grid-cols-2 gap-2 text-[11px]" id="w4-levels-grid">
+                                <!-- Dynamic by JS -->
+                            </div>
+                            <div class="pt-2 no-print">
+                                <a href="dunia4.html" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 border border-slate-700">
+                                    <i class="fa-solid fa-play text-[10px]"></i> Masuk Dunia 4
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DUNIA 5 CARD (FINAL BOSS) -->
+                    <div class="world-card bg-slate-900/90 rounded-3xl p-6 border border-slate-800 shadow-xl flex flex-col justify-between space-y-4 print-page-break md:col-span-2 lg:col-span-2">
+                        <div class="space-y-3">
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xl font-bold border border-emerald-500/20">
+                                    <i class="fa-solid fa-shield-halved"></i>
+                                </div>
+                                <span id="w5-badge" class="px-2.5 py-1 text-[11px] font-extrabold rounded-full bg-slate-800 text-slate-400 border border-slate-700">
+                                    0 / 4 Selesai
+                                </span>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h3 class="text-base font-extrabold text-white leading-tight">Dunia 5: Warga Negara Taat Konstitusi</h3>
+                                    <span class="px-2 py-0.5 text-[9px] font-black uppercase rounded-md bg-red-500/20 text-brand-red border border-red-500/30">Final Boss</span>
+                                </div>
+                                <p class="text-xs text-slate-400 mt-1">Penerapan norma, aksi bela konstitusi, dan pengukuhan Duta Konstitusi resmi.</p>
+                            </div>
+                            <!-- World progress bar -->
+                            <div>
+                                <div class="flex justify-between text-[11px] font-bold text-slate-400 mb-1">
+                                    <span>Progres Dunia 5 (Boss Stage)</span>
+                                    <span id="w5-pct" class="text-white">0%</span>
+                                </div>
+                                <div class="w-full h-2 bg-slate-950 rounded-full overflow-hidden">
+                                    <div id="w5-bar" class="h-full bg-emerald-500 rounded-full w-[0%] transition-all duration-500"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4 Level Badges -->
+                        <div class="space-y-2 pt-3 border-t border-slate-800/80">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Status 4 Level:</p>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px]" id="w5-levels-grid">
+                                <!-- Dynamic by JS -->
+                            </div>
+                            <div class="pt-2 no-print">
+                                <a href="dunia5.html" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 border border-slate-700">
+                                    <i class="fa-solid fa-play text-[10px]"></i> Masuk Dunia 5 (Final Boss)
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- 6. LEMBAR TANDA TANGAN (Hanya Muncul Saat Print/Cetak) -->
+            <div class="hidden print-only pt-8 border-t-2 border-slate-300 mt-8">
+                <div class="grid grid-cols-2 gap-8 text-center text-xs text-slate-800">
+                    <div>
+                        <p class="mb-16">Mengetahui,<br><strong>Guru Mata Pelajaran PPKn</strong></p>
+                        <p class="font-bold underline">Fadilatul Fajri, S.Pd.</p>
+                        <p class="text-[10px] text-slate-600">NIP. -</p>
+                    </div>
+                    <div>
+                        <p class="mb-16">Purwokerto, <span id="print-date">29 Agustus 2026</span><br><strong>Siswa / Siswi</strong></p>
+                        <p class="font-bold underline" id="print-student-name">Nama Siswa</p>
+                        <p class="text-[10px] text-slate-600" id="print-student-meta">Kelas VIII · No. Absen -</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- 7. FOOTER -->
+    <footer class="bg-slate-950 border-t border-slate-800 py-6 text-center text-xs text-slate-500 no-print">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
+            <p>&copy; 2026 EdukaCivic &bull; Fadilatul Fajri &bull; SMP Negeri 5 Purwokerto</p>
+            <div class="flex items-center gap-4">
+                <a href="index.html" class="text-slate-400 hover:text-white transition">Beranda</a>
+                <a href="panduan-siswa.html" class="text-slate-400 hover:text-white transition">Panduan</a>
+                <a href="pusat-bantuan.html" class="text-slate-400 hover:text-white transition">Pusat Bantuan</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT PROFILE & PROGRESS ENGINE -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            renderStudentProfilePage();
+        });
+
+        function getStudentInfo() {
+            try {
+                return JSON.parse(localStorage.getItem('edukacivic_siswa'));
+            } catch(e) {
+                return null;
+            }
+        }
+
+        function getProgressInfo() {
+            try {
+                return JSON.parse(localStorage.getItem('edukacivic_progress')) || { poin: 0, level: 1, dunia: 1, completedLevels: [] };
+            } catch(e) {
+                return { poin: 0, level: 1, dunia: 1, completedLevels: [] };
+            }
+        }
+
+        function getBadgeInfo(poin) {
+            if (poin > 500) return { name: 'Presiden', icon: 'fa-crown', bg: 'bg-red-500/20 text-red-400 border-red-500/30', desc: 'Gelar Tertinggi Konstitusi (Max Tier)', next: 500 };
+            if (poin >= 400) return { name: 'Menteri', icon: 'fa-gavel', bg: 'bg-purple-500/20 text-purple-400 border-purple-500/30', desc: 'Pimpinan Pengambil Keputusan', next: 501 };
+            if (poin >= 300) return { name: 'Pejabat', icon: 'fa-user-tie', bg: 'bg-blue-500/20 text-blue-400 border-blue-500/30', desc: 'Penegak Aturan & Hukum', next: 400 };
+            if (poin >= 200) return { name: 'Aktivis', icon: 'fa-bullhorn', bg: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30', desc: 'Pelopor Semangat Demokrasi', next: 300 };
+            if (poin >= 100) return { name: 'Warga', icon: 'fa-user', bg: 'bg-sky-500/20 text-sky-400 border-sky-500/30', desc: 'Warga Negara Taat Konstitusi', next: 200 };
+            return { name: 'Pemula', icon: 'fa-seedling', bg: 'bg-slate-800 text-slate-300 border-slate-700', desc: 'Pelajar Pemula Konstitusi', next: 100 };
+        }
+
+        function renderStudentProfilePage() {
+            const siswa = getStudentInfo();
+            const prog = getProgressInfo();
+
+            const unauthBox = document.getElementById('unauthenticatedState');
+            const authBox = document.getElementById('authenticatedState');
+
+            if (!siswa) {
+                unauthBox.classList.remove('hidden');
+                authBox.classList.add('hidden');
+                return;
+            } else {
+                unauthBox.classList.add('hidden');
+                authBox.classList.remove('hidden');
+            }
+
+            const poin = prog.poin || siswa.poin || 0;
+            const level = prog.level || siswa.level || 1;
+            const dunia = prog.dunia || siswa.dunia || 1;
+            const completed = prog.completedLevels || siswa.completedLevels || [];
+            const badge = getBadgeInfo(poin);
+
+            const avatarUrl = siswa.avatarUrl || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(siswa.nama || 'Student')}&backgroundColor=b6e3f4`;
+
+            // 1. Identity Header
+            document.getElementById('p-avatar-img').src = avatarUrl;
+            document.getElementById('p-nama-siswa').textContent = siswa.nama;
+            document.getElementById('p-kelas-siswa').textContent = siswa.kelas || 'Kelas VIII';
+            document.getElementById('p-absen-siswa').textContent = `No. Absen ${siswa.noAbsen || '-'}`;
+            document.getElementById('p-sekolah-siswa').textContent = siswa.sekolah || 'SMP Negeri 5 Purwokerto';
+            document.getElementById('p-waktu-login').textContent = siswa.waktuLogin || 'Baru Saja';
+
+            const genderBadge = document.getElementById('p-gender-badge');
+            if (siswa.gender === 'P') {
+                genderBadge.textContent = '👧 P';
+                genderBadge.className = 'absolute -bottom-2 -right-2 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-pink-500 text-white shadow-md';
+            } else {
+                genderBadge.textContent = '👦 L';
+                genderBadge.className = 'absolute -bottom-2 -right-2 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-500 text-white shadow-md';
+            }
+
+            const badgePill = document.getElementById('p-badge-pill');
+            badgePill.className = `px-3 py-1 text-xs font-black rounded-full border flex items-center gap-1.5 shadow-sm ${badge.bg}`;
+            document.getElementById('p-badge-text').textContent = badge.name;
+
+            // 2. Stat Cards
+            document.getElementById('stat-poin').textContent = poin;
+            const poinPct = Math.round((poin / 500) * 100);
+            document.getElementById('stat-poin-pct').textContent = `${poinPct}% dari 500 Max Poin`;
+
+            document.getElementById('stat-level').textContent = `Level ${level}`;
+            document.getElementById('stat-dunia-active').textContent = `Dunia ${dunia} Aktif`;
+
+            document.getElementById('stat-misi-selesai').textContent = completed.length;
+            const misiPct = Math.round((completed.length / 20) * 100);
+            document.getElementById('stat-misi-pct').textContent = `${misiPct}% Total Selesai`;
+
+            document.getElementById('stat-pangkat').textContent = badge.name;
+            document.getElementById('stat-pangkat-desc').textContent = badge.desc;
+
+            // 3. Roadmap Milestone Bar
+            document.getElementById('p-xp-summary').textContent = `${poin} / 500 XP`;
+            const overallPct = Math.min(Math.round((poin / 500) * 100), 100);
+            document.getElementById('p-overall-bar').style.width = `${overallPct}%`;
+
+            // 4. World Breakdown Calculations
+            const worldProgress = calculateWorldProgress(completed);
+            renderWorldCard('w1', worldProgress.dunia1, [
+                { id: 'd1l1', label: 'Lvl 1: Puzzle UUD' },
+                { id: 'd1l2', label: 'Lvl 2: Kuis Dasar' },
+                { id: 'd1l3', label: 'Lvl 3: Sejarah' },
+                { id: 'd1l4', label: 'Lvl 4: Ujian D1' }
+            ], completed);
+
+            renderWorldCard('w2', worldProgress.dunia2, [
+                { id: 'd2l1', label: 'Lvl 1: Sidang 1' },
+                { id: 'd2l2', label: 'Lvl 2: Tokoh BPUPKI' },
+                { id: 'd2l3', label: 'Lvl 3: Sidang 2' },
+                { id: 'd2l4', label: 'Lvl 4: Panitia 9' }
+            ], completed);
+
+            renderWorldCard('w3', worldProgress.dunia3, [
+                { id: 'd3l1', label: 'Lvl 1: Sidang PPKI' },
+                { id: 'd3l2', label: 'Lvl 2: Piagam Jkt' },
+                { id: 'd3l3', label: 'Lvl 3: Kriket Kuis' },
+                { id: 'd3l4', label: 'Lvl 4: Pengesahan' }
+            ], completed);
+
+            renderWorldCard('w4', worldProgress.dunia4, [
+                { id: 'd4l1', label: 'Lvl 1: Hierarki' },
+                { id: 'd4l2', label: 'Lvl 2: UU No.12' },
+                { id: 'd4l3', label: 'Lvl 3: Tata Hukum' },
+                { id: 'd4l4', label: 'Lvl 4: Pacman Lab' }
+            ], completed);
+
+            renderWorldCard('w5', worldProgress.dunia5, [
+                { id: 'd5l1', label: 'Lvl 1: Norma & Nilai' },
+                { id: 'd5l2', label: 'Lvl 2: Tangkap Nilai' },
+                { id: 'd5l3', label: 'Lvl 3: Spider Quiz' },
+                { id: 'd5l4', label: 'Lvl 4: FINAL BOSS' }
+            ], completed);
+
+            // 5. Print Details
+            const now = new Date();
+            document.getElementById('print-date').textContent = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+            document.getElementById('print-student-name').textContent = siswa.nama;
+            document.getElementById('print-student-meta').textContent = `${siswa.kelas || 'Kelas VIII'} · No. Absen ${siswa.noAbsen || '-'}`;
+        }
+
+        function renderWorldCard(prefix, duniaData, levelList, completedList) {
+            const count = duniaData ? duniaData.count : 0;
+            const total = duniaData ? duniaData.total : 4;
+            const pct = duniaData ? duniaData.pct : 0;
+
+            const badgeEl = document.getElementById(`${prefix}-badge`);
+            if (count === total) {
+                badgeEl.textContent = `4/4 Selesai (100%)`;
+                badgeEl.className = 'px-2.5 py-1 text-[11px] font-extrabold rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+            } else if (count > 0) {
+                badgeEl.textContent = `${count}/${total} Selesai (${pct}%)`;
+                badgeEl.className = 'px-2.5 py-1 text-[11px] font-extrabold rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30';
+            } else {
+                badgeEl.textContent = `0/${total} Belum Mulai`;
+                badgeEl.className = 'px-2.5 py-1 text-[11px] font-extrabold rounded-full bg-slate-800 text-slate-400 border border-slate-700';
+            }
+
+            document.getElementById(`${prefix}-pct`).textContent = `${pct}%`;
+            document.getElementById(`${prefix}-bar`).style.width = `${pct}%`;
+
+            const grid = document.getElementById(`${prefix}-levels-grid`);
+            grid.innerHTML = '';
+
+            levelList.forEach(lv => {
+                const isDone = completedList.includes(lv.id);
+                const pill = document.createElement('div');
+                pill.className = `level-badge p-2 rounded-xl border flex items-center justify-between text-[10px] font-bold ${
+                    isDone 
+                        ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-300' 
+                        : 'bg-slate-950/60 border-slate-800 text-slate-500'
+                }`;
+                pill.innerHTML = `
+                    <span class="truncate">${lv.label}</span>
+                    ${isDone ? '<i class="fa-solid fa-circle-check text-emerald-400"></i>' : '<i class="fa-solid fa-lock text-[8px] text-slate-600"></i>'}
+                `;
+                grid.appendChild(pill);
+            });
+        }
+
+        function logoutStudentProfile() {
+            if (confirm('Apakah Anda yakin ingin keluar dari akun siswa ini?')) {
+                localStorage.removeItem('edukacivic_siswa');
+                window.location.href = 'index.html';
+            }
+        }
+    </script>
+</body>
+</html>
+

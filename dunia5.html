@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dunia 5: Menjadi Warga Negara yang Taat Konstitusi - EdukaCivic</title>
+    <link rel="icon" type="image/png" href="Logo Edukacivic.png">
+    
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="student-system.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            red: '#DC2626', redLight: '#EF4444', redDark: '#B91C1C',
+                            emerald: '#10B981', emeraldLight: '#34D399', emeraldDark: '#059669',
+                            teal: '#14B8A6', tealDark: '#0F766E',
+                            cyan: '#06B6D4',
+                            gold: '#F59E0B',
+                            dark: '#0F172A', darker: '#020617', light: '#F8FAFC'
+                        }
+                    },
+                    animation: {
+                        'float': 'float 3s ease-in-out infinite',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0F172A; }
+        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4B5563; }
+        
+        .glow-emerald:hover { box-shadow: 0 0 30px rgba(16, 185, 129, 0.35); }
+        .glow-teal:hover { box-shadow: 0 0 30px rgba(20, 184, 166, 0.35); }
+        .glow-cyan:hover { box-shadow: 0 0 30px rgba(6, 182, 212, 0.35); }
+        .glow-gold:hover { box-shadow: 0 0 35px rgba(245, 158, 11, 0.45); }
+        
+        .level-locked { position: relative; overflow: hidden; }
+        .level-locked::before {
+            content: ''; position: absolute; inset: 0;
+            background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(2px);
+            z-index: 10; border-radius: 1.5rem;
+        }
+    </style>
+    <script>
+        if (!isWorldPreviousCompleted(5)) {
+            alert('🔒 Dunia 5 masih terkunci!\nSilakan selesaikan seluruh level pada Dunia 4 terlebih dahulu.');
+            window.location.href = 'dunia4.html';
+        } else if (!isWorldTokenUnlocked(5)) {
+            document.addEventListener('DOMContentLoaded', () => {
+                showWorldTokenPromptModal(5, 'dunia5.html');
+            });
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-b from-[#02140c] via-[#052618] to-[#010e08] text-white font-sans antialiased overflow-x-hidden min-h-screen selection:bg-emerald-500 selection:text-slate-950">
+
+    <!-- NAVBAR -->
+    <nav class="fixed w-full z-50 bg-brand-dark/90 backdrop-blur-md border-b border-gray-800 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-4">
+                    <a href="index.html" class="flex items-center gap-2 text-gray-400 hover:text-white transition-colors group">
+                        <div class="w-8 h-8 bg-gray-800 rounded-lg flex items-center justify-center group-hover:bg-gray-700 transition-colors">
+                            <i class="fa-solid fa-arrow-left text-sm"></i>
+                        </div>
+                        <span class="text-sm font-medium hidden sm:inline">Kembali</span>
+                    </a>
+                    <div class="w-px h-8 bg-gray-700"></div>
+                    <a href="index.html" class="flex items-center gap-2 cursor-pointer">
+                        <img src="Logo Edukacivic.png" alt="EdukaCivic" class="h-8 w-auto">
+                        <span class="font-bold text-lg tracking-tight text-white hidden sm:inline">Eduka<span class="text-brand-red">Civic</span></span>
+                    </a>
+                </div>
+
+                <div class="hidden md:flex items-center gap-3">
+                    <div class="w-8 h-8 bg-emerald-500/20 text-emerald-400 rounded-lg flex items-center justify-center">
+                        <i class="fa-solid fa-hand-holding-heart text-sm"></i>
+                    </div>
+                    <div>
+                        <p class="text-white font-semibold text-sm leading-none">Dunia 5</p>
+                        <p class="text-gray-400 text-xs">Menjadi Warga Negara Taat Konstitusi</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <div class="hidden sm:flex items-center gap-2 bg-gray-800 px-3 py-1.5 rounded-lg border border-gray-700">
+                        <i class="fa-solid fa-bolt text-yellow-400 text-xs"></i>
+                        <span id="nav-poin" class="text-yellow-400 font-bold text-sm">0</span>
+                        <span class="text-gray-500 text-xs">Poin</span>
+                    </div>
+                    <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-400 p-0.5 cursor-pointer shadow-md" onclick="window.location.href='profil-siswa.html'">
+                        <img id="nav-avatar-img" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Student" alt="Avatar" class="w-full h-full rounded-full bg-slate-900 object-cover">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO BANNER -->
+    <section class="relative pt-24 pb-12 overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-emerald-600/25 via-[#052618]/60 to-transparent"></div>
+        <div class="absolute top-10 left-1/4 w-96 h-96 bg-emerald-500/20 rounded-full filter blur-3xl animate-pulse-slow"></div>
+        <div class="absolute top-20 right-1/4 w-72 h-72 bg-teal-600/20 rounded-full filter blur-3xl animate-pulse-slow"></div>
+        <div class="absolute inset-0 opacity-5 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+CjxyZWN0IHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjEiLz4KPC9zdmc+')]"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
+                <div class="flex-1 text-center lg:text-left">
+                    <!-- Breadcrumb -->
+                    <div class="flex items-center gap-2 text-sm text-gray-400 mb-4 justify-center lg:justify-start">
+                        <a href="index.html" class="hover:text-white transition-colors">Beranda</a>
+                        <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                        <a href="index.html#dunia-game" class="hover:text-white transition-colors">Peta Dunia</a>
+                        <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                        <span class="text-emerald-400 font-medium">Dunia 5</span>
+                    </div>
+
+                    <!-- Eyebrow Pill -->
+                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 mb-4">
+                        <i class="fa-solid fa-crown text-emerald-400 text-xs"></i>
+                        <span class="text-xs font-bold text-emerald-400 tracking-wide uppercase">Level 17 – 20 (Puncak Petualangan)</span>
+                    </div>
+
+                    <h1 class="text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight mb-4">
+                        Dunia 5: <br>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-300">Menjadi Warga Negara Taat Konstitusi</span>
+                    </h1>
+
+                    <!-- Module Description -->
+                    <p class="text-gray-400 text-base lg:text-lg mb-6 max-w-xl mx-auto lg:mx-0">
+                        Wujudkan nilai-nilai konstitusi dalam tindakan nyata di lingkungan keluarga, sekolah, masyarakat, dan taklukkan Grand Final Boss: Naga Mahkota Konstitusi!
+                    </p>
+
+                    <!-- World Stats -->
+                    <div class="flex flex-wrap gap-4 justify-center lg:justify-start mb-6">
+                        <div class="flex items-center gap-2 bg-gray-800/50 px-4 py-2 rounded-xl border border-gray-700">
+                            <i class="fa-solid fa-gamepad text-emerald-400"></i>
+                            <span class="text-sm text-gray-300"><strong class="text-white">4</strong> Level + Final Boss</span>
+                        </div>
+                        <div class="flex items-center gap-2 bg-gray-800/50 px-4 py-2 rounded-xl border border-gray-700">
+                            <i class="fa-solid fa-bolt text-yellow-400"></i>
+                            <span class="text-sm text-gray-300"><strong class="text-white">100</strong> Max Poin</span>
+                        </div>
+                        <div class="flex items-center gap-2 bg-gray-800/50 px-4 py-2 rounded-xl border border-gray-700">
+                            <i class="fa-solid fa-clock text-green-400"></i>
+                            <span class="text-sm text-gray-300">~<strong class="text-white">50</strong> Menit</span>
+                        </div>
+                    </div>
+
+                    <!-- Progress Tracker Box -->
+                    <div class="bg-gray-800/50 p-4 rounded-2xl border border-gray-700 max-w-md mx-auto lg:mx-0">
+                        <div class="flex justify-between text-xs mb-2">
+                            <span class="text-gray-300 font-medium">Progres Dunia 5</span>
+                            <span id="progress-text" class="text-emerald-400 font-bold">0 / 4 Level</span>
+                        </div>
+                        <div class="w-full h-2.5 bg-gray-900 rounded-full overflow-hidden">
+                            <div id="progress-bar" class="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-1000" style="width: 0%"></div>
+                        </div>
+                        <p class="text-gray-500 text-[11px] mt-2"><i class="fa-solid fa-trophy mr-1 text-yellow-400"></i> Selesaikan seluruh level untuk meraih gelar Juara: Penjaga Utama Konstitusi!</p>
+                    </div>
+                </div>
+
+                <!-- Right: World Illustration -->
+                <div class="flex-shrink-0 relative">
+                    <div class="w-64 h-64 lg:w-80 lg:h-80 relative animate-float">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="w-48 h-48 lg:w-56 lg:h-56 rounded-full bg-gradient-to-br from-emerald-600/30 to-teal-600/30 border border-emerald-500/30 flex items-center justify-center backdrop-blur-sm">
+                                <div class="w-32 h-32 lg:w-40 lg:h-40 rounded-full bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-400/20 flex items-center justify-center">
+                                    <div class="text-center">
+                                        <i class="fa-solid fa-crown text-5xl lg:text-6xl text-emerald-400 mb-2"></i>
+                                        <p class="text-emerald-300 text-xs font-bold uppercase tracking-wider">Taat Hukum</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="absolute top-2 right-8 w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center border border-emerald-500/30 animate-pulse">
+                            <i class="fa-solid fa-hands-holding-child text-emerald-400"></i>
+                        </div>
+                        <div class="absolute bottom-4 left-4 w-12 h-12 bg-teal-500/20 rounded-xl flex items-center justify-center border border-teal-500/30 animate-pulse-slow">
+                            <i class="fa-solid fa-school text-teal-400"></i>
+                        </div>
+                        <div class="absolute top-1/2 -right-2 w-10 h-10 bg-yellow-500/20 rounded-lg flex items-center justify-center border border-yellow-500/30 animate-pulse">
+                            <i class="fa-solid fa-trophy text-yellow-400 text-sm"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- LEVEL MAP SECTION -->
+    <section class="py-12 relative">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-10">
+                <h2 class="text-sm font-bold text-emerald-400 tracking-widest uppercase mb-2">Peta Level Akhir</h2>
+                <h3 class="text-2xl md:text-3xl font-extrabold">Pilih Misi & Buktikan Ketaatanmu</h3>
+                <p class="text-gray-400 text-sm mt-2">Selesaikan misi demi misi untuk mencapai Final Boss dan menyandang gelar Juara Konstitusi!</p>
+            </div>
+
+            <div class="space-y-6">
+
+                <!-- LEVEL 17: Sikap Taat terhadap Konstitusi (Gabungan Keluarga, Sekolah, & Masyarakat) -->
+                <div id="level-1-card" class="group relative">
+                    <div class="hidden lg:block absolute left-1/2 -bottom-6 transform -translate-x-1/2 w-0.5 h-6 bg-gradient-to-b from-emerald-500/40 to-transparent"></div>
+                    <a href="dunia5-level1.html" onmouseenter="playSfx('hover')" onclick="playSfx('click')" class="block bg-gray-800/50 backdrop-blur-sm rounded-3xl border border-gray-700 hover:border-emerald-400/50 transition-all duration-300 glow-emerald overflow-hidden transform hover:-translate-y-1 hover:scale-[1.01]">
+                        <div class="flex flex-col md:flex-row">
+                            <div class="md:w-48 bg-gradient-to-br from-emerald-600 to-emerald-800 p-6 flex flex-col items-center justify-center text-center relative overflow-hidden">
+                                <div class="absolute inset-0 opacity-20 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPgo8cmVjdCB3aWR0aD0iOCIgaGVpZ2h0PSI4IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9Ii4xIi8+Cjwvc3ZnPg==')]"></div>
+                                <div class="relative z-10">
+                                    <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-3 mx-auto backdrop-blur-sm border border-white/20">
+                                        <i class="fa-solid fa-school text-3xl text-white"></i>
+                                    </div>
+                                    <span class="text-emerald-200 text-xs font-bold uppercase tracking-widest">Level</span>
+                                    <p class="text-white text-4xl font-extrabold leading-none">17</p>
+                                </div>
+                            </div>
+                            <div class="flex-1 p-6">
+                                <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                                    <div class="flex-1">
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <span class="bg-emerald-500/20 text-emerald-400 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">Keluarga, Sekolah & Masyarakat</span>
+                                            <span id="level1-status" class="bg-green-500/20 text-green-400 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase flex items-center gap-1">
+                                                <i class="fa-solid fa-lock-open text-[8px]"></i> Terbuka
+                                            </span>
+                                        </div>
+                                        <h4 class="text-xl font-bold text-white mb-2">Sikap Taat terhadap Konstitusi</h4>
+                                        <p class="text-gray-400 text-sm leading-relaxed mb-4">Pembiasaan sikap taat dan pengamalan nilai-nilai luhur UUD NRI Tahun 1945 di lingkungan keluarga, sekolah, dan masyarakat luas.</p>
+                                        <div class="flex flex-wrap items-center gap-3 text-xs text-gray-500">
+                                            <span class="flex items-center gap-1"><i class="fa-solid fa-clock"></i> ~15 menit</span>
+                                            <span class="flex items-center gap-1"><i class="fa-solid fa-bolt text-yellow-500"></i> 25 Poin</span>
+                                            <span class="flex items-center gap-1"><i class="fa-solid fa-star text-yellow-400"></i> Mudah</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="w-12 h-12 bg-emerald-500 rounded-xl flex items-center justify-center text-white group-hover:bg-emerald-400 group-hover:scale-110 transition-all shadow-lg shadow-emerald-500/30">
+                                            <i class="fa-solid fa-play text-lg"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- LEVEL 18: Tugas Kelompok -->
+                <div id="level-2-card" class="group relative">
+                    <div class="hidden lg:block absolute left-1/2 -bottom-6 transform -translate-x-1/2 w-0.5 h-6 bg-gradient-to-b from-teal-500/40 to-transparent"></div>
+                    <a href="dunia5-level2.html" onmouseenter="playSfx('hover')" onclick="playSfx('click')" class="block bg-gray-800/50 backdrop-blur-sm rounded-3xl border border-gray-700 hover:border-teal-400/50 transition-all duration-300 glow-teal overflow-hidden transform hover:-translate-y-1 hover:scale-[1.01]">
+                        <div class="flex flex-col md:flex-row">
+                            <div class="md:w-48 bg-gradient-to-br from-teal-600 to-teal-800 p-6 flex flex-col items-center justify-center text-center relative overflow-hidden">
+                                <div class="absolute inset-0 opacity-20 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPgo8cmVjdCB3aWR0aD0iOCIgaGVpZ2h0PSI4IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9Ii4xIi8+Cjwvc3ZnPg==')]"></div>
+                                <div class="relative z-10">
+                                    <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-3 mx-auto backdrop-blur-sm border border-white/20">
+                                        <i class="fa-solid fa-gamepad text-3xl text-white"></i>
+                                    </div>
+                                    <span class="text-teal-200 text-xs font-bold uppercase tracking-widest">Level</span>
+                                    <p class="text-white text-4xl font-extrabold leading-none">18</p>
+                                </div>
+                            </div>
+                            <div class="flex-1 p-6">
+                                <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                                    <div class="flex-1">
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <span class="bg-teal-500/20 text-teal-300 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider flex items-center gap-1">
+                                                <i class="fa-solid fa-link text-[9px]"></i> Game Kerjasama Tali (Pico Park)
+                                            </span>
+                                            <span id="level2-status" class="bg-gray-700 text-gray-400 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase flex items-center gap-1">
+                                                <i class="fa-solid fa-lock text-[8px]"></i> Terkunci
+                                            </span>
+                                        </div>
+                                        <h4 class="text-xl font-bold text-white mb-2">Ekspedisi Tali Konstitusi (Multiplayer)</h4>
+                                        <p class="text-gray-400 text-sm leading-relaxed mb-4">Misi gotong royong 4 pemain terikat tali elastis! Bersama-sama melompati jurang, memanjat tebing tumpuk (stacking), dan menginjak 4 tombol konstitusi untuk membuka gerbang.</p>
+                                        <div class="flex flex-wrap items-center gap-3 text-xs text-gray-500">
+                                            <span class="flex items-center gap-1"><i class="fa-solid fa-users text-teal-400"></i> 4 Pemain Terhubung</span>
+                                            <span class="flex items-center gap-1"><i class="fa-solid fa-bolt text-yellow-500"></i> 25 Poin</span>
+                                            <span class="flex items-center gap-1"><i class="fa-solid fa-handshake-angle text-emerald-400"></i> Gotong Royong</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="w-12 h-12 bg-teal-500 rounded-xl flex items-center justify-center text-white group-hover:bg-teal-400 group-hover:scale-110 transition-all shadow-lg shadow-teal-500/30">
+                                            <i class="fa-solid fa-play text-lg"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- LEVEL 19: Tugas Proyek -->
+                <div id="level-3-card" class="group relative">
+                    <div class="hidden lg:block absolute left-1/2 -bottom-6 transform -translate-x-1/2 w-0.5 h-6 bg-gradient-to-b from-cyan-500/40 to-transparent"></div>
+                    <a href="dunia5-level3.html" onmouseenter="playSfx('hover')" onclick="playSfx('click')" class="block bg-gray-800/50 backdrop-blur-sm rounded-3xl border border-gray-700 hover:border-cyan-400/50 transition-all duration-300 glow-cyan overflow-hidden transform hover:-translate-y-1 hover:scale-[1.01]">
+                        <div class="flex flex-col md:flex-row">
+                            <div class="md:w-48 bg-gradient-to-br from-cyan-600 to-cyan-800 p-6 flex flex-col items-center justify-center text-center relative overflow-hidden">
+                                <div class="relative z-10">
+                                    <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-3 mx-auto backdrop-blur-sm border border-white/20">
+                                        <i class="fa-solid fa-palette text-3xl text-white"></i>
+                                    </div>
+                                    <span class="text-cyan-200 text-xs font-bold uppercase tracking-widest">Level</span>
+                                    <p class="text-white text-4xl font-extrabold leading-none">19</p>
+                                </div>
+                            </div>
+                            <div class="flex-1 p-6">
+                                <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                                    <div class="flex-1">
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <span class="bg-cyan-500/20 text-cyan-300 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider flex items-center gap-1">
+                                                <i class="fa-solid fa-border-all text-[9px]"></i> Kanvas Kolaboratif 2x2
+                                            </span>
+                                            <span id="level3-status" class="bg-gray-700 text-gray-400 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase flex items-center gap-1">
+                                                <i class="fa-solid fa-lock text-[8px]"></i> Terkunci
+                                            </span>
+                                        </div>
+                                        <h4 class="text-xl font-bold text-white mb-2">Kanvas Kolaboratif: Mosaik Konstitusi</h4>
+                                        <p class="text-gray-400 text-sm leading-relaxed mb-4">Misi seni kolaboratif 4 siswa! Menyatukan 4 potongan gambar kuadran 2x2 bertema konstitusi menjadi satu karya utuh yang dipamerkan di galeri kelas.</p>
+                                        <div class="flex flex-wrap items-center gap-3 text-xs text-gray-500">
+                                            <span class="flex items-center gap-1"><i class="fa-solid fa-users text-cyan-400"></i> Kolaborasi 4 Kuadran</span>
+                                            <span class="flex items-center gap-1"><i class="fa-solid fa-bolt text-yellow-500"></i> 25 Poin</span>
+                                            <span class="flex items-center gap-1"><i class="fa-solid fa-images text-emerald-400"></i> Galeri Kelas</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="w-12 h-12 bg-cyan-500 rounded-xl flex items-center justify-center text-white group-hover:bg-cyan-400 group-hover:scale-110 transition-all shadow-lg shadow-cyan-500/30">
+                                            <i class="fa-solid fa-play text-lg"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- LEVEL 20: Final Boss Battle -->
+                <div id="level-4-card" class="group relative">
+                    <a href="dunia5-level4.html" onmouseenter="playSfx('hover')" onclick="playSfx('click')" class="block bg-gray-800/50 backdrop-blur-sm rounded-3xl border border-gray-700 hover:border-yellow-400/50 transition-all duration-300 glow-gold overflow-hidden transform hover:-translate-y-1 hover:scale-[1.01]">
+                        <div class="flex flex-col md:flex-row">
+                            <div class="md:w-48 bg-gradient-to-br from-amber-500 via-orange-600 to-red-700 p-6 flex flex-col items-center justify-center text-center relative overflow-hidden">
+                                <div class="relative z-10">
+                                    <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-3 mx-auto backdrop-blur-sm border border-white/20">
+                                        <i class="fa-solid fa-dragon text-3xl text-white"></i>
+                                    </div>
+                                    <span class="text-yellow-200 text-xs font-bold uppercase tracking-widest">Final Boss</span>
+                                    <p class="text-white text-4xl font-extrabold leading-none">20</p>
+                                </div>
+                            </div>
+                            <div class="flex-1 p-6">
+                                <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                                    <div class="flex-1">
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <span class="bg-yellow-500/20 text-yellow-400 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider flex items-center gap-1">
+                                                <i class="fa-solid fa-crown text-[8px]"></i> The Grand Finale
+                                            </span>
+                                            <span id="level4-status" class="bg-gray-700 text-gray-400 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase flex items-center gap-1">
+                                                <i class="fa-solid fa-lock text-[8px]"></i> Terkunci
+                                            </span>
+                                        </div>
+                                        <h4 class="text-xl font-bold text-white mb-2">The Grand Final Boss: Naga Mahkota Konstitusi</h4>
+                                        <p class="text-gray-400 text-sm leading-relaxed mb-4">Hadapi ujian puncak seluruh 5 Dunia, kalahkan Naga Mahkota Konstitusi, dan raih gelar Juara Tertinggi!</p>
+                                        <div class="flex flex-wrap items-center gap-3 text-xs text-gray-500">
+                                            <span class="flex items-center gap-1"><i class="fa-solid fa-clock"></i> ~25 menit</span>
+                                            <span class="flex items-center gap-1"><i class="fa-solid fa-bolt text-yellow-500"></i> 25 Poin</span>
+                                            <span class="flex items-center gap-1"><i class="fa-solid fa-fire text-red-400"></i> Sangat Sulit</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="w-12 h-12 bg-gradient-to-br from-yellow-500 to-amber-600 rounded-xl flex items-center justify-center text-white group-hover:scale-110 transition-all shadow-lg shadow-yellow-500/30">
+                                            <i class="fa-solid fa-play text-lg"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- REWARD PREVIEW SECTION -->
+    <section class="py-12">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-gradient-to-r from-emerald-600/20 via-teal-600/20 to-yellow-600/20 rounded-3xl border border-emerald-500/20 p-8 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-48 h-48 bg-yellow-500/10 rounded-full filter blur-3xl"></div>
+                <div class="relative z-10 flex flex-col md:flex-row items-center gap-6">
+                    <div class="w-20 h-20 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-2xl flex items-center justify-center shadow-lg shadow-yellow-500/30 shrink-0">
+                        <i class="fa-solid fa-crown text-4xl text-slate-950"></i>
+                    </div>
+                    <div class="text-center md:text-left flex-1">
+                        <h3 class="text-xl font-bold text-white mb-2">Hadiah Menamatkan Seluruh 5 Dunia</h3>
+                        <p class="text-gray-400 text-sm mb-4">Kumpulkan semua 500 total poin dari 20 level untuk mendapatkan penghargaan tertinggi:</p>
+                        <div class="flex flex-wrap gap-3 justify-center md:justify-start">
+                            <div class="flex items-center gap-2 bg-gray-800/60 px-4 py-2 rounded-xl border border-gray-700">
+                                <i class="fa-solid fa-crown text-yellow-400"></i>
+                                <span class="text-sm text-gray-300">Gelar <strong class="text-yellow-400">Penjaga Utama Konstitusi</strong></span>
+                            </div>
+                            <div class="flex items-center gap-2 bg-gray-800/60 px-4 py-2 rounded-xl border border-gray-700">
+                                <i class="fa-solid fa-certificate text-emerald-400"></i>
+                                <span class="text-sm text-gray-300">Lulus <strong class="text-emerald-400">Sempurna 100%</strong></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- LEARNING OBJECTIVES SECTION -->
+    <section class="py-12">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-8">
+                <h2 class="text-sm font-bold text-emerald-400 tracking-widest uppercase mb-2">Tujuan Pembelajaran</h2>
+                <h3 class="text-2xl font-extrabold">Apa yang Akan Kamu Pelajari?</h3>
+            </div>
+
+            <div class="grid sm:grid-cols-2 gap-4">
+                <div class="bg-gray-800/30 p-5 rounded-2xl border border-gray-700 flex items-start gap-4 hover:bg-gray-800/50 transition-colors">
+                    <div class="w-10 h-10 bg-emerald-500/20 rounded-xl flex items-center justify-center shrink-0 mt-0.5">
+                        <i class="fa-solid fa-school text-emerald-400"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-white font-semibold text-sm mb-1">Sikap Taat di Keluarga & Sekolah</h4>
+                        <p class="text-gray-400 text-xs leading-relaxed">Menerapkan norma kesopanan, kedisiplinan, dan tata tertib di rumah serta lingkungan sekolah.</p>
+                    </div>
+                </div>
+
+                <div class="bg-gray-800/30 p-5 rounded-2xl border border-gray-700 flex items-start gap-4 hover:bg-gray-800/50 transition-colors">
+                    <div class="w-10 h-10 bg-teal-500/20 rounded-xl flex items-center justify-center shrink-0 mt-0.5">
+                        <i class="fa-solid fa-users text-teal-400"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-white font-semibold text-sm mb-1">Sikap Taat di Masyarakat & Bernegara</h4>
+                        <p class="text-gray-400 text-xs leading-relaxed">Menjaga ketertiban umum, toleransi kebinekaan, taat aturan lalu lintas, dan menjunjung tinggi hukum.</p>
+                    </div>
+                </div>
+
+                <div class="bg-gray-800/30 p-5 rounded-2xl border border-gray-700 flex items-start gap-4 hover:bg-gray-800/50 transition-colors">
+                    <div class="w-10 h-10 bg-cyan-500/20 rounded-xl flex items-center justify-center shrink-0 mt-0.5">
+                        <i class="fa-solid fa-award text-cyan-400"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-white font-semibold text-sm mb-1">Refleksi & Komitmen Warga Teladan</h4>
+                        <p class="text-gray-400 text-xs leading-relaxed">Menyusun komitmen pribadi sebagai generasi penerus bangsa yang cinta tanah air dan patuh konstitusi.</p>
+                    </div>
+                </div>
+
+                <div class="bg-gray-800/30 p-5 rounded-2xl border border-gray-700 flex items-start gap-4 hover:bg-gray-800/50 transition-colors">
+                    <div class="w-10 h-10 bg-yellow-500/20 rounded-xl flex items-center justify-center shrink-0 mt-0.5">
+                        <i class="fa-solid fa-crown text-yellow-400"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-white font-semibold text-sm mb-1">The Grand Final Boss Battle</h4>
+                        <p class="text-gray-400 text-xs leading-relaxed">Menuntaskan seluruh kompetensi dan mengalahkan Naga Mahkota Konstitusi untuk meraih gelar Juara!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- NAVIGASI ANTAR DUNIA (SEBELUMNYA & SELANJUTNYA) -->
+    <section class="py-8 bg-slate-900/60 border-t border-gray-800">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <a href="dunia4.html" class="w-full sm:w-auto px-5 py-3 bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white font-bold rounded-2xl border border-gray-700 transition flex items-center justify-center gap-2 text-xs sm:text-sm">
+                    <i class="fa-solid fa-chevron-left"></i> Sebelumnya: Dunia 4
+                </a>
+                
+                <div class="flex items-center gap-2 text-xs text-gray-500 font-semibold">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Dunia 5 dari 5 (Puncak)
+                </div>
+
+                <a href="index.html#dunia-game" class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-2xl shadow-lg shadow-emerald-600/30 transition transform hover:scale-105 flex items-center justify-center gap-2 text-xs sm:text-sm">
+                    <i class="fa-solid fa-house"></i> Beranda / Peta 5 Dunia
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- BOTTOM CTA -->
+    <section class="py-10">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-3xl p-8 text-center relative overflow-hidden shadow-2xl shadow-emerald-600/20">
+                <div class="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+CjxjaXJjbGUgY3g9IjIiIGN5PSIyIiByPSIyIiBmaWxsPSIjZmZmIi8+Cjwvc3ZnPg==')]"></div>
+                <div class="relative z-10">
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-white mb-4">Siap Menuntaskan Misi Terakhir?</h2>
+                    <p class="text-emerald-100 mb-6 max-w-md mx-auto text-xs sm:text-sm">Mulai dari Level 17, buktikan pengabdianmu dan raih gelar tertinggi: Penjaga Utama Konstitusi!</p>
+                    <a href="dunia5-level1.html" class="inline-flex items-center gap-2 px-8 py-3.5 bg-white text-emerald-600 font-bold rounded-xl shadow-xl hover:bg-gray-50 hover:scale-105 transition-all text-base">
+                        <i class="fa-solid fa-play"></i> Mulai Level 17
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-brand-dark text-gray-400 py-8 border-t border-gray-800 mt-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-sm text-center flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-2">
+                <img src="Logo Edukacivic.png" alt="EdukaCivic" class="h-6 w-auto">
+                <span class="font-bold text-white">Eduka<span class="text-brand-red">Civic</span></span>
+            </div>
+            <p>&copy; 2026 EdukaCivic | Fadilatul Fajri</p>
+            <a href="index.html" class="text-gray-400 hover:text-white transition-colors flex items-center gap-1">
+                <i class="fa-solid fa-arrow-left text-xs"></i> Kembali ke Beranda
+            </a>
+        </div>
+    </footer>
+
+    <!-- DYNAMIC PROGRESS LOGIC -->
+    <script>
+        function updatePageProgress() {
+            const progress = getPlayerProgress();
+            const completed = progress.completedLevels || [];
+            
+            // Count completed Dunia 5 levels
+            const d5Levels = ['d5l1','d5l2','d5l3','d5l4'];
+            let completedCount = 0;
+            d5Levels.forEach(l => { if (completed.includes(l)) completedCount++; });
+
+            // Update nav poin
+            const navPoin = document.getElementById('nav-poin');
+            if (navPoin) navPoin.textContent = progress.poin || 0;
+
+            // Update progress tracker
+            const progText = document.getElementById('progress-text');
+            if (progText) progText.textContent = completedCount + ' / 4 Level';
+            const progBar = document.getElementById('progress-bar');
+            if (progBar) progBar.style.width = (completedCount / 4 * 100) + '%';
+
+            // Level progression configure (Level 18 dan Level 19 selalu terbuka untuk game bersama)
+            configureLevelCard('level-1-card', 'level1-status', isWorldUnlocked(5), completed.includes('d5l1'), 'dunia5-level1.html', 'Level 17', 'Dunia 4');
+            configureLevelCard('level-2-card', 'level2-status', true, completed.includes('d5l2'), 'dunia5-level2.html', 'Level 18', 'Level 17');
+            configureLevelCard('level-3-card', 'level3-status', true, completed.includes('d5l3'), 'dunia5-level3.html', 'Level 19', 'Level 18');
+            configureLevelCard('level-4-card', 'level4-status', completed.includes('d5l3'), completed.includes('d5l4'), 'dunia5-level4.html', 'Level 20', 'Level 19');
+
+            updateNavbarStudent();
+        }
+
+        // Run on page load
+        updatePageProgress();
+    </script>
+
+    <!-- Web Audio Synthesizer for Interactive Sound Effects -->
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSfx(type) {
+            try {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'hover') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(587.33, now);
+                    gain.gain.setValueAtTime(0.04, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+                    osc.start(now);
+                    osc.stop(now + 0.06);
+                } else if (type === 'click') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(440, now);
+                    osc.frequency.setValueAtTime(659.25, now + 0.04);
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+                    osc.start(now);
+                    osc.stop(now + 0.12);
+                } else if (type === 'unlock') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.setValueAtTime(659.25, now + 0.08);
+                    osc.frequency.setValueAtTime(783.99, now + 0.16);
+                    osc.frequency.setValueAtTime(1046.5, now + 0.24);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.45);
+                    osc.start(now);
+                    osc.stop(now + 0.45);
+                }
+            } catch(e) {}
+        }
+    </script>
+</body>
+</html>

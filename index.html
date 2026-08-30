@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EdukaCivic - Belajar PPKn Interaktif</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="Logo Edukacivic.png">
+    
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="student-system.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            red: '#DC2626',
+                            redLight: '#EF4444',
+                            redDark: '#B91C1C',
+                            dark: '#0F172A',
+                            darker: '#020617',
+                            light: '#F8FAFC'
+                        }
+                    },
+                    animation: {
+                        'float': 'float 3s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-brand-light text-brand-dark font-sans antialiased overflow-x-hidden">
+
+    <!-- 1. NAVBAR (Sticky) -->
+    <nav class="fixed w-full z-50 bg-white/90 backdrop-blur-md border-b border-gray-200 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo -->
+                <a href="index.html" class="flex items-center gap-3 cursor-pointer">
+                    <img src="Logo Edukacivic.png" alt="EdukaCivic" class="h-10 w-auto">
+                    <span class="font-bold text-2xl tracking-tight text-brand-dark">Eduka<span class="text-brand-red">Civic</span></span>
+                </a>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex space-x-8">
+                    <a href="#beranda" class="text-sm font-medium text-gray-700 hover:text-brand-red transition-colors">Beranda</a>
+                    <a href="#fitur" class="text-sm font-medium text-gray-700 hover:text-brand-red transition-colors">Fitur Utama</a>
+                    <a href="#dunia-game" class="text-sm font-medium text-gray-700 hover:text-brand-red transition-colors">5 Dunia Game</a>
+                    <a href="#badge" class="text-sm font-medium text-gray-700 hover:text-brand-red transition-colors">Peringkat & Badge</a>
+                </div>
+
+                <!-- CTA Buttons / User Profile -->
+                <div class="hidden md:flex items-center gap-3">
+                    
+                    <!-- USER PROFILE BUTTON & DROPDOWN POP-UP -->
+                    <div class="relative" id="nav-student-container">
+                        <!-- Profile Trigger Button -->
+                        <button id="nav-student-box" onclick="toggleProfileDropdown(event)" type="button" class="hidden items-center gap-2.5 bg-slate-100 hover:bg-slate-200/90 active:scale-95 p-1.5 pr-3 rounded-2xl border border-slate-200 transition-all cursor-pointer select-none group focus:outline-none focus:ring-2 focus:ring-brand-red/30">
+                            <img id="nav-avatar-img" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Student" alt="Avatar" class="w-8 h-8 rounded-xl bg-slate-900 border border-slate-300 group-hover:scale-105 transition-transform object-cover">
+                            <div class="text-left">
+                                <p id="nav-student-nama" class="text-xs font-bold text-brand-dark leading-tight">Nama Siswa</p>
+                                <p id="nav-student-sub" class="text-[10px] text-gray-500 leading-none">Kelas VIII</p>
+                            </div>
+                            <i id="dropdown-arrow" class="fa-solid fa-chevron-down text-[10px] text-gray-400 group-hover:text-brand-red transition-transform duration-200 ml-1"></i>
+                        </button>
+
+                        <!-- DROPDOWN POP-UP MENU -->
+                        <div id="profileDropdown" class="hidden absolute right-0 mt-3 w-80 bg-slate-950/95 backdrop-blur-2xl border border-slate-800 rounded-3xl shadow-2xl p-5 z-50 text-white transform origin-top-right transition-all duration-200 scale-95 opacity-0 pointer-events-none">
+                            
+                            <!-- 1. Header Profil Ringkas -->
+                            <div class="flex items-center gap-3.5 pb-4 border-b border-slate-800/80">
+                                <div class="relative shrink-0">
+                                    <img id="pop-avatar-img" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Student" alt="Avatar" class="w-12 h-12 rounded-2xl bg-slate-900 border-2 border-brand-red object-cover shadow-md">
+                                    <span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-emerald-500 border-2 border-slate-950 rounded-full" title="Online"></span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center justify-between gap-1.5">
+                                        <h4 id="pop-student-nama" class="text-sm font-extrabold text-white truncate">Nama Siswa</h4>
+                                        <span id="pop-badge" class="shrink-0 px-2 py-0.5 text-[10px] font-extrabold rounded-full bg-slate-700/50 text-slate-300 border border-slate-600/50">Pemula</span>
+                                    </div>
+                                    <p id="pop-student-sub" class="text-xs text-slate-400 font-medium truncate mt-0.5">Kelas VIII · Absen 1</p>
+                                </div>
+                            </div>
+
+                            <!-- 2. Ringkasan Progres Belajar (Progress Bar & Stats) -->
+                            <div class="py-4 space-y-3">
+                                <!-- Level & XP -->
+                                <div>
+                                    <div class="flex justify-between items-center text-xs mb-1.5 font-semibold">
+                                        <span id="pop-level-text" class="text-slate-200 flex items-center gap-1.5">
+                                            <i class="fa-solid fa-gamepad text-brand-red"></i> Level 1
+                                        </span>
+                                        <span id="pop-xp-text" class="text-[11px] text-slate-400 font-medium">0 / 100 XP</span>
+                                    </div>
+                                    <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden p-0.5">
+                                        <div id="pop-xp-bar" class="h-full bg-gradient-to-r from-brand-red via-orange-500 to-amber-400 rounded-full w-[0%] transition-all duration-700"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Stats: Total Poin & Misi Aktif -->
+                                <div class="grid grid-cols-2 gap-2.5 pt-1">
+                                    <div class="bg-slate-900/90 p-3 rounded-2xl border border-slate-800/80">
+                                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Poin</p>
+                                        <p class="text-sm font-extrabold text-yellow-400 flex items-center gap-1.5 mt-0.5">
+                                            <i class="fa-solid fa-bolt text-xs"></i> <span id="pop-poin">0</span>
+                                        </p>
+                                    </div>
+                                    <div class="bg-slate-900/90 p-3 rounded-2xl border border-slate-800/80">
+                                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Misi Aktif</p>
+                                        <p id="pop-misi" class="text-xs font-extrabold text-slate-200 truncate mt-1">Dunia 1 • Lvl 1</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 3. Divider / Garis Pemisah -->
+                            <div class="border-t border-slate-800/80 -mx-5 my-1"></div>
+
+                            <!-- 4. Tombol Navigasi / Aksi -->
+                            <div class="pt-3 space-y-1.5">
+                                <a href="profil-siswa.html" class="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-bold text-slate-200 hover:text-white hover:bg-slate-900 rounded-2xl border border-transparent hover:border-slate-800 transition group">
+                                    <div class="w-7 h-7 rounded-xl bg-slate-800 flex items-center justify-center group-hover:bg-brand-red group-hover:text-white transition">
+                                        <i class="fa-solid fa-id-card text-xs"></i>
+                                    </div>
+                                    <span>Lihat Profil & Rapor Progres</span>
+                                </a>
+                                <button onclick="logoutStudent()" type="button" class="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-bold text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-2xl border border-transparent hover:border-rose-500/20 transition group text-left cursor-pointer">
+                                    <div class="w-7 h-7 rounded-xl bg-rose-500/10 flex items-center justify-center group-hover:bg-rose-500/20 text-rose-400 transition">
+                                        <i class="fa-solid fa-arrow-right-from-bracket text-xs"></i>
+                                    </div>
+                                    <span>Keluar (Logout)</span>
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <a href="login-guru.html" class="px-4 py-2 text-xs font-semibold text-brand-dark border-2 border-brand-dark rounded-xl hover:bg-brand-dark hover:text-white transition-all">
+                        Masuk Guru
+                    </a>
+                    <a id="btn-nav-action" href="javascript:void(0)" onclick="handleMulaiBelajar()" class="px-5 py-2.5 text-xs font-bold text-white bg-brand-red rounded-xl shadow-lg shadow-red-500/30 hover:bg-brand-redDark hover:-translate-y-0.5 transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-gamepad"></i> <span id="nav-btn-text">Mulai Belajar</span>
+                    </a>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-gray-700 hover:text-brand-red focus:outline-none">
+                        <i class="fa-solid fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200 shadow-lg">
+            <div class="px-4 py-4 space-y-3">
+                <div id="mobile-student-box" class="hidden p-4 bg-slate-950 rounded-2xl border border-slate-800 flex flex-col gap-3">
+                    <div class="flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                            <img id="mobile-avatar-img" src="" alt="Avatar" class="w-10 h-10 rounded-xl bg-slate-900 border border-slate-700">
+                            <div>
+                                <p id="mobile-student-nama" class="text-xs font-bold text-white">Nama Siswa</p>
+                                <p id="mobile-student-sub" class="text-[10px] text-slate-400">Kelas VIII · Absen 1</p>
+                            </div>
+                        </div>
+                        <span id="mobile-student-badge" class="px-2 py-0.5 text-[9px] font-bold rounded-full bg-slate-700/50 text-slate-300 border border-slate-600/50">Pemula</span>
+                    </div>
+                    <div class="flex items-center justify-between text-[11px] text-slate-400 border-t border-slate-800/80 pt-2 font-medium">
+                        <span id="mobile-student-poin" class="text-yellow-400 font-bold"><i class="fa-solid fa-bolt text-xs"></i> 0 Poin</span>
+                        <div class="flex items-center gap-3">
+                            <a href="profil-siswa.html" class="text-emerald-400 font-bold hover:underline">Rapor Progres</a>
+                            <a href="login-siswa.html" class="text-brand-red font-bold hover:underline">Edit</a>
+                            <button onclick="logoutStudent()" class="text-rose-400 font-bold hover:underline">Keluar</button>
+                        </div>
+                    </div>
+                </div>
+                <a href="#beranda" class="block text-sm font-medium text-gray-700 hover:text-brand-red transition-colors py-2">Beranda</a>
+                <a href="#fitur" class="block text-sm font-medium text-gray-700 hover:text-brand-red transition-colors py-2">Fitur Utama</a>
+                <a href="#dunia-game" class="block text-sm font-medium text-gray-700 hover:text-brand-red transition-colors py-2">5 Dunia Game</a>
+                <a href="#badge" class="block text-sm font-medium text-gray-700 hover:text-brand-red transition-colors py-2">Peringkat & Badge</a>
+                <div class="pt-3 border-t border-gray-100 flex flex-col gap-2">
+                    <a href="login-guru.html" class="w-full px-5 py-2.5 text-sm font-semibold text-brand-dark border-2 border-brand-dark rounded-xl hover:bg-brand-dark hover:text-white transition-all text-center">
+                        Masuk Guru
+                    </a>
+                    <a href="javascript:void(0)" onclick="handleMulaiBelajar()" class="w-full px-5 py-2.5 text-sm font-semibold text-white bg-brand-red rounded-xl shadow-lg shadow-red-500/30 hover:bg-brand-redDark transition-all text-center">
+                        Mulai Belajar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 2. HERO SECTION -->
+    <section id="beranda" class="relative pt-32 pb-20 lg:pt-40 lg:pb-28 overflow-hidden">
+        <!-- Background Decorations -->
+        <div class="absolute top-20 left-0 w-72 h-72 bg-brand-red/10 rounded-full mix-blend-multiply filter blur-3xl opacity-70"></div>
+        <div class="absolute top-40 right-0 w-72 h-72 bg-blue-300/20 rounded-full mix-blend-multiply filter blur-3xl opacity-70"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <!-- Text Content -->
+                <div class="text-center lg:text-left">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-100 border border-red-200 mb-6">
+                        <span class="flex h-2 w-2 relative">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-red opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-red"></span>
+                        </span>
+                        <span class="text-xs font-bold text-brand-red tracking-wide uppercase">Study  Ngerti  Beraksi</span>
+                    </div>
+                    
+                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-brand-dark leading-tight mb-6">
+                        Petualangan Menjadi <br>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-red to-orange-500">Penjaga Konstitusi</span> Bangsa!
+                    </h1>
+                    
+                    <p class="text-lg text-gray-600 mb-8 max-w-2xl mx-auto lg:mx-0">
+                        Belajar PPKn bukan lagi sekadar hafalan buku teks. Masuki 5 Dunia petualangan interaktif, taklukkan tantangan mini-game, dan jadilah warga negara teladan.
+                    </p>
+                    
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                        <a href="javascript:void(0)" onclick="handleMulaiBelajar()" class="px-8 py-4 text-base font-bold text-white bg-brand-red rounded-xl shadow-xl shadow-red-500/40 hover:bg-brand-redDark hover:-translate-y-1 transition-all flex justify-center items-center gap-2">
+                            <i class="fa-solid fa-gamepad"></i> Mulai Petualangan
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Hero Mockup (Gamified Card) - Shows real student progress -->
+                <div class="relative mx-auto w-full max-w-md lg:max-w-full animate-float">
+                    <div class="bg-brand-darker rounded-3xl p-6 shadow-2xl border border-gray-800 relative z-10">
+                        <!-- Card Header -->
+                        <div class="flex justify-between items-center mb-6">
+                            <div class="flex items-center gap-4">
+                                <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-brand-red to-orange-400 p-0.5 shadow-lg">
+                                    <img id="hero-avatar-img" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Student&backgroundColor=b6e3f4" alt="Avatar Siswa" class="w-full h-full rounded-2xl bg-brand-dark object-cover">
+                                </div>
+                                <div>
+                                    <h3 id="hero-nama" class="text-white font-bold text-lg">Siswa Baru</h3>
+                                    <p id="hero-lencana" class="text-brand-redLight text-sm font-medium">Lencana: Pemula</p>
+                                </div>
+                            </div>
+                            <div class="bg-gray-800 px-3 py-1.5 rounded-lg border border-gray-700 text-center">
+                                <p class="text-gray-400 text-[10px] uppercase font-bold">Total Poin</p>
+                                <p class="text-yellow-400 font-extrabold text-lg"><span id="hero-poin">0</span> <i class="fa-solid fa-bolt text-sm"></i></p>
+                            </div>
+                        </div>
+
+                        <!-- EXP Bar -->
+                        <div class="mb-6">
+                            <div class="flex justify-between text-xs mb-2">
+                                <span id="hero-level" class="text-gray-300 font-medium">Level 1</span>
+                                <span id="hero-xp-text" class="text-gray-400">0 / 100 XP menuju Warga</span>
+                            </div>
+                            <div class="w-full h-3 bg-gray-800 rounded-full overflow-hidden">
+                                <div id="hero-xp-bar" class="h-full bg-gradient-to-r from-brand-red to-orange-400 w-[0%] relative transition-all duration-1000">
+                                    <div class="absolute top-0 right-0 bottom-0 left-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPgo8cmVjdCB3aWR0aD0iOCIgaGVpZ2h0PSI4IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9Ii4xIi8+Cjwvc3ZnPg==')] opacity-50"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Active Quest -->
+                        <div class="bg-gray-900 rounded-xl p-4 border border-gray-800">
+                            <div class="flex items-start gap-3">
+                                <div class="mt-1 bg-blue-500/20 text-blue-400 p-2 rounded-lg">
+                                    <i class="fa-solid fa-map-location-dot"></i>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Misi Aktif</p>
+                                    <h4 id="hero-misi-judul" class="text-white font-semibold text-sm mb-1">Dunia 1 &bull; Level 1</h4>
+                                    <p id="hero-misi-desc" class="text-gray-400 text-xs">Puzzle Konstitusi &mdash; Pelajari hukum dasar negara.</p>
+                                </div>
+                            </div>
+                            <a href="javascript:void(0)" onclick="handleMulaiBelajar()" class="w-full mt-4 bg-gray-800 hover:bg-gray-700 text-white text-sm font-semibold py-2 rounded-lg transition-colors block text-center">
+                                Lanjutkan Misi <i class="fa-solid fa-arrow-right ml-1 text-xs"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Decorative elements behind mockup -->
+                    <div class="absolute -z-10 top-1/2 -right-8 w-24 h-24 bg-brand-red rounded-full blur-2xl opacity-40"></div>
+                    <div class="absolute -z-10 -bottom-8 -left-8 w-32 h-32 bg-blue-500 rounded-full blur-2xl opacity-20"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. FITUR UTAMA -->
+    <section id="fitur" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <h2 class="text-sm font-bold text-brand-red tracking-widest uppercase mb-2">Mengapa EdukaCivic?</h2>
+                <h3 class="text-3xl md:text-4xl font-extrabold text-brand-dark">Cara Baru Memahami Sejarah Konstitusi</h3>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Feature 1: Gamified Learning -->
+                <div class="bg-brand-light p-8 rounded-3xl border border-gray-100 hover:border-brand-red/30 hover:shadow-xl hover:-translate-y-2 transition-all group">
+                    <div class="w-14 h-14 bg-red-100 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-brand-red transition-colors">
+                        <i class="fa-solid fa-gamepad text-2xl text-brand-red group-hover:text-white transition-colors"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-brand-dark mb-3">Gamified Learning</h4>
+                    <p class="text-gray-600 text-sm leading-relaxed">20 Level dengan genre mini-game variatif.</p>
+                </div>
+
+                <!-- Feature 2: Materi dan Video Interaktif (replaced AI Mentor) -->
+                <div class="bg-brand-light p-8 rounded-3xl border border-gray-100 hover:border-brand-red/30 hover:shadow-xl hover:-translate-y-2 transition-all group">
+                    <div class="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-blue-600 transition-colors">
+                        <i class="fa-solid fa-play-circle text-2xl text-blue-600 group-hover:text-white transition-colors"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-brand-dark mb-3">Materi & Video Interaktif</h4>
+                    <p class="text-gray-600 text-sm leading-relaxed">Pelajari setiap bab melalui materi ringkas dan video pembelajaran interaktif yang mudah dipahami sebelum memulai tantangan game.</p>
+                </div>
+
+                <!-- Feature 3: Poin & Peringkat -->
+                <div class="bg-brand-light p-8 rounded-3xl border border-gray-100 hover:border-brand-red/30 hover:shadow-xl hover:-translate-y-2 transition-all group">
+                    <div class="w-14 h-14 bg-yellow-100 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-yellow-500 transition-colors">
+                        <i class="fa-solid fa-trophy text-2xl text-yellow-600 group-hover:text-white transition-colors"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-brand-dark mb-3">Poin & Peringkat</h4>
+                    <p class="text-gray-600 text-sm leading-relaxed">Sistem poin yang kompetitif dengan Leaderboard kelas real-time memicu semangat siswa untuk terus belajar.</p>
+                </div>
+
+                <!-- Feature 4: Portal Terintegrasi -->
+                <div class="bg-brand-light p-8 rounded-3xl border border-gray-100 hover:border-brand-red/30 hover:shadow-xl hover:-translate-y-2 transition-all group">
+                    <div class="w-14 h-14 bg-green-100 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-green-600 transition-colors">
+                        <i class="fa-solid fa-chalkboard-user text-2xl text-green-600 group-hover:text-white transition-colors"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-brand-dark mb-3">Portal Terintegrasi</h4>
+                    <p class="text-gray-600 text-sm leading-relaxed">Guru dapat memantau progres siswa, analisis pemahaman materi, hingga ekspor nilai secara otomatis.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. PETA PETUALANGAN 5 DUNIA -->
+    <section id="dunia-game" class="py-20 bg-brand-dark text-white relative">
+        <div class="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white to-transparent"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            
+            <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+                <div class="max-w-2xl">
+                    <h2 class="text-sm font-bold text-brand-redLight tracking-widest uppercase mb-2">World Map Quest</h2>
+                    <h3 class="text-3xl md:text-4xl font-extrabold mb-4">Jelajahi 5 Dunia Konstitusi</h3>
+                    <p class="text-gray-400">Setiap dunia mewakili bab materi PPKn yang dirancang khusus untuk menciptakan pengalaman belajar yang immersive.</p>
+                </div>
+                <a href="javascript:void(0)" onclick="handleMulaiBelajar()" class="px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl font-semibold backdrop-blur-sm transition-colors border border-white/10 shrink-0">
+                    Lihat Peta Lengkap <i class="fa-solid fa-map ml-2"></i>
+                </a>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Dunia 1 -->
+                <a id="world-card-1" href="dunia1.html" class="bg-gray-800/50 backdrop-blur-sm p-6 rounded-3xl border border-gray-700 hover:border-brand-redLight hover:shadow-[0_0_30px_rgba(239,68,68,0.2)] transition-all group cursor-pointer block">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 bg-blue-500/20 text-blue-400 rounded-xl flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-puzzle-piece"></i>
+                        </div>
+                        <span class="bg-gray-900 px-3 py-1 rounded-lg text-xs font-bold text-gray-400">Level 1-4</span>
+                    </div>
+                    <h4 class="text-xl font-bold mb-2">Dunia 1: Mengenal Konstitusi</h4>
+                    <p class="text-gray-400 text-sm mb-4">Pahami dasar-dasar hukum dan konstitusi melalui tantangan logika.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-2.5 py-1 bg-gray-900 rounded text-[10px] font-semibold text-gray-300">Konstitusi</span>
+                        <span class="px-2.5 py-1 bg-gray-900 rounded text-[10px] font-semibold text-gray-300">Arcade</span>
+                        <span class="px-2.5 py-1 bg-gray-900 rounded text-[10px] font-semibold text-gray-300">Snake Game</span>
+                    </div>
+                </a>
+
+                <!-- Dunia 2 -->
+                <a id="world-card-2" href="dunia2.html" class="bg-gray-800/50 backdrop-blur-sm p-6 rounded-3xl border border-gray-700 hover:border-brand-redLight hover:shadow-[0_0_30px_rgba(239,68,68,0.2)] transition-all group cursor-pointer block">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 bg-orange-500/20 text-orange-400 rounded-xl flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-landmark"></i>
+                        </div>
+                        <span class="bg-gray-900 px-3 py-1 rounded-lg text-xs font-bold text-gray-400">Level 5-8</span>
+                    </div>
+                    <h4 class="text-xl font-bold mb-2">Dunia 2: Perumusan UUD 1945</h4>
+                    <p class="text-gray-400 text-sm mb-4">Masuki era kemerdekaan dan ikuti sidang BPUPKI secara interaktif.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-2.5 py-1 bg-gray-900 rounded text-[10px] font-semibold text-gray-300">BPUPKI</span>
+                        <span class="px-2.5 py-1 bg-gray-900 rounded text-[10px] font-semibold text-gray-300">Endless Runner</span>
+                        <span class="px-2.5 py-1 bg-gray-900 rounded text-[10px] font-semibold text-gray-300">Arcade</span>
+                    </div>
+                </a>
+
+                <!-- Dunia 3 -->
+                <a id="world-card-3" href="dunia3.html" class="bg-gray-800/50 backdrop-blur-sm p-6 rounded-3xl border border-gray-700 hover:border-brand-redLight hover:shadow-[0_0_30px_rgba(239,68,68,0.2)] transition-all group cursor-pointer block">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 bg-red-500/20 text-brand-redLight rounded-xl flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-file-signature"></i>
+                        </div>
+                        <span class="bg-gray-900 px-3 py-1 rounded-lg text-xs font-bold text-gray-400">Level 9-12</span>
+                    </div>
+                    <h4 class="text-xl font-bold mb-2">Dunia 3: Pengesahan UUD</h4>
+                    <p class="text-gray-400 text-sm mb-4">Pertahankan argumen dalam proses pengesahan oleh PPKI.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-2.5 py-1 bg-gray-900 rounded text-[10px] font-semibold text-gray-300">PPKI</span>
+                        <span class="px-2.5 py-1 bg-gray-900 rounded text-[10px] font-semibold text-gray-300">Platformer</span>
+                        <span class="px-2.5 py-1 bg-gray-900 rounded text-[10px] font-semibold text-gray-300">Super Mario</span>
+                    </div>
+                </a>
+
+                <!-- Dunia 4 -->
+                <a id="world-card-4" href="dunia4.html" class="bg-gray-800/50 backdrop-blur-sm p-6 rounded-3xl border border-gray-700 hover:border-brand-redLight hover:shadow-[0_0_30px_rgba(239,68,68,0.2)] transition-all group cursor-pointer block">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 bg-purple-500/20 text-purple-400 rounded-xl flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-scale-balanced"></i>
+                        </div>
+                        <span class="bg-gray-900 px-3 py-1 rounded-lg text-xs font-bold text-gray-400">Level 13-16</span>
+                    </div>
+                    <h4 class="text-xl font-bold mb-2">Dunia 4: Kekuatan UUD</h4>
+                    <p class="text-gray-400 text-sm mb-4">Pahami hierarki hukum Indonesia melalui simulasi pengambilan keputusan.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-2.5 py-1 bg-gray-900 rounded text-[10px] font-semibold text-gray-300">UUD 1945</span>
+                        <span class="px-2.5 py-1 bg-gray-900 rounded text-[10px] font-semibold text-gray-300">Maze Arcade</span>
+                        <span class="px-2.5 py-1 bg-gray-900 rounded text-[10px] font-semibold text-gray-300">Pac-Man Game</span>
+                    </div>
+                </a>
+
+                <!-- Dunia 5 -->
+                <a id="world-card-5" href="dunia5.html" class="bg-gray-800/50 backdrop-blur-sm p-6 rounded-3xl border border-gray-700 hover:border-brand-redLight hover:shadow-[0_0_30px_rgba(239,68,68,0.2)] transition-all group cursor-pointer block md:col-span-2 lg:col-span-1">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 bg-green-500/20 text-green-400 rounded-xl flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                        <span class="bg-gray-900 px-3 py-1 rounded-lg text-xs font-bold text-gray-400">Level 17-20</span>
+                    </div>
+                    <h4 class="text-xl font-bold mb-2">Dunia 5: Taat Konstitusi</h4>
+                    <p class="text-gray-400 text-sm mb-4">Terapkan ilmu di kehidupan nyata sebagai warga negara yang baik.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-2.5 py-1 bg-gray-900 rounded text-[10px] font-semibold text-gray-300">Taat Konstitusi</span>
+                        <span class="px-2.5 py-1 bg-gray-900 rounded text-[10px] font-semibold text-gray-300">Puzzle</span>
+                        <span class="px-2.5 py-1 bg-gray-900 rounded text-[10px] font-semibold text-gray-300">Parking Game</span>
+                    </div>
+                </a>
+                
+                <!-- Callout CTA - navigates to last level worked on -->
+                <a href="javascript:void(0)" onclick="handleMulaiBelajar()" class="hidden lg:flex bg-gradient-to-br from-brand-red to-orange-500 p-6 rounded-3xl items-center justify-center text-center shadow-lg transform hover:scale-105 transition-all cursor-pointer">
+                    <div>
+                        <i class="fa-solid fa-play-circle text-4xl mb-3 text-white/90"></i>
+                        <h4 class="text-xl font-bold text-white">Lanjutkan Belajar!</h4>
+                        <p class="text-white/80 text-sm mt-1">Ke level terakhirmu</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. TANGGA PRESTASI & BADGE -->
+    <section id="badge" class="py-20 bg-brand-light">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-sm font-bold text-brand-red tracking-widest uppercase mb-2">Sistem Reward</h2>
+                <h3 class="text-3xl font-extrabold text-brand-dark mb-4">Tangga Prestasi & Lencana</h3>
+                <p class="text-gray-600">Selesaikan misi dan kumpulkan poin untuk mencapai tingkat tertinggi pemerintahan kelas!</p>
+            </div>
+
+            <div class="space-y-4">
+                <!-- Tier 1: Pemula (< 100 Poin) -->
+                <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex items-center justify-between hover:shadow-md transition-shadow">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 text-xl border-2 border-gray-300">
+                            <i class="fa-solid fa-seedling text-gray-500"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-brand-dark">Lencana Pemula</h4>
+                            <p class="text-xs text-gray-500">Pelajar pemula yang baru memulai petualangan mempelajari konstitusi dasar.</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="inline-block bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-bold">&lt; 100 Poin</span>
+                    </div>
+                </div>
+
+                <!-- Tier 2: Warga (100 - 200 Poin) -->
+                <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex items-center justify-between hover:shadow-md transition-shadow">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-sky-50 rounded-full flex items-center justify-center text-sky-500 text-xl border-2 border-sky-300">
+                            <i class="fa-solid fa-user text-sky-500"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-brand-dark">Lencana Warga</h4>
+                            <p class="text-xs text-gray-500">Warga negara muda yang telah memahami aturan dan hukum dasar.</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="inline-block bg-sky-100 text-sky-700 px-3 py-1 rounded-full text-xs font-bold">100 - 200 Poin</span>
+                    </div>
+                </div>
+
+                <!-- Tier 3: Aktivis (200 - 300 Poin) -->
+                <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex items-center justify-between hover:shadow-md transition-shadow">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-500 text-xl border-2 border-emerald-300">
+                            <i class="fa-solid fa-bullhorn text-emerald-500"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-brand-dark">Lencana Aktivis</h4>
+                            <p class="text-xs text-gray-500">Mulai aktif bersuara dan peduli pada penegakan konstitusi di lingkungan.</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="inline-block bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-bold">200 - 300 Poin</span>
+                    </div>
+                </div>
+
+                <!-- Tier 4: Pejabat (300 - 400 Poin) -->
+                <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex items-center justify-between hover:shadow-md transition-shadow">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 text-xl border-2 border-blue-300">
+                            <i class="fa-solid fa-user-tie text-blue-500"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-brand-dark">Lencana Pejabat</h4>
+                            <p class="text-xs text-gray-500">Mampu menyelesaikan analisis birokrasi, hukum, dan tata pemerintahan negara.</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="inline-block bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold">300 - 400 Poin</span>
+                    </div>
+                </div>
+
+                <!-- Tier 5: Menteri (400 - 500 Poin) -->
+                <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex items-center justify-between hover:shadow-md transition-shadow">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-purple-50 rounded-full flex items-center justify-center text-purple-500 text-xl border-2 border-purple-300">
+                            <i class="fa-solid fa-gavel text-purple-500"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-brand-dark">Lencana Menteri</h4>
+                            <p class="text-xs text-gray-500">Pemberi solusi strategis dan bijak dalam menghadapi dinamika UUD 1945.</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="inline-block bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-bold">400 - 500 Poin</span>
+                    </div>
+                </div>
+
+                <!-- Tier 6: Presiden (> 500 Poin) -->
+                <div class="bg-gradient-to-r from-brand-red to-amber-500 p-[2px] rounded-2xl shadow-lg">
+                    <div class="bg-white p-5 rounded-[14px] flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center text-amber-500 text-xl border-2 border-amber-400">
+                                <i class="fa-solid fa-crown text-amber-500"></i>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h4 class="font-bold text-brand-dark">Lencana Presiden</h4>
+                                    <span class="bg-brand-red text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase animate-pulse">Max Tier</span>
+                                </div>
+                                <p class="text-xs text-gray-500">Penjaga Konstitusi sejati! Penguasa seluruh materi kelas dan teladan bangsa.</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="inline-block bg-red-100 text-brand-red px-3 py-1 rounded-full text-xs font-extrabold shadow-sm">&gt; 500 Poin</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. FOOTER CTA & FOOTER -->
+    <section class="bg-brand-red relative overflow-hidden">
+        <!-- Abstract Pattern -->
+        <div class="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+CjxjaXJjbGUgY3g9IjIiIGN5PSIyIiByPSIyIiBmaWxsPSIjZmZmIi8+Cjwvc3ZnPg==')]"></div>
+        
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center relative z-10">
+            <h2 class="text-3xl md:text-4xl font-extrabold text-white mb-6">
+                Siap Jadi Juara di Papan Peringkat dan Teladan di Dunia Nyata?
+            </h2>
+            <a href="javascript:void(0)" onclick="handleMulaiBelajar()" class="inline-block px-8 py-4 bg-white text-brand-red font-bold rounded-xl shadow-xl hover:bg-gray-50 hover:scale-105 transition-transform text-lg">
+                Mulai Berpetualang Sekarang
+            </a>
+        </div>
+    </section>
+
+    <footer class="bg-brand-dark text-gray-400 py-12 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            <div class="md:col-span-2">
+                <div class="flex items-center gap-2 mb-4">
+                    <img src="Logo Edukacivic.png" alt="EdukaCivic" class="h-8 w-auto">
+                    <span class="font-bold text-xl text-white">Eduka<span class="text-brand-red">Civic</span></span>
+                </div>
+                <p class="text-sm leading-relaxed pr-4">
+                    Platform pembelajaran interaktif PPKn terdepan untuk siswa SMP. Menggabungkan kurikulum pendidikan nasional dengan pendekatan gamifikasi yang menyenangkan.
+                </p>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-4">Navigasi</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="#beranda" class="hover:text-white transition-colors">Beranda</a></li>
+                    <li><a href="#fitur" class="hover:text-white transition-colors">Fitur Utama</a></li>
+                    <li><a href="#dunia-game" class="hover:text-white transition-colors">Dunia Game</a></li>
+                    <li><a href="#badge" class="hover:text-white transition-colors">Peringkat & Badge</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-4">Dukungan</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="profil-siswa.html" class="hover:text-white transition-colors">Profil & Rapor Siswa</a></li>
+                    <li><a href="pusat-bantuan.html" class="hover:text-white transition-colors">Pusat Bantuan</a></li>
+                    <li><a href="panduan-siswa.html" class="hover:text-white transition-colors">Panduan Siswa</a></li>
+                    <li><a href="kebijakan-privasi.html" class="hover:text-white transition-colors">Kebijakan Privasi</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 border-t border-gray-800 text-sm text-center md:text-left flex flex-col md:flex-row justify-between items-center">
+            <p>&copy; 2026 EdukaCivic | Fadilatul Fajri</p>
+            <div class="flex space-x-4 mt-4 md:mt-0">
+                <a href="https://www.instagram.com/fdlatul_fajri?igsi=aTEwcng1eGN1emRn" target="_blank" rel="noopener" class="text-gray-400 hover:text-white"><i class="fa-brands fa-instagram text-xl"></i></a>
+                <a href="https://youtube.com/@fadilatulfajrioficial?si=4d8lyZP5Rp0qgAgK" target="_blank" rel="noopener" class="text-gray-400 hover:text-white"><i class="fa-brands fa-youtube text-xl"></i></a>
+                <a href="https://www.linkedin.com/in/fadilatul-fajri-9578b424a?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" rel="noopener" class="text-gray-400 hover:text-white"><i class="fa-brands fa-linkedin text-xl"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Logic: Student Progress & Navigation -->
+    <script>
+        // Get student data from localStorage
+        function getStudentData() {
+            try {
+                return JSON.parse(localStorage.getItem('edukacivic_siswa'));
+            } catch (e) {
+                return null;
+            }
+        }
+
+        // Get student progress from localStorage  
+        function getStudentProgress() {
+            try {
+                return JSON.parse(localStorage.getItem('edukacivic_progress')) || { poin: 0, level: 1, dunia: 1 };
+            } catch (e) {
+                return { poin: 0, level: 1, dunia: 1 };
+            }
+        }
+
+        // Determine badge details based on points
+        function getBadgeInfo(poin) {
+            if (poin > 500) return { name: 'Presiden', bg: 'bg-red-500/20 text-red-400 border-red-500/30', color: 'text-red-400', icon: 'fa-crown' };
+            if (poin >= 400) return { name: 'Menteri', bg: 'bg-purple-500/20 text-purple-400 border-purple-500/30', color: 'text-purple-400', icon: 'fa-gavel' };
+            if (poin >= 300) return { name: 'Pejabat', bg: 'bg-blue-500/20 text-blue-400 border-blue-500/30', color: 'text-blue-400', icon: 'fa-user-tie' };
+            if (poin >= 200) return { name: 'Aktivis', bg: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30', color: 'text-emerald-400', icon: 'fa-bullhorn' };
+            if (poin >= 100) return { name: 'Warga', bg: 'bg-sky-500/20 text-sky-400 border-sky-500/30', color: 'text-sky-400', icon: 'fa-user' };
+            return { name: 'Pemula', bg: 'bg-slate-700/50 text-slate-300 border-slate-600/50', color: 'text-slate-400', icon: 'fa-seedling' };
+        }
+
+        function getBadge(poin) {
+            return getBadgeInfo(poin).name;
+        }
+
+        // Determine next badge target
+        function getNextBadge(poin) {
+            if (poin > 500) return { name: 'Max!', target: 500 };
+            if (poin >= 400) return { name: 'Presiden', target: 501 };
+            if (poin >= 300) return { name: 'Menteri', target: 400 };
+            if (poin >= 200) return { name: 'Pejabat', target: 300 };
+            if (poin >= 100) return { name: 'Aktivis', target: 200 };
+            return { name: 'Warga', target: 100 };
+        }
+
+        // Handle "Mulai Belajar" button - goes to login or latest progress world
+        function handleMulaiBelajar() {
+            const siswa = typeof getActiveStudent === 'function' ? getActiveStudent() : getStudentData();
+            if (siswa) {
+                const targetUrl = typeof getLatestStudentProgressUrl === 'function' ? getLatestStudentProgressUrl() : 'dunia1.html';
+                window.location.href = targetUrl;
+            } else {
+                window.location.href = 'login-siswa.html';
+            }
+        }
+
+        // Update Hero Card, Navbar & Dropdown Pop-Up with real student data
+        function updateHeroCard() {
+            const siswa = getStudentData();
+            const progress = getStudentProgress();
+
+            if (siswa) {
+                // Student is logged in - show real data
+                const poin = progress.poin || 0;
+                const badgeInfo = getBadgeInfo(poin);
+                const badge = badgeInfo.name;
+                const nextBadge = getNextBadge(poin);
+                const level = progress.level || 1;
+                const dunia = progress.dunia || 1;
+
+                const avatarUrl = siswa.avatarUrl || 'https://api.dicebear.com/7.x/adventurer/svg?seed=' + encodeURIComponent(siswa.nama || 'Student') + '&backgroundColor=b6e3f4';
+
+                // Navbar trigger button
+                const navBox = document.getElementById('nav-student-box');
+                const mobBox = document.getElementById('mobile-student-box');
+                if (navBox) {
+                    navBox.classList.remove('hidden');
+                    navBox.classList.add('flex');
+                    document.getElementById('nav-avatar-img').src = avatarUrl;
+                    document.getElementById('nav-student-nama').textContent = (siswa.nama || '').split(' ').slice(0, 2).join(' ');
+                    document.getElementById('nav-student-sub').textContent = `${siswa.kelas || 'Kelas VIII'} · Absen ${siswa.noAbsen || '-'}`;
+                }
+
+                // Dropdown Pop-Up elements
+                const popAvatar = document.getElementById('pop-avatar-img');
+                if (popAvatar) {
+                    popAvatar.src = avatarUrl;
+                    document.getElementById('pop-student-nama').textContent = siswa.nama;
+                    document.getElementById('pop-student-sub').textContent = `${siswa.kelas || 'Kelas VIII'} · Absen ${siswa.noAbsen || '-'}`;
+                    
+                    const badgeEl = document.getElementById('pop-badge');
+                    badgeEl.textContent = badge;
+                    badgeEl.className = `shrink-0 px-2.5 py-0.5 text-[10px] font-extrabold rounded-full border ${badgeInfo.bg}`;
+
+                    document.getElementById('pop-level-text').innerHTML = `<i class="fa-solid fa-gamepad text-brand-red"></i> Level ${level}`;
+                    document.getElementById('pop-xp-text').textContent = `${poin} / ${nextBadge.target} XP`;
+                    
+                    const currentTierStart = poin > 500 ? 500 : poin >= 400 ? 400 : poin >= 300 ? 300 : poin >= 200 ? 200 : poin >= 100 ? 100 : 0;
+                    const xpInTier = poin - currentTierStart;
+                    const tierSize = nextBadge.target - currentTierStart;
+                    const xpPercent = Math.min(Math.round((xpInTier / Math.max(tierSize, 1)) * 100), 100);
+                    document.getElementById('pop-xp-bar').style.width = `${xpPercent}%`;
+
+                    document.getElementById('pop-poin').textContent = poin;
+                    document.getElementById('pop-misi').textContent = `Dunia ${dunia} • Level ${level}`;
+                }
+
+                // Mobile drawer widget
+                if (mobBox) {
+                    mobBox.classList.remove('hidden');
+                    mobBox.classList.add('flex');
+                    document.getElementById('mobile-avatar-img').src = avatarUrl;
+                    document.getElementById('mobile-student-nama').textContent = siswa.nama;
+                    document.getElementById('mobile-student-sub').textContent = `${siswa.kelas || 'Kelas VIII'} · Absen ${siswa.noAbsen || '-'}`;
+                    
+                    const mobBadge = document.getElementById('mobile-student-badge');
+                    if (mobBadge) {
+                        mobBadge.textContent = badge;
+                        mobBadge.className = `px-2 py-0.5 text-[9px] font-bold rounded-full border ${badgeInfo.bg}`;
+                    }
+                    const mobPoin = document.getElementById('mobile-student-poin');
+                    if (mobPoin) {
+                        mobPoin.innerHTML = `<i class="fa-solid fa-bolt text-xs text-yellow-400"></i> ${poin} Poin`;
+                    }
+                }
+
+                document.getElementById('nav-btn-text').textContent = 'Lanjut Main';
+
+                // Hero card widgets
+                document.getElementById('hero-avatar-img').src = avatarUrl;
+                document.getElementById('hero-nama').textContent = siswa.nama;
+                document.getElementById('hero-lencana').textContent = 'Lencana: ' + badge + (siswa.kelas ? ' (' + siswa.kelas + ')' : '');
+                document.getElementById('hero-poin').textContent = poin;
+                document.getElementById('hero-level').textContent = 'Level ' + level;
+                
+                // XP bar calculation for Hero Card
+                const currentTierStart = poin > 500 ? 500 : poin >= 400 ? 400 : poin >= 300 ? 300 : poin >= 200 ? 200 : poin >= 100 ? 100 : 0;
+                const xpInTier = poin - currentTierStart;
+                const tierSize = nextBadge.target - currentTierStart;
+                const xpPercent = Math.min(Math.round((xpInTier / Math.max(tierSize, 1)) * 100), 100);
+                
+                document.getElementById('hero-xp-text').textContent = poin + ' / ' + nextBadge.target + ' XP menuju ' + nextBadge.name;
+                document.getElementById('hero-xp-bar').style.width = xpPercent + '%';
+
+                // Active mission
+                document.getElementById('hero-misi-judul').textContent = 'Dunia ' + dunia + ' • Level ' + level;
+                document.getElementById('hero-misi-desc').textContent = 'Lanjutkan petualanganmu di dunia ' + dunia + '!';
+            } else {
+                // Not logged in
+                document.getElementById('nav-btn-text').textContent = 'Masuk Siswa';
+            }
+        }
+
+        // Dropdown Toggle & Click Outside Functions
+        function toggleProfileDropdown(e) {
+            if (e) e.stopPropagation();
+            const dropdown = document.getElementById('profileDropdown');
+            if (!dropdown) return;
+
+            const isOpen = !dropdown.classList.contains('hidden') && dropdown.classList.contains('opacity-100');
+
+            if (isOpen) {
+                closeProfileDropdown();
+            } else {
+                openProfileDropdown();
+            }
+        }
+
+        function openProfileDropdown() {
+            const dropdown = document.getElementById('profileDropdown');
+            const arrow = document.getElementById('dropdown-arrow');
+            if (!dropdown) return;
+
+            dropdown.classList.remove('hidden', 'pointer-events-none');
+            // Force reflow for CSS transition
+            void dropdown.offsetWidth;
+            dropdown.classList.remove('scale-95', 'opacity-0');
+            dropdown.classList.add('scale-100', 'opacity-100');
+            if (arrow) arrow.classList.add('rotate-180');
+        }
+
+        function closeProfileDropdown() {
+            const dropdown = document.getElementById('profileDropdown');
+            const arrow = document.getElementById('dropdown-arrow');
+            if (!dropdown || dropdown.classList.contains('hidden')) return;
+
+            dropdown.classList.remove('scale-100', 'opacity-100');
+            dropdown.classList.add('scale-95', 'opacity-0', 'pointer-events-none');
+            if (arrow) arrow.classList.remove('rotate-180');
+
+            setTimeout(() => {
+                if (dropdown && dropdown.classList.contains('opacity-0')) {
+                    dropdown.classList.add('hidden');
+                }
+            }, 200);
+        }
+
+        // Close on click outside
+        window.addEventListener('click', (event) => {
+            const dropdown = document.getElementById('profileDropdown');
+            const btn = document.getElementById('nav-student-box');
+            if (dropdown && !dropdown.classList.contains('hidden')) {
+                if (!dropdown.contains(event.target) && !btn.contains(event.target)) {
+                    closeProfileDropdown();
+                }
+            }
+        });
+
+
+        // Close on Escape key
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeProfileDropdown();
+            }
+        });
+
+        // Logout Student
+        function logoutStudent() {
+            if (confirm('Apakah Anda yakin ingin keluar dari akun siswa ini?')) {
+                localStorage.removeItem('edukacivic_siswa');
+                window.location.reload();
+            }
+        }
+
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        if (mobileMenuBtn && mobileMenu) {
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+            mobileMenu.querySelectorAll('a[href^="#"]').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                });
+            });
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateWorldMapCards();
+            updateHeroCard();
+        });
+
+        function updateWorldMapCards() {
+            const worlds = [
+                { num: 1, cardId: 'world-card-1', req: 'Dunia 1', href: 'dunia1.html' },
+                { num: 2, cardId: 'world-card-2', req: 'Dunia 1', href: 'dunia2.html' },
+                { num: 3, cardId: 'world-card-3', req: 'Dunia 2', href: 'dunia3.html' },
+                { num: 4, cardId: 'world-card-4', req: 'Dunia 3', href: 'dunia4.html' },
+                { num: 5, cardId: 'world-card-5', req: 'Dunia 4', href: 'dunia5.html' }
+            ];
+
+            worlds.forEach(w => {
+                const card = document.getElementById(w.cardId);
+                if (!card) return;
+                
+                const prevCompleted = isWorldPreviousCompleted(w.num);
+                const tokenUnlocked = isWorldTokenUnlocked(w.num);
+                const fullyUnlocked = prevCompleted && tokenUnlocked;
+
+                const oldOverlay = card.querySelector('.world-locked-overlay');
+                if (oldOverlay) oldOverlay.remove();
+
+                if (fullyUnlocked || w.num === 1) {
+                    card.classList.remove('opacity-60', 'cursor-not-allowed', 'relative', 'overflow-hidden');
+                    card.setAttribute('href', w.href);
+                    card.onclick = null;
+                } else if (prevCompleted && !tokenUnlocked) {
+                    // Dunia sebelumnya selesai, butuh Token Rahasia Guru untuk pertemuan ini
+                    card.classList.add('relative', 'overflow-hidden');
+                    card.classList.remove('opacity-60', 'cursor-not-allowed');
+                    card.removeAttribute('href');
+                    card.onclick = (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        openWorldWithTokenCheck(w.num, w.href);
+                    };
+
+                    const overlay = document.createElement('div');
+                    overlay.className = 'world-locked-overlay absolute inset-0 z-20 flex items-center justify-center bg-slate-950/75 backdrop-blur-[2px] rounded-3xl cursor-pointer';
+                    overlay.innerHTML = '<div class="bg-gray-900/95 border-2 border-orange-500/60 px-5 py-3.5 rounded-2xl text-center shadow-2xl transform transition-transform hover:scale-105 pointer-events-auto">' +
+                        '<div class="w-9 h-9 rounded-xl bg-orange-500/20 text-orange-400 mx-auto flex items-center justify-center mb-1 text-sm border border-orange-500/40">' +
+                        '<i class="fa-solid fa-key"></i>' +
+                        '</div>' +
+                        '<span class="inline-block px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-300 text-[9px] font-extrabold uppercase tracking-wider mb-1">Pertemuan ' + w.num + '</span>' +
+                        '<p class="text-white font-extrabold text-xs">Butuh Token Guru</p>' +
+                        '<p class="text-orange-200 text-[10px] mt-0.5">Klik untuk masukkan token</p>' +
+                        '</div>';
+                    overlay.onclick = (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        openWorldWithTokenCheck(w.num, w.href);
+                    };
+                    card.appendChild(overlay);
+                } else {
+                    // Belum menyelesaikan dunia sebelumnya
+                    card.classList.add('relative', 'overflow-hidden', 'opacity-60', 'cursor-not-allowed');
+                    card.removeAttribute('href');
+                    card.onclick = (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        alert('🔒 Dunia ' + w.num + ' masih terkunci!\nSilakan selesaikan seluruh level pada ' + w.req + ' terlebih dahulu.');
+                    };
+
+                    const overlay = document.createElement('div');
+                    overlay.className = 'world-locked-overlay absolute inset-0 z-20 flex items-center justify-center bg-slate-950/85 backdrop-blur-[2px] rounded-3xl cursor-not-allowed';
+                    overlay.innerHTML = '<div class="bg-gray-900/95 border border-gray-700 px-4 py-2.5 rounded-2xl text-center shadow-lg transform transition-transform hover:scale-105 pointer-events-auto">' +
+                        '<i class="fa-solid fa-lock text-yellow-400 text-lg mb-1"></i>' +
+                        '<p class="text-white font-bold text-xs">Dunia ' + w.num + ' Terkunci</p>' +
+                        '<p class="text-gray-400 text-[10px] mt-0.5">Tuntaskan ' + w.req + ' terlebih dahulu</p>' +
+                        '</div>';
+                    overlay.onclick = (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        alert('🔒 Dunia ' + w.num + ' masih terkunci!\nSilakan selesaikan seluruh level pada ' + w.req + ' terlebih dahulu.');
+                    };
+                    card.appendChild(overlay);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

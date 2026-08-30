@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level 7: Perjalanan Perumusan UUD - EdukaCivic</title>
+    <link rel="icon" type="image/png" href="Logo Edukacivic.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="student-system.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: {
+                        brand: { red: '#DC2626', redLight: '#EF4444', redDark: '#B91C1C', dark: '#0F172A', darker: '#020617', light: '#F8FAFC' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0F172A; }
+        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4B5563; }
+
+        .section-card {
+            background: rgba(30, 41, 59, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(75, 85, 99, 0.5);
+            border-radius: 1.5rem;
+        }
+
+        /* Timeline Slot & Card Styles */
+        .reconstruct-slot {
+            min-height: 85px;
+            border: 2px dashed #475569;
+            transition: all 0.25s ease;
+        }
+        .reconstruct-slot.drag-over {
+            border-color: #f97316;
+            background-color: rgba(249, 115, 22, 0.15);
+        }
+        .reconstruct-slot.correct {
+            border-color: #10b981 !important;
+            background-color: rgba(16, 185, 129, 0.18) !important;
+            border-style: solid;
+        }
+        .reconstruct-slot.wrong {
+            border-color: #ef4444 !important;
+            background-color: rgba(239, 68, 68, 0.18) !important;
+            border-style: solid;
+            animation: shake 0.35s;
+        }
+
+        .reconstruct-card {
+            cursor: grab;
+            user-select: none;
+            touch-action: manipulation;
+            transition: all 0.2s ease;
+        }
+        .reconstruct-card:active {
+            cursor: grabbing;
+            transform: scale(0.98);
+        }
+        .reconstruct-card.selected {
+            ring: 3px solid #f59e0b;
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.5);
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .step-badge {
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            box-shadow: 0 0 15px rgba(249, 115, 22, 0.35);
+        }
+    </style>
+    <script>
+        function getProgress() {
+            try { return JSON.parse(localStorage.getItem('edukacivic_progress')) || { poin: 0, level: 1, dunia: 2, completedLevels: [] }; }
+            catch(e) { return { poin: 0, level: 1, dunia: 2, completedLevels: [] }; }
+        }
+        const prog = getProgress();
+        if (!prog.completedLevels || !prog.completedLevels.includes('d2l2')) {
+            window.location.href = 'dunia2.html';
+        }
+    </script>
+    <script>
+        if (typeof isLevelUnlocked === "function" && !isLevelUnlocked("d2l3")) {
+            alert("🔒 Level ini masih terkunci! Selesaikan Level 6 terlebih dahulu.");
+            window.location.href = "index.html";
+        }
+    </script>
+</head>
+<body class="bg-brand-darker text-white font-sans antialiased min-h-screen flex flex-col selection:bg-orange-600 selection:text-white">
+
+    <!-- Web Audio Sound Effects -->
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            try {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'correct') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.15);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, now);
+                    osc.frequency.exponentialRampToValueAtTime(146.83, now + 0.2);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                } else if (type === 'victory') {
+                    [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+                        const o = audioCtx.createOscillator();
+                        const g = audioCtx.createGain();
+                        o.connect(g);
+                        g.connect(audioCtx.destination);
+                        o.type = 'triangle';
+                        o.frequency.setValueAtTime(freq, now + i * 0.1);
+                        g.gain.setValueAtTime(0.3, now + i * 0.1);
+                        g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.1 + 0.4);
+                        o.start(now + i * 0.1);
+                        o.stop(now + i * 0.1 + 0.4);
+                    });
+                }
+            } catch(e) {}
+        }
+    </script>
+
+    <!-- NAVBAR -->
+    <nav class="fixed w-full z-50 bg-brand-dark/90 backdrop-blur-md border-b border-gray-800 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-4">
+                    <a href="dunia2.html" class="flex items-center gap-2 text-gray-400 hover:text-white transition-colors group">
+                        <div class="w-8 h-8 bg-gray-800 rounded-lg flex items-center justify-center group-hover:bg-gray-700 transition-colors">
+                            <i class="fa-solid fa-arrow-left text-sm"></i>
+                        </div>
+                        <span class="text-sm font-medium hidden sm:inline">Peta Dunia 2</span>
+                    </a>
+                    <div class="w-px h-8 bg-gray-700"></div>
+                    <a href="index.html" class="flex items-center gap-2">
+                        <img src="Logo Edukacivic.png" alt="EdukaCivic" class="h-8 w-auto">
+                        <span class="font-bold text-lg text-white hidden sm:inline">Eduka<span class="text-brand-red">Civic</span></span>
+                    </a>
+                </div>
+                
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2 bg-orange-500/10 border border-orange-500/30 px-3 py-1.5 rounded-full">
+                        <i class="fa-solid fa-clock-rotate-left text-orange-400 text-xs"></i>
+                        <span class="text-orange-400 font-bold text-xs">Dunia 2 · Level 7</span>
+                    </div>
+                    <div class="flex items-center gap-2 bg-gray-800 px-3 py-1.5 rounded-lg border border-gray-700">
+                        <i class="fa-solid fa-bolt text-yellow-400 text-xs"></i>
+                        <span id="nav-poin" class="text-yellow-400 font-bold text-sm">0</span>
+                        <span class="text-gray-500 text-xs">Poin</span>
+                    </div>
+                    <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-brand-red to-orange-400 p-0.5 cursor-pointer shadow-md" onclick="window.location.href='profil-siswa.html'">
+                        <img id="nav-avatar-img" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Student" alt="Avatar" class="w-full h-full rounded-full bg-slate-900 object-cover">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <script>document.getElementById('nav-poin').textContent = prog.poin || 0;</script>
+
+    <!-- HERO SECTION -->
+    <section class="relative pt-24 pb-12 overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-orange-950/30 via-brand-darker to-brand-darker pointer-events-none"></div>
+        <div class="absolute top-20 right-10 w-72 h-72 bg-orange-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 relative z-10 text-center">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-500/10 border border-orange-500/30 mb-4">
+                <i class="fa-solid fa-clock-rotate-left text-orange-400 text-xs"></i>
+                <span class="text-xs font-bold text-orange-400 tracking-widest uppercase">Dunia 2 · Level 7</span>
+            </div>
+            
+            <h1 class="text-3xl md:text-5xl font-extrabold leading-tight mb-4">
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-amber-300 to-yellow-400">Perjalanan Perumusan UUD</span>
+            </h1>
+            
+            <p class="text-gray-300 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
+                Telusuri dinamika rapat sidang pleno BPUPK dari 10 hingga 16 Juli 1945, evolusi draf naskah UUD pimpinan Prof. Dr. Soepomo, hingga diterimanya konstitusi secara bulat.
+            </p>
+
+            <!-- Reading progress bar -->
+            <div class="mt-6 max-w-sm mx-auto">
+                <div class="flex justify-between text-xs text-gray-500 mb-1">
+                    <span>Progres Membaca</span>
+                    <span id="read-pct">0%</span>
+                </div>
+                <div class="w-full h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                    <div id="read-bar" class="h-full bg-gradient-to-r from-orange-500 to-amber-400 rounded-full transition-all duration-300" style="width:0%"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-grow pb-16 px-4">
+        <div class="max-w-4xl mx-auto space-y-10">
+
+            <!-- ===== SECTION 1: KRONOLOGI SIDANG KEDUA BPUPKI (10 - 16 JULI 1945) ===== -->
+            <section class="section-card p-6 md:p-8">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-12 h-12 rounded-2xl bg-orange-500/20 text-orange-400 flex items-center justify-center text-xl border border-orange-500/30">
+                        <i class="fa-solid fa-calendar-days"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-orange-400">Materi Inti</span>
+                        <h2 class="text-xl md:text-2xl font-bold text-white">Kronologi Sidang Kedua BPUPKI (10–16 Juli 1945)</h2>
+                    </div>
+                </div>
+
+                <p class="text-gray-300 text-sm leading-relaxed mb-8">
+                    Setelah masa reses dan lahirnya rancangan Piagam Jakarta (22 Juni 1945), BPUPKI menggelar Sidang Kedua dengan fokus utama menyusun Rancangan Undang-Undang Dasar Republik Indonesia. Berikut adalah tahapan penting perjalanan perumusannya:
+                </p>
+
+                <!-- Interactive Visual Chrono-Timeline -->
+                <div class="relative py-4">
+                    <!-- Center Vertical Timeline Stem Line -->
+                    <div class="hidden md:block absolute left-1/2 top-4 bottom-4 w-1 -translate-x-1/2 bg-gradient-to-b from-orange-500/30 via-amber-500/60 to-yellow-400/80 rounded-full shadow-[0_0_12px_rgba(249,115,22,0.4)]"></div>
+                    <div class="md:hidden absolute left-6 top-4 bottom-4 w-1 bg-gradient-to-b from-orange-500/30 via-amber-500/60 to-yellow-400/80 rounded-full"></div>
+
+                    <div class="space-y-8 md:space-y-12 relative">
+                        
+                        <!-- Milestone 1: 10 Juli 1945 (Left on Desktop) -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center group">
+                            <!-- Content Left -->
+                            <div class="md:w-1/2 md:pr-10 pl-14 md:pl-0 w-full">
+                                <div class="bg-gradient-to-br from-slate-900/95 to-slate-850/90 p-5 md:p-6 rounded-2xl border border-orange-500/30 hover:border-orange-500/70 shadow-lg hover:shadow-orange-500/20 transition-all duration-300 transform group-hover:-translate-y-1">
+                                    <div class="flex items-center justify-between gap-2 mb-2">
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-orange-500/20 text-orange-400 font-black text-xs rounded-full border border-orange-500/40 shadow-sm">
+                                            <i class="fa-solid fa-calendar-day text-[10px]"></i> 10 Juli 1945
+                                        </span>
+                                        <span class="text-[11px] text-gray-400 font-semibold bg-gray-800/80 px-2.5 py-0.5 rounded-lg border border-gray-700">
+                                            Sidang Pleno Hari Ke-1
+                                        </span>
+                                    </div>
+                                    <h3 class="text-white font-bold text-base md:text-lg mb-1.5 flex items-center gap-2">
+                                        <span class="w-2 h-2 rounded-full bg-orange-400"></span> Pembukaan Sidang & Laporan Hasil Reses
+                                    </h3>
+                                    <p class="text-gray-300 text-xs sm:text-sm leading-relaxed">
+                                        Ketua BPUPKI <strong>Dr. K.R.T. Radjiman Wedyodiningrat</strong> membuka sidang kedua. <strong>Ir. Soekarno</strong> melaporkan hasil kerja Panitia Kecil dan pembentukan Panitia Sembilan yang berhasil menyusun naskah <em>Piagam Jakarta</em> sebagai rancangan Pembukaan UUD.
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <!-- Center Node Pin -->
+                            <div class="absolute left-6 md:left-1/2 -translate-x-1/2 top-4 md:top-auto w-10 h-10 rounded-full bg-slate-950 border-2 border-orange-500 text-orange-400 flex items-center justify-center text-sm shadow-[0_0_15px_rgba(249,115,22,0.6)] group-hover:scale-110 group-hover:bg-orange-500 group-hover:text-slate-950 transition-all duration-300 z-10">
+                                <i class="fa-solid fa-door-open text-xs"></i>
+                            </div>
+                            
+                            <!-- Right Empty Spacer on Desktop -->
+                            <div class="hidden md:block md:w-1/2 md:pl-10"></div>
+                        </div>
+
+                        <!-- Milestone 2: 11 Juli 1945 (Right on Desktop) -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center group">
+                            <!-- Left Empty Spacer on Desktop -->
+                            <div class="hidden md:block md:w-1/2 md:pr-10"></div>
+                            
+                            <!-- Center Node Pin -->
+                            <div class="absolute left-6 md:left-1/2 -translate-x-1/2 top-4 md:top-auto w-10 h-10 rounded-full bg-slate-950 border-2 border-amber-500 text-amber-400 flex items-center justify-center text-sm shadow-[0_0_15px_rgba(245,158,11,0.6)] group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-slate-950 transition-all duration-300 z-10">
+                                <i class="fa-solid fa-users text-xs"></i>
+                            </div>
+
+                            <!-- Content Right -->
+                            <div class="md:w-1/2 md:pl-10 pl-14 md:pl-0 w-full">
+                                <div class="bg-gradient-to-br from-slate-900/95 to-slate-850/90 p-5 md:p-6 rounded-2xl border border-amber-500/30 hover:border-amber-500/70 shadow-lg hover:shadow-amber-500/20 transition-all duration-300 transform group-hover:-translate-y-1">
+                                    <div class="flex items-center justify-between gap-2 mb-2">
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500/20 text-amber-400 font-black text-xs rounded-full border border-amber-500/40 shadow-sm">
+                                            <i class="fa-solid fa-calendar-day text-[10px]"></i> 11 Juli 1945
+                                        </span>
+                                        <span class="text-[11px] text-gray-400 font-semibold bg-gray-800/80 px-2.5 py-0.5 rounded-lg border border-gray-700">
+                                            Sidang Pleno Hari Ke-2
+                                        </span>
+                                    </div>
+                                    <h3 class="text-white font-bold text-base md:text-lg mb-1.5 flex items-center gap-2">
+                                        <span class="w-2 h-2 rounded-full bg-amber-400"></span> Pembentukan 3 Panitia Kerja
+                                    </h3>
+                                    <p class="text-gray-300 text-xs sm:text-sm leading-relaxed">
+                                        BPUPKI membentuk 3 Panitia Kerja: <strong>Panitia Perancang UUD</strong> (19 anggota, ketua: Ir. Soekarno), <strong>Panitia Pembelaan Tanah Air</strong> (ketua: Abikoesno Tjokrosoejoso), dan <strong>Panitia Keuangan & Perekonomian</strong> (ketua: Drs. Moh. Hatta).
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Milestone 3: 13 Juli 1945 (Left on Desktop) -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center group">
+                            <!-- Content Left -->
+                            <div class="md:w-1/2 md:pr-10 pl-14 md:pl-0 w-full">
+                                <div class="bg-gradient-to-br from-slate-900/95 to-slate-850/90 p-5 md:p-6 rounded-2xl border border-purple-500/30 hover:border-purple-500/70 shadow-lg hover:shadow-purple-500/20 transition-all duration-300 transform group-hover:-translate-y-1">
+                                    <div class="flex items-center justify-between gap-2 mb-2">
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-purple-500/20 text-purple-400 font-black text-xs rounded-full border border-purple-500/40 shadow-sm">
+                                            <i class="fa-solid fa-calendar-day text-[10px]"></i> 13 Juli 1945
+                                        </span>
+                                        <span class="text-[11px] text-gray-400 font-semibold bg-gray-800/80 px-2.5 py-0.5 rounded-lg border border-gray-700">
+                                            Sidang Panitia Perancang
+                                        </span>
+                                    </div>
+                                    <h3 class="text-white font-bold text-base md:text-lg mb-1.5 flex items-center gap-2">
+                                        <span class="w-2 h-2 rounded-full bg-purple-400"></span> Hasil Kerja Tim 7 & Panitia Penghalus Bahasa
+                                    </h3>
+                                    <p class="text-gray-300 text-xs sm:text-sm leading-relaxed">
+                                        Panitia Kecil Tim 7 (Prof. Soepomo) menyerahkan draf Batang Tubuh UUD. Disepakati pembentukan <strong>Panitia Penghalus Bahasa</strong> (Prof. Dr. Soepomo, Prof. Dr. P.A. Hoesein Djajadiningrat, dan H. Agus Salim) untuk menyempurnakan redaksi naskah.
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <!-- Center Node Pin -->
+                            <div class="absolute left-6 md:left-1/2 -translate-x-1/2 top-4 md:top-auto w-10 h-10 rounded-full bg-slate-950 border-2 border-purple-500 text-purple-400 flex items-center justify-center text-sm shadow-[0_0_15px_rgba(168,85,247,0.6)] group-hover:scale-110 group-hover:bg-purple-500 group-hover:text-slate-950 transition-all duration-300 z-10">
+                                <i class="fa-solid fa-pen-nib text-xs"></i>
+                            </div>
+                            
+                            <!-- Right Empty Spacer on Desktop -->
+                            <div class="hidden md:block md:w-1/2 md:pl-10"></div>
+                        </div>
+
+                        <!-- Milestone 4: 14 Juli 1945 (Right on Desktop) -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center group">
+                            <!-- Left Empty Spacer on Desktop -->
+                            <div class="hidden md:block md:w-1/2 md:pr-10"></div>
+                            
+                            <!-- Center Node Pin -->
+                            <div class="absolute left-6 md:left-1/2 -translate-x-1/2 top-4 md:top-auto w-10 h-10 rounded-full bg-slate-950 border-2 border-blue-500 text-blue-400 flex items-center justify-center text-sm shadow-[0_0_15px_rgba(59,130,246,0.6)] group-hover:scale-110 group-hover:bg-blue-500 group-hover:text-slate-950 transition-all duration-300 z-10">
+                                <i class="fa-solid fa-scroll text-xs"></i>
+                            </div>
+
+                            <!-- Content Right -->
+                            <div class="md:w-1/2 md:pl-10 pl-14 md:pl-0 w-full">
+                                <div class="bg-gradient-to-br from-slate-900/95 to-slate-850/90 p-5 md:p-6 rounded-2xl border border-blue-500/30 hover:border-blue-500/70 shadow-lg hover:shadow-blue-500/20 transition-all duration-300 transform group-hover:-translate-y-1">
+                                    <div class="flex items-center justify-between gap-2 mb-2">
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-500/20 text-blue-400 font-black text-xs rounded-full border border-blue-500/40 shadow-sm">
+                                            <i class="fa-solid fa-calendar-day text-[10px]"></i> 14 Juli 1945
+                                        </span>
+                                        <span class="text-[11px] text-gray-400 font-semibold bg-gray-800/80 px-2.5 py-0.5 rounded-lg border border-gray-700">
+                                            Sidang Pleno Hari Ke-5
+                                        </span>
+                                    </div>
+                                    <h3 class="text-white font-bold text-base md:text-lg mb-1.5 flex items-center gap-2">
+                                        <span class="w-2 h-2 rounded-full bg-blue-400"></span> Laporan 3 Naskah Pokok oleh Ir. Soekarno
+                                    </h3>
+                                    <p class="text-gray-300 text-xs sm:text-sm leading-relaxed">
+                                        Ir. Soekarno membacakan laporan resmi berisi 3 naskah pokok: <strong>(1) Pernyataan Indonesia Merdeka</strong>, <strong>(2) Pembukaan UUD</strong> (dari Piagam Jakarta), dan <strong>(3) Batang Tubuh UUD</strong> (42 pasal).
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Milestone 5: 15 Juli 1945 (Left on Desktop) -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center group">
+                            <!-- Content Left -->
+                            <div class="md:w-1/2 md:pr-10 pl-14 md:pl-0 w-full">
+                                <div class="bg-gradient-to-br from-slate-900/95 to-slate-850/90 p-5 md:p-6 rounded-2xl border border-emerald-500/30 hover:border-emerald-500/70 shadow-lg hover:shadow-emerald-500/20 transition-all duration-300 transform group-hover:-translate-y-1">
+                                    <div class="flex items-center justify-between gap-2 mb-2">
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/20 text-emerald-400 font-black text-xs rounded-full border border-emerald-500/40 shadow-sm">
+                                            <i class="fa-solid fa-calendar-day text-[10px]"></i> 15 Juli 1945
+                                        </span>
+                                        <span class="text-[11px] text-gray-400 font-semibold bg-gray-800/80 px-2.5 py-0.5 rounded-lg border border-gray-700">
+                                            Sidang Pleno Hari Ke-6
+                                        </span>
+                                    </div>
+                                    <h3 class="text-white font-bold text-base md:text-lg mb-1.5 flex items-center gap-2">
+                                        <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Pembahasan Rancangan & Penjelasan Prof. Soepomo
+                                    </h3>
+                                    <p class="text-gray-300 text-xs sm:text-sm leading-relaxed">
+                                        Prof. Dr. Soepomo memberikan penjelasan pasal demi pasal mengenai paham <em>Negara Integralistik/Kekeluargaan</em>, kedaulatan rakyat, bentuk negara kesatuan, dan sistem pemerintahan Indonesia merdeka.
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <!-- Center Node Pin -->
+                            <div class="absolute left-6 md:left-1/2 -translate-x-1/2 top-4 md:top-auto w-10 h-10 rounded-full bg-slate-950 border-2 border-emerald-500 text-emerald-400 flex items-center justify-center text-sm shadow-[0_0_15px_rgba(16,185,129,0.6)] group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-slate-950 transition-all duration-300 z-10">
+                                <i class="fa-solid fa-landmark text-xs"></i>
+                            </div>
+                            
+                            <!-- Right Empty Spacer on Desktop -->
+                            <div class="hidden md:block md:w-1/2 md:pl-10"></div>
+                        </div>
+
+                        <!-- Milestone 6: 16 Juli 1945 (Right on Desktop - Puncak Final) -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center group">
+                            <!-- Left Empty Spacer on Desktop -->
+                            <div class="hidden md:block md:w-1/2 md:pr-10"></div>
+                            
+                            <!-- Center Node Pin (Celebratory) -->
+                            <div class="absolute left-6 md:left-1/2 -translate-x-1/2 top-4 md:top-auto w-12 h-12 rounded-full bg-gradient-to-tr from-yellow-500 to-amber-600 border-2 border-yellow-300 text-slate-950 flex items-center justify-center text-base shadow-[0_0_20px_rgba(234,179,8,0.8)] group-hover:scale-110 transition-all duration-300 z-10 animate-pulse">
+                                <i class="fa-solid fa-star text-sm"></i>
+                            </div>
+
+                            <!-- Content Right (Celebratory Golden Box) -->
+                            <div class="md:w-1/2 md:pl-10 pl-14 md:pl-0 w-full">
+                                <div class="bg-gradient-to-br from-amber-500/20 via-orange-500/25 to-yellow-500/20 p-5 md:p-6 rounded-2xl border-2 border-amber-400/60 shadow-[0_0_25px_rgba(245,158,11,0.25)] hover:border-amber-400 transition-all duration-300 transform group-hover:-translate-y-1 relative overflow-hidden">
+                                    <div class="absolute -right-8 -top-8 w-24 h-24 bg-yellow-400/10 rounded-full blur-xl pointer-events-none"></div>
+                                    <div class="flex items-center justify-between gap-2 mb-2">
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-yellow-500 to-amber-500 text-slate-950 font-black text-xs rounded-full shadow-md">
+                                            🌟 16 Juli 1945
+                                        </span>
+                                        <span class="text-[11px] text-amber-300 font-extrabold bg-amber-500/20 px-2.5 py-0.5 rounded-lg border border-amber-400/40">
+                                            Puncak Kesepakatan Final
+                                        </span>
+                                    </div>
+                                    <h3 class="text-white font-black text-base md:text-lg mb-1.5 flex items-center gap-2">
+                                        <i class="fa-solid fa-crown text-yellow-400 text-sm"></i> Penerimaan Naskah UUD 1945 Secara Bulat & Aklamasi
+                                    </h3>
+                                    <p class="text-amber-100/90 text-xs sm:text-sm leading-relaxed">
+                                        Seluruh anggota BPUPKI secara aklamasi menerima dan menyetujui seluruh naskah rancangan UUD NRI 1945. Sidang ditutup dengan suasana haru, tepuk tangan sukacita, dan linangan air mata persatuan para tokoh bangsa.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== VIDEO PEMBELAJARAN DUNIA 2 LEVEL 3 ===== -->
+            <section class="section-card p-6 md:p-8 bg-gradient-to-br from-slate-900/90 via-slate-850/80 to-slate-900/90 border border-orange-500/30 shadow-2xl">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 rounded-2xl bg-orange-500/20 text-orange-400 flex items-center justify-center text-xl border border-orange-500/30 shadow-md">
+                        <i class="fa-solid fa-circle-play"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-orange-400">Video Edukasi</span>
+                        <h2 class="text-xl md:text-2xl font-bold text-white">Video Pembelajaran: Perjalanan Perumusan UUD 1945</h2>
+                    </div>
+                </div>
+
+                <p class="text-gray-300 text-sm leading-relaxed mb-6">
+                    Saksikan tayangan video berikut untuk memahami lebih mendalam peristiwa bersejarah sidang 10–16 Juli 1945, dinamika perumusan pasal-pasal konstitusi, hingga penerimaan naskah secara aklamasi!
+                </p>
+
+                <!-- Video Player Container -->
+                <div class="relative overflow-hidden rounded-2xl border-2 border-orange-500/40 shadow-2xl bg-slate-950/80 group">
+                    <video 
+                        id="video-player"
+                        controls 
+                        preload="metadata"
+                        class="w-full max-h-[460px] object-contain mx-auto rounded-xl bg-black shadow-inner focus:outline-none"
+                    >
+                        <source src="Video 2 Dunia 2 fiks.mp4" type="video/mp4">
+                        Peramban Anda tidak mendukung pemutar video HTML5.
+                    </video>
+                </div>
+
+                <!-- Video Description / Info Badge -->
+                <div class="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs text-gray-400 bg-slate-950/60 p-3.5 rounded-xl border border-gray-800">
+                    <div class="flex items-center gap-2 text-orange-300 font-semibold">
+                        <i class="fa-solid fa-film"></i>
+                        <span>Video 2 Dunia 2 · Perjalanan Perumusan UUD 1945</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-gray-400">
+                        <i class="fa-solid fa-headphones text-yellow-400"></i>
+                        <span>Gunakan earphone / speaker untuk kualitas audio optimal</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== SECTION 2: AKTIVITAS INTERAKTIF SISWA ===== -->
+            <section class="section-card p-6 md:p-8">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl border border-amber-500/30">
+                        <i class="fa-solid fa-puzzle-piece"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-amber-400">Aktivitas Interaktif Siswa</span>
+                        <h2 class="text-xl md:text-2xl font-bold text-white">Rekonstruksi Kronologi Naskah (13–16 Juli 1945)</h2>
+                    </div>
+                </div>
+
+                <p class="text-gray-300 text-xs sm:text-sm leading-relaxed mb-6">
+                    Susunlah kartu-kartu peristiwa sejarah di bawah ini ke dalam slot tanggal sidang yang tepat. Klik kartu lalu klik slot target, atau seret kartu (drag & drop).
+                </p>
+
+                <!-- Card Bank (Pilihan Acak) -->
+                <div class="mb-8">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">
+                        <i class="fa-solid fa-layer-group"></i> Bank Kartu Peristiwa (Pilih & Pasangkan)
+                    </h3>
+                    <div id="reconstruct-bank" class="grid grid-cols-1 sm:grid-cols-2 gap-3 min-h-[100px] p-4 bg-gray-900/80 rounded-2xl border border-gray-700/80">
+                        
+                        <!-- Card 14 Juli -->
+                        <div id="card-14-juli" data-target="slot-14-juli" draggable="true" ondragstart="handleRCDragStart(event)" onclick="handleRCCardClick(this)" class="reconstruct-card p-3.5 bg-gray-800 hover:bg-gray-750 border border-gray-600 rounded-xl text-left shadow-md">
+                            <span class="inline-block px-2 py-0.5 bg-blue-500/20 text-blue-300 font-bold text-[10px] rounded-md mb-1">
+                                Laporan 3 Naskah
+                            </span>
+                            <p class="text-xs text-gray-200 font-medium leading-snug">
+                                Ir. Soekarno membacakan laporan resmi berisi Pernyataan Indonesia Merdeka, Pembukaan UUD, dan Batang Tubuh UUD (42 pasal).
+                            </p>
+                        </div>
+
+                        <!-- Card 16 Juli -->
+                        <div id="card-16-juli" data-target="slot-16-juli" draggable="true" ondragstart="handleRCDragStart(event)" onclick="handleRCCardClick(this)" class="reconstruct-card p-3.5 bg-gray-800 hover:bg-gray-750 border border-gray-600 rounded-xl text-left shadow-md">
+                            <span class="inline-block px-2 py-0.5 bg-yellow-500/20 text-yellow-300 font-bold text-[10px] rounded-md mb-1">
+                                Kesepakatan Final Aklamasi
+                            </span>
+                            <p class="text-xs text-gray-200 font-medium leading-snug">
+                                Naskah Rancangan UUD secara bulat dan aklamasi disetujui & diterima oleh seluruh anggota BPUPKI dengan suasana haru.
+                            </p>
+                        </div>
+
+                        <!-- Card 13 Juli -->
+                        <div id="card-13-juli" data-target="slot-13-juli" draggable="true" ondragstart="handleRCDragStart(event)" onclick="handleRCCardClick(this)" class="reconstruct-card p-3.5 bg-gray-800 hover:bg-gray-750 border border-gray-600 rounded-xl text-left shadow-md">
+                            <span class="inline-block px-2 py-0.5 bg-purple-500/20 text-purple-300 font-bold text-[10px] rounded-md mb-1">
+                                Penyerahan Draf Tim 7
+                            </span>
+                            <p class="text-xs text-gray-200 font-medium leading-snug">
+                                Prof. Soepomo menyerahkan draf naskah UUD dan dibentuk Panitia Penghalus Bahasa (Soepomo, Hoesein Djajadiningrat, Agus Salim).
+                            </p>
+                        </div>
+
+                        <!-- Card 15 Juli -->
+                        <div id="card-15-juli" data-target="slot-15-juli" draggable="true" ondragstart="handleRCDragStart(event)" onclick="handleRCCardClick(this)" class="reconstruct-card p-3.5 bg-gray-800 hover:bg-gray-750 border border-gray-600 rounded-xl text-left shadow-md">
+                            <span class="inline-block px-2 py-0.5 bg-emerald-500/20 text-emerald-300 font-bold text-[10px] rounded-md mb-1">
+                                Penjelasan Negara Integralistik
+                            </span>
+                            <p class="text-xs text-gray-200 font-medium leading-snug">
+                                Pembahasan Bab demi Bab rancangan UUD serta penjelasan mendalam oleh Prof. Soepomo tentang asas kekeluargaan.
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Target Slots Grid -->
+                <div class="space-y-4">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-orange-400">
+                        <i class="fa-solid fa-clock"></i> Tempatkan Sesuai Urutan Tanggal:
+                    </h3>
+
+                    <!-- Slot 13 Juli -->
+                    <div class="bg-gray-900/60 p-4 rounded-2xl border border-gray-700/80">
+                        <div class="flex items-center gap-2 mb-2 font-bold text-xs text-orange-400">
+                            <span class="w-5 h-5 rounded-full bg-orange-500/20 flex items-center justify-center text-[10px]">1</span>
+                            <span>Sidang Panitia Perancang — 13 Juli 1945</span>
+                        </div>
+                        <div id="slot-13-juli" ondragover="handleRCDragOver(event)" ondragleave="handleRCDragLeave(event)" ondrop="handleRCDrop(event)" onclick="handleRCSlotClick(this)" class="reconstruct-slot rounded-xl p-3 flex items-center justify-center text-gray-500 text-xs text-center border-dashed">
+                            Tempatkan peristiwa & naskah 13 Juli di sini
+                        </div>
+                    </div>
+
+                    <!-- Slot 14 Juli -->
+                    <div class="bg-gray-900/60 p-4 rounded-2xl border border-gray-700/80">
+                        <div class="flex items-center gap-2 mb-2 font-bold text-xs text-orange-400">
+                            <span class="w-5 h-5 rounded-full bg-orange-500/20 flex items-center justify-center text-[10px]">2</span>
+                            <span>Sidang Pleno BPUPKI — 14 Juli 1945</span>
+                        </div>
+                        <div id="slot-14-juli" ondragover="handleRCDragOver(event)" ondragleave="handleRCDragLeave(event)" ondrop="handleRCDrop(event)" onclick="handleRCSlotClick(this)" class="reconstruct-slot rounded-xl p-3 flex items-center justify-center text-gray-500 text-xs text-center border-dashed">
+                            Tempatkan peristiwa & naskah 14 Juli di sini
+                        </div>
+                    </div>
+
+                    <!-- Slot 15 Juli -->
+                    <div class="bg-gray-900/60 p-4 rounded-2xl border border-gray-700/80">
+                        <div class="flex items-center gap-2 mb-2 font-bold text-xs text-orange-400">
+                            <span class="w-5 h-5 rounded-full bg-orange-500/20 flex items-center justify-center text-[10px]">3</span>
+                            <span>Sidang Pleno Lanjutan — 15 Juli 1945</span>
+                        </div>
+                        <div id="slot-15-juli" ondragover="handleRCDragOver(event)" ondragleave="handleRCDragLeave(event)" ondrop="handleRCDrop(event)" onclick="handleRCSlotClick(this)" class="reconstruct-slot rounded-xl p-3 flex items-center justify-center text-gray-500 text-xs text-center border-dashed">
+                            Tempatkan peristiwa & filosofi 15 Juli di sini
+                        </div>
+                    </div>
+
+                    <!-- Slot 16 Juli -->
+                    <div class="bg-gray-900/60 p-4 rounded-2xl border border-gray-700/80">
+                        <div class="flex items-center gap-2 mb-2 font-bold text-xs text-orange-400">
+                            <span class="w-5 h-5 rounded-full bg-orange-500/20 flex items-center justify-center text-[10px]">4</span>
+                            <span>Sidang Pleno Pengambilan Keputusan — 16 Juli 1945</span>
+                        </div>
+                        <div id="slot-16-juli" ondragover="handleRCDragOver(event)" ondragleave="handleRCDragLeave(event)" ondrop="handleRCDrop(event)" onclick="handleRCSlotClick(this)" class="reconstruct-slot rounded-xl p-3 flex items-center justify-center text-gray-500 text-xs text-center border-dashed">
+                            Tempatkan peristiwa & kesepakatan final 16 Juli di sini
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Controls -->
+                <div class="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <button onclick="checkReconstructTimeline()" class="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-bold rounded-xl shadow-lg shadow-orange-600/30 transition transform hover:scale-105 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-circle-check"></i> Periksa Hasil Rekonstruksi
+                    </button>
+                    <button onclick="resetReconstructTimeline()" class="w-full sm:w-auto px-6 py-3.5 bg-gray-800 hover:bg-gray-700 text-gray-300 font-semibold rounded-xl border border-gray-700 transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-rotate-left"></i> Reset Susunan
+                    </button>
+                </div>
+
+                <!-- Feedback Message -->
+                <div id="reconstruct-feedback" class="hidden mt-6 p-4 rounded-xl text-center font-bold text-sm"></div>
+            </section>
+
+            <!-- ===== SECTION 3: CTA KE KUIS LEVEL 7 (GATED) ===== -->
+            <div id="quiz-cta-container" class="py-6"></div>
+
+            <!-- NAVIGASI LEVEL (SEBELUMNYA & SELANJUTNYA) -->
+            <div class="mt-8 pt-6 border-t border-gray-800">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <a href="dunia2-level2.html" class="w-full sm:w-auto px-5 py-3 bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white font-bold rounded-xl border border-gray-700 transition flex items-center justify-center gap-2 text-xs sm:text-sm">
+                        <i class="fa-solid fa-chevron-left"></i> Sebelumnya: Level 6
+                    </a>
+                    
+                    <a href="dunia2.html" class="text-xs text-gray-400 hover:text-white flex items-center gap-1.5 font-semibold">
+                        <i class="fa-solid fa-map"></i> Peta Dunia 2 (Level 7/20)
+                    </a>
+
+                    <a href="dunia2-level4.html" class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white font-bold rounded-xl shadow-lg shadow-red-600/30 transition transform hover:scale-105 flex items-center justify-center gap-2 text-xs sm:text-sm">
+                        Selanjutnya: Level 8 (Boss) <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-brand-dark text-gray-400 py-8 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-sm text-center flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-2">
+                <img src="Logo Edukacivic.png" alt="EdukaCivic" class="h-6 w-auto">
+                <span class="font-bold text-white">Eduka<span class="text-brand-red">Civic</span></span>
+            </div>
+            <p>&copy; 2026 EdukaCivic | Fadilatul Fajri</p>
+        </div>
+    </footer>
+
+    <script>
+        // Reading progress tracker
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const pct = docHeight > 0 ? Math.min(100, Math.round((scrollTop / docHeight) * 100)) : 0;
+            document.getElementById('read-bar').style.width = pct + '%';
+            document.getElementById('read-pct').textContent = pct + '%';
+        });
+
+        // Rekonstruksi Naskah Drag & Drop / Click-to-slot Logic
+        let draggedRCCard = null;
+        let selectedRCCard = null;
+
+        function handleRCDragStart(e) {
+            draggedRCCard = e.target;
+            e.dataTransfer.setData('text/plain', e.target.id);
+        }
+
+        function handleRCDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('drag-over');
+        }
+
+        function handleRCDragLeave(e) {
+            e.currentTarget.classList.remove('drag-over');
+        }
+
+        function handleRCDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+            const targetSlot = e.currentTarget;
+            if (draggedRCCard) {
+                placeRCCard(draggedRCCard, targetSlot);
+                draggedRCCard = null;
+            }
+        }
+
+        function handleRCCardClick(card) {
+            if (selectedRCCard === card) {
+                card.classList.remove('selected');
+                selectedRCCard = null;
+            } else {
+                document.querySelectorAll('.reconstruct-card').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                selectedRCCard = card;
+            }
+        }
+
+        function handleRCSlotClick(slot) {
+            if (selectedRCCard) {
+                placeRCCard(selectedRCCard, slot);
+                selectedRCCard.classList.remove('selected');
+                selectedRCCard = null;
+            }
+        }
+
+        function placeRCCard(card, slot) {
+            if (slot.children.length > 0) {
+                const existing = slot.children[0];
+                document.getElementById('reconstruct-bank').appendChild(existing);
+            }
+            slot.innerHTML = '';
+            slot.appendChild(card);
+        }
+
+        function checkReconstructTimeline() {
+            const slots = ['slot-13-juli', 'slot-14-juli', 'slot-15-juli', 'slot-16-juli'];
+            let correctCount = 0;
+            let filledCount = 0;
+
+            slots.forEach(slotId => {
+                const slot = document.getElementById(slotId);
+                slot.classList.remove('correct', 'wrong');
+
+                if (slot.children.length > 0) {
+                    filledCount++;
+                    const card = slot.children[0];
+                    if (card.dataset.target === slotId) {
+                        slot.classList.add('correct');
+                        correctCount++;
+                    } else {
+                        slot.classList.add('wrong');
+                    }
+                }
+            });
+
+            const fb = document.getElementById('reconstruct-feedback');
+            fb.classList.remove('hidden');
+
+            if (correctCount === 4) {
+                playSound('victory');
+                triggerConfetti();
+                fb.className = 'mt-6 p-4 rounded-xl text-center font-bold text-sm bg-green-500/20 border border-green-500/40 text-green-300';
+                fb.innerHTML = '🎉 Luar Biasa! Semua tahapan rekonstruksi naskah Soepomo (13–16 Juli 1945) telah kamu susun dengan sempurna!';
+
+                // Mark activity as done & unlock quiz CTA
+                sessionStorage.setItem('edukacivic_act_d2l3', 'true');
+                setQuizButtonUnlocked('d2l3', 'dunia2-level3-kuis.html', 'quiz-cta-container');
+
+            } else if (filledCount < 4) {
+                playSound('wrong');
+                fb.className = 'mt-6 p-4 rounded-xl text-center font-bold text-sm bg-yellow-500/20 border border-yellow-500/40 text-yellow-300';
+                fb.innerHTML = `⚠️ Baru ${filledCount} dari 4 slot tanggal yang terisi (${correctCount} benar). Tempatkan seluruh kartu ya!`;
+            } else {
+                playSound('wrong');
+                fb.className = 'mt-6 p-4 rounded-xl text-center font-bold text-sm bg-red-500/20 border border-red-500/40 text-red-300';
+                fb.innerHTML = `💪 ${correctCount} dari 4 urutan tanggal tepat. Periksa kartu pada kotak bertanda merah!`;
+            }
+        }
+
+        function resetReconstructTimeline() {
+            const bank = document.getElementById('reconstruct-bank');
+            const cards = document.querySelectorAll('.reconstruct-card');
+            cards.forEach(c => {
+                c.classList.remove('selected');
+                bank.appendChild(c);
+            });
+
+            const defaultTexts = {
+                'slot-13-juli': 'Tempatkan peristiwa & naskah 13 Juli di sini',
+                'slot-14-juli': 'Tempatkan peristiwa & naskah 14 Juli di sini',
+                'slot-15-juli': 'Tempatkan peristiwa & filosofi 15 Juli di sini',
+                'slot-16-juli': 'Tempatkan peristiwa & kesepakatan final 16 Juli di sini'
+            };
+
+            for (const [slotId, text] of Object.entries(defaultTexts)) {
+                const slot = document.getElementById(slotId);
+                slot.classList.remove('correct', 'wrong', 'drag-over');
+                slot.innerHTML = text;
+            }
+
+            document.getElementById('reconstruct-feedback').classList.add('hidden');
+            selectedRCCard = null;
+            draggedRCCard = null;
+        }
+
+        function triggerConfetti() {
+            try {
+                confetti({
+                    particleCount: 80,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            } catch(e) {}
+        }
+
+        // Initialize gating on load
+        document.addEventListener('DOMContentLoaded', () => {
+            initInteractiveActivityGating('d2l3', 'dunia2-level3-kuis.html', 'quiz-cta-container');
+            updateNavbarStudent();
+        });
+    </script>
+</body>
+</html>

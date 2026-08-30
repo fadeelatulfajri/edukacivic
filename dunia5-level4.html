@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level 20: 🏆 FINAL BOSS — Duta Konstitusi Muda - EdukaCivic</title>
+    <link rel="icon" type="image/png" href="Logo Edukacivic.png">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800;900&family=Great+Vibes&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="student-system.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                        cinzel: ['Cinzel', 'serif'],
+                        script: ['"Great Vibes"', 'cursive']
+                    },
+                    colors: {
+                        brand: {
+                            emerald: '#10B981', emeraldLight: '#34D399', emeraldDark: '#059669',
+                            teal: '#14B8A6',
+                            gold: '#F59E0B', goldLight: '#FBBF24', goldDark: '#D97706',
+                            dark: '#0F172A', darker: '#020617', light: '#F8FAFC'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0F172A; }
+        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4B5563; }
+
+        .boss-card {
+            background: rgba(15, 23, 42, 0.88);
+            backdrop-filter: blur(14px);
+            border: 2px solid rgba(245, 158, 11, 0.5);
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 35px -5px rgba(245, 158, 11, 0.2);
+        }
+
+        .gold-glow {
+            animation: goldGlowAnim 3s infinite alternate ease-in-out;
+        }
+        @keyframes goldGlowAnim {
+            0% { box-shadow: 0 0 15px rgba(245, 158, 11, 0.3); }
+            100% { box-shadow: 0 0 35px rgba(245, 158, 11, 0.7); }
+        }
+
+        /* Luxury Certificate Paper */
+        .cert-paper {
+            background-color: #FFFDF8;
+            background-image: 
+                radial-gradient(#F3E8CB 1px, transparent 1px),
+                radial-gradient(#F3E8CB 1px, #FFFDF8 1px);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+            border: 12px solid #1E293B;
+            outline: 5px solid #D97706;
+            outline-offset: -9px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 50px rgba(245, 158, 11, 0.3);
+        }
+
+        @media print {
+            body {
+                background: #FFFFFF !important;
+                color: #000000 !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            nav, header, footer, #materi-section, #ikrar-section, #quiz-section, #btn-actions, #nav-bar, .nav-level-bar {
+                display: none !important;
+            }
+            #certificate-area {
+                display: block !important;
+                margin: 0 auto !important;
+                width: 100% !important;
+                box-shadow: none !important;
+                page-break-inside: avoid;
+            }
+            .cert-paper {
+                box-shadow: none !important;
+                border: 8px solid #1E293B !important;
+                outline: 4px solid #D97706 !important;
+            }
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            padding: 1rem;
+        }
+        .modal-box {
+            animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes modalPop {
+            0% { opacity: 0; transform: scale(0.9) translateY(15px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+    </style>
+    <script>
+        function getProgress() {
+            try { return JSON.parse(localStorage.getItem('edukacivic_progress')) || { poin: 0, level: 1, dunia: 5, completedLevels: [] }; }
+            catch(e) { return { poin: 0, level: 1, dunia: 5, completedLevels: [] }; }
+        }
+        const prog = getProgress();
+        if (!prog.completedLevels || !prog.completedLevels.includes('d5l3')) {
+            window.location.href = 'dunia5.html';
+        }
+    </script>
+    <script>
+        if (typeof isLevelUnlocked === "function" && !isLevelUnlocked("d5l4")) {
+            alert("🔒 Level ini masih terkunci! Selesaikan Level 19 terlebih dahulu.");
+            window.location.href = "index.html";
+        }
+    </script>
+</head>
+<body class="bg-brand-darker text-white font-sans antialiased min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-slate-950">
+
+    <!-- Web Audio Synthesizer -->
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            try {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'click') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(440, now);
+                    osc.frequency.setValueAtTime(660, now + 0.05);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                    osc.start(now);
+                    osc.stop(now + 0.1);
+                } else if (type === 'correct') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.setValueAtTime(659.25, now + 0.08);
+                    osc.frequency.setValueAtTime(783.99, now + 0.16);
+                    osc.frequency.setValueAtTime(1046.50, now + 0.24);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.45);
+                    osc.start(now);
+                    osc.stop(now + 0.45);
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, now);
+                    osc.frequency.exponentialRampToValueAtTime(120, now + 0.25);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                } else if (type === 'fanfare') {
+                    [523.25, 659.25, 783.99, 1046.5, 1318.51, 1567.98].forEach((freq, i) => {
+                        const o = audioCtx.createOscillator();
+                        const g = audioCtx.createGain();
+                        o.connect(g);
+                        o.type = 'triangle';
+                        o.frequency.setValueAtTime(freq, now + i * 0.12);
+                        g.gain.setValueAtTime(0.35, now + i * 0.12);
+                        g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.12 + 0.5);
+                        o.start(now + i * 0.12);
+                        o.stop(now + i * 0.12 + 0.5);
+                    });
+                }
+            } catch(e) {}
+        }
+    </script>
+
+    <!-- NAVBAR -->
+    <nav id="nav-bar" class="fixed w-full z-50 bg-brand-dark/95 backdrop-blur-md border-b border-gray-800 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                
+                <div class="flex items-center gap-4">
+                    <a href="dunia5.html" class="flex items-center gap-2 text-gray-400 hover:text-white transition-colors group">
+                        <div class="w-9 h-9 bg-gray-800 border border-gray-700 rounded-xl flex items-center justify-center group-hover:bg-gray-700 transition-colors">
+                            <i class="fa-solid fa-arrow-left text-sm text-amber-400"></i>
+                        </div>
+                        <span class="text-sm font-medium hidden sm:inline">Peta Dunia 5</span>
+                    </a>
+                    <div class="w-px h-8 bg-gray-800"></div>
+                    <a href="index.html" class="flex items-center gap-2">
+                        <img src="Logo Edukacivic.png" alt="EdukaCivic" class="h-8 w-auto">
+                        <span class="font-bold text-lg text-white hidden sm:inline">Eduka<span class="text-amber-400">Civic</span></span>
+                    </a>
+                </div>
+                
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 px-3.5 py-1.5 rounded-full">
+                        <i class="fa-solid fa-crown text-yellow-400 text-xs"></i>
+                        <span class="text-yellow-400 font-black text-xs uppercase tracking-wider">Puncak · Level 20</span>
+                    </div>
+                    <div class="flex items-center gap-2 bg-gray-800/90 px-3.5 py-1.5 rounded-xl border border-gray-700 shadow-inner">
+                        <i class="fa-solid fa-bolt text-yellow-400 text-xs"></i>
+                        <span id="nav-poin" class="text-yellow-400 font-bold text-sm">0</span>
+                        <span class="text-gray-500 text-xs">Poin</span>
+                    </div>
+                    
+                    <!-- Avatar Button -->
+                    <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-amber-500 via-yellow-400 to-emerald-400 p-0.5 cursor-pointer shadow-md transform hover:scale-105 transition" onclick="window.location.href='profil-siswa.html'">
+                        <img id="nav-avatar-img" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Student" alt="Avatar" class="w-full h-full rounded-full bg-slate-900 object-cover">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </nav>
+    <script>document.getElementById('nav-poin').textContent = prog.poin || 0;</script>
+
+    <!-- HERO SECTION -->
+    <header class="relative pt-24 pb-10 overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-amber-950/40 via-brand-darker to-brand-darker pointer-events-none"></div>
+        <div class="absolute top-20 right-10 w-96 h-96 bg-amber-500/15 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 relative z-10 text-center">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/15 border border-amber-500/40 mb-3 shadow-lg shadow-amber-900/30">
+                <i class="fa-solid fa-crown text-yellow-400 text-xs"></i>
+                <span class="text-xs font-black text-amber-300 tracking-widest uppercase">LEVEL 20 · GRAND FINALE MASTER BATTLE</span>
+            </div>
+            
+            <h1 class="text-3xl md:text-5xl font-black leading-tight mb-4">
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-amber-400 to-orange-400">FINAL BOSS: Warga Negara Taat Konstitusi</span>
+            </h1>
+            
+            <p class="text-gray-300 text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
+                Puncak petualangan seluruh 20 Level EdukaCivic! Kuasai rangkuman komprehensif <strong>Dunia 1 sampai Dunia 5</strong>, canangkan Ikrar Digital Taat Konstitusi, taklukkan 20 Soal Ujian Master, dan raih <strong>Piagam Duta Konstitusi Muda Indonesia</strong>!
+            </p>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-grow pb-16 px-4">
+        <div class="max-w-4xl mx-auto space-y-10">
+
+            <!-- ===== SECTION 1: MATERI PENGUATAN AKHIR (MASTERY RECAP BAB 2) ===== -->
+            <section id="materi-section" class="boss-card p-6 md:p-8 gold-glow">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-yellow-400 flex items-center justify-center text-xl border border-amber-500/30">
+                        <i class="fa-solid fa-gem"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-amber-400">Mastery Recap Bab 2</span>
+                        <h2 class="text-xl md:text-2xl font-bold text-white">Rangkuman Akhir: Kesepakatan Luhur & Karakter Bangsa</h2>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5 text-xs sm:text-sm">
+                    
+                    <!-- Box 1: Kesepakatan Luhur -->
+                    <div class="bg-gray-900/90 border border-amber-500/40 p-5 rounded-2xl flex flex-col justify-between shadow-lg">
+                        <div>
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="text-2xl">🇮🇩</span>
+                                <h3 class="text-base font-black text-amber-300">Kesepakatan Luhur</h3>
+                            </div>
+                            <p class="text-gray-300 leading-relaxed text-xs">
+                                <strong>Komitmen Mempertahankan Pembukaan UUD 1945:</strong> Memuat dasar falsafah Pancasila dan cita-cita proklamasi. Mengubah Pembukaan sama artinya dengan membubarkan NKRI.
+                            </p>
+                        </div>
+                        <div class="mt-4 p-2.5 bg-slate-950/80 rounded-xl border border-slate-800 text-[11px] text-amber-200">
+                            🛡️ <strong>Pasal 37 ayat (5):</strong> Bentuk NKRI tidak dapat diubah!
+                        </div>
+                    </div>
+
+                    <!-- Box 2: Karakter Warga Negara Ideal -->
+                    <div class="bg-gray-900/90 border border-amber-500/40 p-5 rounded-2xl flex flex-col justify-between shadow-lg">
+                        <div>
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="text-2xl">🌟</span>
+                                <h3 class="text-base font-black text-amber-300">Karakter Warga Ideal</h3>
+                            </div>
+                            <p class="text-gray-300 leading-relaxed text-xs">
+                                Berjiwa <strong>nasionalis</strong>, berwawasan luas, menjunjung tinggi supremasi hukum, dan secara sadar mengamalkan konstitusi di lingkungan diri, keluarga, sekolah, dan masyarakat.
+                            </p>
+                        </div>
+                        <div class="mt-4 p-2.5 bg-slate-950/80 rounded-xl border border-slate-800 text-[11px] text-emerald-300">
+                            🏆 <strong>Misi:</strong> Aksi Nyata Duta Konstitusi Muda!
+                        </div>
+                    </div>
+
+                    <!-- Box 3: Supremasi & Jalur Konstitusional -->
+                    <div class="bg-gray-900/90 border border-amber-500/40 p-5 rounded-2xl flex flex-col justify-between shadow-lg">
+                        <div>
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="text-2xl">⚖️</span>
+                                <h3 class="text-base font-black text-amber-300">Supremasi Hukum</h3>
+                            </div>
+                            <p class="text-gray-300 leading-relaxed text-xs">
+                                Semua peraturan wajib bersumber pada UUD 1945 (UU No. 12 Tahun 2011). Semua tuntutan hak diselesaikan lewat musyawarah atau jalur peradilan resmi (MK/MA).
+                            </p>
+                        </div>
+                        <div class="mt-4 p-2.5 bg-slate-950/80 rounded-xl border border-slate-800 text-[11px] text-yellow-300">
+                            🏛️ <strong>Asas:</strong> Lex Superior Derogat Legi Inferiori
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- ===== GAMBAR LEVEL 20: DUTA KONSTITUSI MUDA ===== -->
+                <div class="mt-6 flex flex-col md:flex-row items-center gap-6 bg-gradient-to-tr from-amber-950/80 via-slate-900 to-yellow-950/60 p-6 rounded-2xl border border-amber-500/40 text-center md:text-left shadow-xl">
+                    <!-- Image Box -->
+                    <div class="w-full md:w-1/2 flex justify-center">
+                        <div class="relative group rounded-2xl overflow-hidden border-2 border-amber-500/50 shadow-2xl cursor-pointer max-w-sm" onclick="openImageModal()">
+                            <img src="Level 20.jfif" alt="Infografis Duta Konstitusi Muda - Level 20" class="w-full h-auto object-contain rounded-xl transform group-hover:scale-105 transition duration-300">
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 text-white font-bold text-xs backdrop-blur-xs">
+                                <i class="fa-solid fa-magnifying-glass-plus text-lg"></i>
+                                <span>Klik untuk Memperbesar Gambar</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Description Box -->
+                    <div class="w-full md:w-1/2 space-y-3">
+                        <span class="inline-block bg-amber-500/20 text-yellow-300 text-xs font-bold px-3 py-1 rounded-full uppercase border border-amber-500/40">
+                            Lencana Kehormatan Level 20
+                        </span>
+                        <h3 class="text-xl font-bold text-white">Duta Konstitusi Muda EdukaCivic</h3>
+                        <p class="text-xs text-gray-300 leading-relaxed">
+                            Simbol kehormatan tertinggi bagi siswa yang telah menguasai seluruh hakikat perumusan, pengesahan, kedudukan tata urutan peraturan, dan pengamalan nyata UUD NRI Tahun 1945.
+                        </p>
+                        <div class="p-3 bg-slate-950/80 rounded-xl border border-slate-800 text-xs text-amber-300">
+                            🦅 <strong>Garuda Pancasila:</strong> Simbol kedaulatan, persatuan, dan keadilan sosial bagi seluruh rakyat Indonesia!
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Image Modal for Fullscreen View -->
+            <div id="image-modal" class="modal-overlay hidden" onclick="closeImageModal()">
+                <div class="modal-box relative max-w-4xl w-full p-2 bg-gray-900/95 border-2 border-amber-500 rounded-2xl" onclick="event.stopPropagation()">
+                    <button onclick="closeImageModal()" class="absolute -top-4 -right-4 w-10 h-10 bg-red-600 hover:bg-red-500 text-white rounded-full flex items-center justify-center text-lg font-bold shadow-xl border-2 border-white z-10 transition">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                    <img src="Level 20.jfif" alt="Infografis Level 20" class="w-full max-h-[85vh] object-contain rounded-xl">
+                </div>
+            </div>
+
+            <!-- ===== SECTION 2: AKTIVITAS IKRAR DIGITAL TAAT KONSTITUSI ===== -->
+            <section id="ikrar-section" class="boss-card p-6 md:p-8 border-2 border-yellow-500/60 shadow-2xl">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 rounded-2xl bg-yellow-500/20 text-yellow-400 flex items-center justify-center text-2xl border border-yellow-500/30">
+                        <i class="fa-solid fa-scroll"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-amber-400">Aktivitas Pra-Boss</span>
+                        <h2 class="text-xl sm:text-2xl font-black text-white">Penyusunan Ikrar Digital Taat Konstitusi</h2>
+                    </div>
+                </div>
+
+                <p class="text-gray-300 text-xs sm:text-sm mb-6 leading-relaxed">
+                    Centang seluruh 4 pilar komitmen aksi nyata ketaatan konstitusi di bawah ini sebelum memasuki medan Ujian Final Boss 20 Level:
+                </p>
+
+                <div class="space-y-3 mb-6 text-xs sm:text-sm">
+                    <!-- Ikrar 1 -->
+                    <label class="flex items-start gap-3 p-4 bg-slate-900/90 rounded-2xl border border-gray-700 hover:border-amber-400/60 cursor-pointer transition">
+                        <input type="checkbox" id="ikrar-1" onchange="checkIkrarProgress()" class="form-checkbox h-5 w-5 text-amber-500 rounded bg-slate-950 border-gray-600 focus:ring-amber-500 mt-0.5 shrink-0">
+                        <div>
+                            <strong class="text-amber-300">1. Lingkup Diri Sendiri:</strong>
+                            <p class="text-gray-300 text-xs mt-0.5 leading-relaxed">Saya berjanji akan senantiasa bersikap jujur, disiplin, berakhlak mulia, dan menjunjung tinggi nilai integritas moral berbangsa.</p>
+                        </div>
+                    </label>
+
+                    <!-- Ikrar 2 -->
+                    <label class="flex items-start gap-3 p-4 bg-slate-900/90 rounded-2xl border border-gray-700 hover:border-amber-400/60 cursor-pointer transition">
+                        <input type="checkbox" id="ikrar-2" onchange="checkIkrarProgress()" class="form-checkbox h-5 w-5 text-amber-500 rounded bg-slate-950 border-gray-600 focus:ring-amber-500 mt-0.5 shrink-0">
+                        <div>
+                            <strong class="text-amber-300">2. Lingkup Keluarga:</strong>
+                            <p class="text-gray-300 text-xs mt-0.5 leading-relaxed">Saya berjanji akan membiasakan musyawarah mufakat, bersikap sopan santun kepada orang tua, dan menjaga kerukunan anggota keluarga.</p>
+                        </div>
+                    </label>
+
+                    <!-- Ikrar 3 -->
+                    <label class="flex items-start gap-3 p-4 bg-slate-900/90 rounded-2xl border border-gray-700 hover:border-amber-400/60 cursor-pointer transition">
+                        <input type="checkbox" id="ikrar-3" onchange="checkIkrarProgress()" class="form-checkbox h-5 w-5 text-amber-500 rounded bg-slate-950 border-gray-600 focus:ring-amber-500 mt-0.5 shrink-0">
+                        <div>
+                            <strong class="text-amber-300">3. Lingkup Sekolah:</strong>
+                            <p class="text-gray-300 text-xs mt-0.5 leading-relaxed">Saya berjanji akan mengikuti upacara bendera dengan khidmat (Pasal 30), belajar giat (Pasal 31), dan mematuhi seluruh tata tertib sekolah.</p>
+                        </div>
+                    </label>
+
+                    <!-- Ikrar 4 -->
+                    <label class="flex items-start gap-3 p-4 bg-slate-900/90 rounded-2xl border border-gray-700 hover:border-amber-400/60 cursor-pointer transition">
+                        <input type="checkbox" id="ikrar-4" onchange="checkIkrarProgress()" class="form-checkbox h-5 w-5 text-amber-500 rounded bg-slate-950 border-gray-600 focus:ring-amber-500 mt-0.5 shrink-0">
+                        <div>
+                            <strong class="text-amber-300">4. Lingkup Masyarakat & Negara:</strong>
+                            <p class="text-gray-300 text-xs mt-0.5 leading-relaxed">Saya berjanji akan hidup rukun antarumat beragama, taat aturan hukum (Pasal 27), dan mendukung pembangunan negara (Pasal 23A).</p>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="text-center">
+                    <button id="btn-submit-ikrar" disabled onclick="activateFinalQuiz()" class="w-full sm:w-auto px-8 py-4 bg-gray-700 text-gray-400 font-extrabold rounded-2xl text-sm transition shadow-lg cursor-not-allowed flex items-center justify-center gap-2 mx-auto">
+                        <i class="fa-solid fa-lock"></i> Kunci Ikrar & Mulai Final Boss Battle (20 Soal Master)
+                    </button>
+                </div>
+            </section>
+
+            <!-- ===== SECTION 3: FINAL BOSS MASTER QUIZ BATTLE (20 SOAL LEVEL 1-20) ===== -->
+            <section id="quiz-section" class="hidden boss-card p-6 md:p-8 border-2 border-amber-500/70 shadow-2xl">
+                <!-- Header Box with World & Level Track -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 pb-4 border-b border-gray-700">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-yellow-400 flex items-center justify-center text-xl border border-amber-500/40">
+                            👑
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span id="boss-dunia-badge" class="px-2.5 py-0.5 text-[10px] font-extrabold uppercase rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">Dunia 1</span>
+                                <span id="boss-level-badge" class="text-xs font-bold text-amber-400">Level 1: Hakikat Konstitusi</span>
+                            </div>
+                            <h3 class="text-base font-black text-white">UJIAN PAMUNGKAS FINAL BOSS (20 LEVEL)</h3>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-3">
+                        <div class="text-right">
+                            <span id="boss-q-badge" class="bg-amber-500/20 text-yellow-300 text-xs font-black px-3 py-1 rounded-full uppercase border border-amber-500/40">
+                                Soal 1 / 20
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="space-y-1 mb-6">
+                    <div class="flex justify-between text-[11px] font-bold text-gray-400">
+                        <span>Progres Ujian Master: <span id="boss-percent" class="text-amber-400">5%</span></span>
+                        <span>Skor Benar: <span id="boss-live-score" class="text-emerald-400">0</span> / 20</span>
+                    </div>
+                    <div class="w-full h-3 bg-gray-900 rounded-full overflow-hidden border border-gray-800 p-0.5">
+                        <div id="boss-bar" class="h-full bg-gradient-to-r from-yellow-500 via-amber-500 to-emerald-500 rounded-full transition-all duration-300" style="width: 5%"></div>
+                    </div>
+                </div>
+
+                <!-- Question Box -->
+                <div class="mb-6 bg-slate-900/60 p-4 sm:p-5 rounded-2xl border border-slate-800">
+                    <span id="boss-q-topic" class="inline-block text-[11px] font-black text-amber-300 uppercase tracking-widest mb-1.5">
+                        🎯 TOPIK: LEVEL 1
+                    </span>
+                    <h2 id="boss-q-text" class="text-base sm:text-lg font-bold text-white leading-relaxed">
+                        Memuat soal final...
+                    </h2>
+                </div>
+
+                <!-- Options -->
+                <div id="boss-options-box" class="space-y-3">
+                    <!-- Injected here -->
+                </div>
+
+                <!-- Feedback -->
+                <div id="boss-feedback" class="hidden mt-4 p-4 rounded-xl text-xs sm:text-sm font-semibold leading-relaxed"></div>
+            </section>
+
+            <!-- ===== SECTION 4: PIAGAM SERTIFIKAT KELULUSAN DIGITAL ===== -->
+            <div id="certificate-area" class="hidden space-y-6">
+                
+                <div class="text-center py-2">
+                    <h2 class="text-2xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-amber-400 to-yellow-200 animate-pulse">
+                        🎉 SELAMAT! KAMU RESMI MENJADI DUTA KONSTITUSI MUDA! 🎉
+                    </h2>
+                    <p class="text-xs sm:text-sm text-gray-300 mt-1">
+                        Seluruh 5 Dunia & 20 Level EdukaCivic telah berhasil kamu taklukkan dengan predikat Sangat Memuaskan!
+                    </p>
+                </div>
+
+                <!-- CERTIFICATE CARD CONTAINER -->
+                <div id="cert-container" class="cert-paper rounded-3xl p-6 sm:p-12 text-slate-900 relative overflow-hidden max-w-3xl mx-auto shadow-2xl">
+                    
+                    <!-- Decorative Corner Accents -->
+                    <div class="absolute top-4 left-4 w-12 h-12 border-t-4 border-l-4 border-amber-600 rounded-tl-xl"></div>
+                    <div class="absolute top-4 right-4 w-12 h-12 border-t-4 border-r-4 border-amber-600 rounded-tr-xl"></div>
+                    <div class="absolute bottom-4 left-4 w-12 h-12 border-b-4 border-l-4 border-amber-600 rounded-bl-xl"></div>
+                    <div class="absolute bottom-4 right-4 w-12 h-12 border-b-4 border-r-4 border-amber-600 rounded-br-xl"></div>
+
+                    <!-- Inner Content -->
+                    <div class="relative z-10 text-center py-4">
+                        
+                        <!-- Header Logo & Title -->
+                        <div class="flex items-center justify-center gap-3 mb-2">
+                            <img src="Logo Edukacivic.png" alt="EdukaCivic" class="h-10 w-auto">
+                            <span class="text-xl font-black tracking-tight text-slate-900 font-cinzel">EDUKACIVIC INDONESIA</span>
+                        </div>
+
+                        <h2 class="text-2xl sm:text-4xl font-black text-amber-900 uppercase tracking-widest font-cinzel mt-2 mb-1">
+                            PIAGAM PENGHARGAAN
+                        </h2>
+                        <p id="cert-no-val" class="text-xs sm:text-sm text-amber-800 font-semibold tracking-widest uppercase">
+                            Nomor Sertifikat: EDC/2026/KNST/VIII
+                        </p>
+
+                        <div class="w-32 h-1 bg-gradient-to-r from-transparent via-amber-600 to-transparent mx-auto my-4"></div>
+
+                        <p class="text-xs sm:text-sm text-gray-700 font-serif italic mb-2">
+                            Piagam ini dengan bangga dianugerahkan kepada:
+                        </p>
+
+                        <!-- Student Avatar & Name Block -->
+                        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 my-4">
+                            <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-tr from-amber-500 via-yellow-400 to-emerald-400 p-1 shadow-lg border-2 border-amber-600/40 shrink-0">
+                                <img id="cert-avatar-img" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Student" alt="Avatar Siswa" class="w-full h-full rounded-full bg-slate-900 object-cover">
+                            </div>
+                            <div class="text-center sm:text-left">
+                                <h3 id="cert-student-name" class="text-2xl sm:text-4xl font-black text-slate-950 border-b-2 border-amber-600 pb-1 font-serif tracking-wide italic inline-block">
+                                    Siswa Teladan EdukaCivic
+                                </h3>
+                                <p id="cert-school-kelas" class="text-xs sm:text-sm text-slate-800 font-bold mt-1">
+                                    SMP Negeri 5 Purwokerto · Kelas VIII
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <p class="text-xs sm:text-sm text-gray-700 max-w-xl mx-auto leading-relaxed mb-6">
+                            Telah berhasil menuntaskan seluruh kurikulum materi dan ujian interaktif Pembelajaran PPKn <strong>Bab 2: Bentuk dan Kedaulatan Negara Serta Tata Urutan Peraturan Perundang-undangan (20 Level Mastery)</strong>, dan secara resmi dinobatkan sebagai:
+                        </p>
+
+                        <!-- Badge Title -->
+                        <div class="inline-block bg-gradient-to-r from-amber-600 to-yellow-500 text-white font-black text-sm sm:text-lg px-8 py-2.5 rounded-full shadow-lg border-2 border-yellow-200 tracking-wider font-cinzel mb-8">
+                            ★ DUTA KONSTITUSI MUDA INDONESIA ★
+                        </div>
+
+                        <!-- Signatures & Points Footer -->
+                        <div class="grid grid-cols-3 items-end pt-4 border-t border-amber-300 text-xs text-slate-900 font-serif">
+                            
+                            <!-- Date & City -->
+                            <div class="text-center">
+                                <p class="text-[11px] text-gray-600">Purwokerto,</p>
+                                <p id="cert-date-val" class="font-bold text-xs border-b border-slate-700 pb-1 mb-1 mt-4">25 Agustus 2026</p>
+                                <p class="text-[10px] text-gray-600">Tanggal Kelulusan</p>
+                            </div>
+
+                            <!-- Total Score Badge Seal -->
+                            <div class="text-center">
+                                <div class="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-tr from-amber-600 to-yellow-400 rounded-full mx-auto flex flex-col items-center justify-center text-white border-4 border-yellow-100 shadow-xl mb-1">
+                                    <span id="cert-total-poin" class="font-black text-base sm:text-xl leading-none">500+</span>
+                                    <span class="text-[9px] font-bold uppercase tracking-wider">POIN</span>
+                                </div>
+                                <p class="text-[10px] font-bold text-amber-900">Nilai: SANGAT BAIK</p>
+                            </div>
+
+                            <!-- Teacher Signature -->
+                            <div class="text-center">
+                                <p class="text-[11px] text-gray-600">Guru Pembimbing / Kreator:</p>
+                                <p class="font-bold text-sm text-slate-950 border-b border-slate-700 pb-1 mb-1 font-script text-base sm:text-lg">
+                                    Fadilatul Fajri
+                                </p>
+                                <p class="text-[10px] text-gray-600">Fadilatul Fajri, S.Pd.</p>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- ACTION BUTTONS -->
+                <div id="btn-actions" class="flex flex-wrap items-center justify-center gap-4 pt-4">
+                    <button onclick="window.print()" class="px-8 py-4 bg-gradient-to-r from-amber-600 to-yellow-500 hover:from-amber-500 hover:to-yellow-400 text-slate-950 font-black rounded-2xl text-sm shadow-xl shadow-amber-600/30 transition transform hover:scale-105 flex items-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-print text-lg"></i> Cetak / Simpan PDF Sertifikat
+                    </button>
+                    <a href="profil-siswa.html" class="px-6 py-4 bg-slate-800 hover:bg-slate-700 text-gray-200 font-bold rounded-2xl text-sm border border-gray-700 transition flex items-center gap-2">
+                        <i class="fa-solid fa-award text-yellow-400"></i> Lihat Rapor & Lencana Lengkap
+                    </a>
+                    <a href="index.html" class="px-6 py-4 bg-slate-800 hover:bg-slate-700 text-gray-200 font-bold rounded-2xl text-sm border border-gray-700 transition flex items-center gap-2">
+                        <i class="fa-solid fa-house"></i> Kembali ke Beranda Utama
+                    </a>
+                </div>
+
+                <!-- NAVIGASI LEVEL (SEBELUMNYA & SELANJUTNYA) -->
+                <div class="nav-level-bar mt-8 pt-6 border-t border-gray-800">
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <a href="dunia5-level3.html" class="w-full sm:w-auto px-5 py-3 bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white font-bold rounded-xl border border-gray-700 transition flex items-center justify-center gap-2 text-xs sm:text-sm">
+                            <i class="fa-solid fa-chevron-left"></i> Sebelumnya: Level 19
+                        </a>
+                        
+                        <a href="dunia5.html" class="text-xs text-gray-400 hover:text-white flex items-center gap-1.5 font-semibold">
+                            <i class="fa-solid fa-map"></i> Peta Dunia 5 (Level 20/20 · Puncak)
+                        </a>
+
+                        <a href="index.html" class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-yellow-500 via-amber-600 to-orange-600 hover:from-yellow-400 hover:to-amber-500 text-slate-950 font-black rounded-xl shadow-lg shadow-yellow-500/30 transition transform hover:scale-105 flex items-center justify-center gap-2 text-xs sm:text-sm">
+                            <i class="fa-solid fa-house"></i> Beranda EdukaCivic <i class="fa-solid fa-chevron-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-brand-dark text-gray-400 py-6 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 text-xs text-center flex flex-col md:flex-row justify-between items-center gap-3">
+            <div class="flex items-center gap-2">
+                <img src="Logo Edukacivic.png" alt="EdukaCivic" class="h-6 w-auto">
+                <span class="font-bold text-white">Eduka<span class="text-amber-400">Civic</span></span>
+            </div>
+            <p>&copy; 2026 EdukaCivic | Fadilatul Fajri · SMP Negeri 5 Purwokerto</p>
+        </div>
+    </footer>
+
+    <!-- FINAL BOSS JAVASCRIPT ENGINE (20 SOAL MASTER DARI LEVEL 1 - 20) -->
+    <script>
+        // Check Ikrar Boxes
+        function checkIkrarProgress() {
+            playSound('click');
+            const c1 = document.getElementById('ikrar-1').checked;
+            const c2 = document.getElementById('ikrar-2').checked;
+            const c3 = document.getElementById('ikrar-3').checked;
+            const c4 = document.getElementById('ikrar-4').checked;
+
+            const btn = document.getElementById('btn-submit-ikrar');
+            if (c1 && c2 && c3 && c4) {
+                btn.disabled = false;
+                btn.className = 'w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-amber-600 to-yellow-500 hover:from-amber-500 hover:to-yellow-400 text-slate-950 font-black rounded-2xl text-sm shadow-xl shadow-amber-600/30 transition transform hover:scale-105 flex items-center justify-center gap-2 mx-auto cursor-pointer';
+                btn.innerHTML = '<i class="fa-solid fa-unlock"></i> Ikrar Lengkap! Mulai Final Boss Battle (20 Soal Master)';
+            } else {
+                btn.disabled = true;
+                btn.className = 'w-full sm:w-auto px-8 py-4 bg-gray-700 text-gray-400 font-extrabold rounded-2xl text-sm transition shadow-lg cursor-not-allowed flex items-center justify-center gap-2 mx-auto';
+                btn.innerHTML = '<i class="fa-solid fa-lock"></i> Centang Semua 4 Komitmen untuk Membuka Final Battle';
+            }
+        }
+
+        function activateFinalQuiz() {
+            playSound('fanfare');
+            document.getElementById('ikrar-section').classList.add('hidden');
+            document.getElementById('quiz-section').classList.remove('hidden');
+            document.getElementById('quiz-section').scrollIntoView({ behavior: 'smooth' });
+            loadBossQuestion();
+        }
+
+        // 20 MASTER BOSS QUESTIONS COVERING LEVEL 1 TO LEVEL 20
+        const bossQuestions = [
+            // === DUNIA 1: HAKIKAT & KLASIFIKASI KONSTITUSI (LEVEL 1 - 4) ===
+            {
+                level: "Level 1: Hakikat Konstitusi",
+                dunia: "Dunia 1",
+                duniaColor: "bg-blue-500/20 text-blue-300 border-blue-500/30",
+                q: "1. Istilah konstitusi berasal dari bahasa Prancis 'constituer' dan bahasa Belanda 'Grondwet'. Apa makna harfiah dari 'constituer'?",
+                opts: [
+                    "Mengubah aturan dan hukum negara",
+                    "Membentuk, menyusun, dan mendirikan suatu negara",
+                    "Membubarkan lembaga pemerintahan",
+                    "Menghukum para pelanggar tata tertib"
+                ],
+                ans: 1,
+                exp: "Konstitusi berasal dari kata 'constituer' (Prancis) yang berarti membentuk/menyusun negara, serta 'Grondwet' (Belanda) yang berarti undang-undang dasar."
+            },
+            {
+                level: "Level 2: Nilai & Fungsi Konstitusi",
+                dunia: "Dunia 1",
+                duniaColor: "bg-blue-500/20 text-blue-300 border-blue-500/30",
+                q: "2. Suatu konstitusi yang secara hukum sah berlaku, tetapi dalam praktiknya hanya dijadikan formalitas oleh penguasa untuk mempertahankan kekuasaan, memiliki nilai...",
+                opts: [
+                    "Nilai Normatif",
+                    "Nilai Nominal",
+                    "Nilai Semantik",
+                    "Nilai Filosofis"
+                ],
+                ans: 2,
+                exp: "Nilai semantik berarti konstitusi hanya menjadi formalitas/kedok semata demi kepentingan kekuasaan penguasa."
+            },
+            {
+                level: "Level 3: Klasifikasi Konstitusi",
+                dunia: "Dunia 1",
+                duniaColor: "bg-blue-500/20 text-blue-300 border-blue-500/30",
+                q: "3. Hukum dasar tidak tertulis yang timbul dan senantiasa terpelihara dalam praktik ketatanegaraan (seperti Pidato Kenegaraan Presiden setiap 16 Agustus) disebut...",
+                opts: [
+                    "Yurisprudensi",
+                    "Konvensi Ketatanegaraan",
+                    "Doktrin Hukum",
+                    "Traktat Internasional"
+                ],
+                ans: 1,
+                exp: "Konvensi ketatanegaraan adalah hukum dasar tidak tertulis yang dipatuhi dan dipelihara dalam penyelenggaraan negara."
+            },
+            {
+                level: "Level 4: Boss Dunia 1 (Supreme Law)",
+                dunia: "Dunia 1",
+                duniaColor: "bg-blue-500/20 text-blue-300 border-blue-500/30",
+                q: "4. Mengapa UUD NRI Tahun 1945 berkedudukan sebagai hukum dasar tertinggi (Supreme Law) di Indonesia?",
+                opts: [
+                    "Karena seluruh peraturan perundang-undangan di bawahnya harus bersumber dan tidak boleh bertentangan dengan UUD 1945",
+                    "Karena UUD 1945 hanya boleh dibaca oleh Presiden dan menteri",
+                    "Karena naskah aslinya dibuat di tempat yang tinggi",
+                    "Karena tidak boleh dipelajari oleh siswa sekolah"
+                ],
+                ans: 0,
+                exp: "Sebagai Supreme Law, UUD NRI Tahun 1945 merupakan sumber hukum positif tertinggi dan tolok ukur keabsahan semua aturan di Indonesia."
+            },
+
+            // === DUNIA 2: PERUMUSAN UUD NRI TAHUN 1945 (LEVEL 5 - 8) ===
+            {
+                level: "Level 5: Mengenal BPUPKI",
+                dunia: "Dunia 2",
+                duniaColor: "bg-orange-500/20 text-orange-300 border-orange-500/30",
+                q: "5. Apa nama resmi BPUPKI dalam bahasa Jepang dan siapakah tokoh yang ditunjuk memimpin sidang sebagai ketuanya?",
+                opts: [
+                    "Dokuritsu Junbi Inkai — diketuai Ir. Soekarno",
+                    "Dokuritsu Junbi Cosakai — diketuai Dr. K.R.T. Radjiman Wedyodiningrat",
+                    "Chuo Sangi In — diketuai Drs. Mohammad Hatta",
+                    "Jawa Hokokai — diketuai Mr. Soepomo"
+                ],
+                ans: 1,
+                exp: "BPUPKI bernama resmi Dokuritsu Junbi Cosakai, diresmikan 29 April 1945, dan dipimpin oleh Dr. K.R.T. Radjiman Wedyodiningrat."
+            },
+            {
+                level: "Level 6: Tokoh & Panitia Perancang",
+                dunia: "Dunia 2",
+                duniaColor: "bg-orange-500/20 text-orange-300 border-orange-500/30",
+                q: "6. Pada masa Sidang II BPUPKI, dibentuk Panitia Perancang UUD (19 orang) dan Panitia Kecil Perancang UUD (7 orang) yang bertugas merancang pasal-pasal batang tubuh yang diketuai oleh...",
+                opts: [
+                    "Prof. Dr. Mr. Soepomo",
+                    "Mr. Achmad Soebardjo",
+                    "Mr. A.A. Maramis",
+                    "H. Agus Salim"
+                ],
+                ans: 0,
+                exp: "Prof. Dr. Mr. Soepomo mengetuai Panitia Kecil 7 Orang yang bertugas merumuskan pasal-pasal Batang Tubuh UUD."
+            },
+            {
+                level: "Level 7: Kronologi Perumusan",
+                dunia: "Dunia 2",
+                duniaColor: "bg-orange-500/20 text-orange-300 border-orange-500/30",
+                q: "7. Pada tanggal 22 Juni 1945, Panitia Sembilan berhasil menyepakati naskah rancangan Pembukaan UUD yang sangat bersejarah, yaitu...",
+                opts: [
+                    "Dekrit Presiden",
+                    "Piagam Jakarta (Jakarta Charter)",
+                    "Teks Proklamasi",
+                    "Maklumat Pemerintah No. X"
+                ],
+                ans: 1,
+                exp: "Panitia Sembilan merumuskan Piagam Jakarta (Jakarta Charter) pada 22 Juni 1945 yang memuat lima sila dasar negara."
+            },
+            {
+                level: "Level 8: Boss Dunia 2 (Laporan BPUPKI)",
+                dunia: "Dunia 2",
+                duniaColor: "bg-orange-500/20 text-orange-300 border-orange-500/30",
+                q: "8. Tiga hasil kerja penting yang dilaporkan oleh Ir. Soekarno pada sidang pleno BPUPKI 14 Juli 1945 adalah...",
+                opts: [
+                    "Pernyataan Indonesia Merdeka, Pembukaan UUD, dan Batang Tubuh UUD (16 Bab, 37 Pasal)",
+                    "Pancasila, Lagu Kebangsaan, dan Lambang Garuda",
+                    "Pembagian Provinsi, Kementerian, dan Tentara Nasional",
+                    "Mata Uang Rupiah, Bahasa Indonesia, dan Bendera Pusaka"
+                ],
+                ans: 0,
+                exp: "Ir. Soekarno melaporkan 3 hasil pokok: 1) Pernyataan Indonesia Merdeka, 2) Pembukaan UUD, 3) Batang Tubuh UUD (16 Bab, 37 Pasal)."
+            },
+
+            // === DUNIA 3: PENGESAHAN UUD NRI TAHUN 1945 (LEVEL 9 - 12) ===
+            {
+                level: "Level 9: Mengenal PPKI",
+                dunia: "Dunia 3",
+                duniaColor: "bg-rose-500/20 text-rose-300 border-rose-500/30",
+                q: "9. Kapan PPKI (Dokuritsu Junbi Inkai) resmi dibentuk dan siapakah pimpinannya?",
+                opts: [
+                    "1 Maret 1945 — Radjiman Wedyodiningrat",
+                    "22 Juni 1945 — Panitia Sembilan",
+                    "7 Agustus 1945 — Ir. Soekarno (Ketua) & Drs. Mohammad Hatta (Wakil Ketua)",
+                    "17 Agustus 1945 — Sutan Sjahrir"
+                ],
+                ans: 2,
+                exp: "PPKI dibentuk 7 Agustus 1945 dengan 27 tokoh nasionalis dipimpin Ir. Soekarno dan Drs. Mohammad Hatta."
+            },
+            {
+                level: "Level 10: Sikap Toleransi Pengesahan",
+                dunia: "Dunia 3",
+                duniaColor: "bg-rose-500/20 text-rose-300 border-rose-500/30",
+                q: "10. Jiwa toleransi dan kenegarawanan luhur para tokoh bangsa terbukti pada 18 Agustus 1945 saat menyepakati perubahan 7 kata sila pertama Piagam Jakarta menjadi...",
+                opts: [
+                    "Ketuhanan Yang Maha Esa",
+                    "Ketuhanan yang beradab dan berkeadilan",
+                    "Ketuhanan dengan kewajiban syariat",
+                    "Ketuhanan yang berkebudayaan"
+                ],
+                ans: 0,
+                exp: "Bung Hatta bersama para tokoh Islam bermusyawarah mengubah rumusan menjadi 'Ketuhanan Yang Maha Esa' demi menjaga persatuan NKRI."
+            },
+            {
+                level: "Level 11: Tiga Keputusan Sidang PPKI",
+                dunia: "Dunia 3",
+                duniaColor: "bg-rose-500/20 text-rose-300 border-rose-500/30",
+                q: "11. Tiga keputusan bersejarah Sidang Pertama PPKI pada 18 Agustus 1945 di Gedung Tyuuoo Sangi-in adalah...",
+                opts: [
+                    "Membentuk TNI, menetapkan mata uang rupiah, dan menyusun kabinet",
+                    "Mengesahkan UUD 1945, Memilih Presiden (Sukarno) & Wapres (Hatta), dan Membentuk KNIP",
+                    "Membagi 8 provinsi, merumuskan teks proklamasi, dan membentuk PNI",
+                    "Menetapkan lambang Garuda, lagu Indonesia Raya, dan bendera Merah Putih"
+                ],
+                ans: 1,
+                exp: "3 Keputusan PPKI 18 Agustus 1945: 1) Mengesahkan UUD 1945, 2) Memilih Presiden & Wapres secara aklamasi, 3) Membentuk KNIP."
+            },
+            {
+                level: "Level 12: Boss Dunia 3 (Peran KNIP)",
+                dunia: "Dunia 3",
+                duniaColor: "bg-rose-500/20 text-rose-300 border-rose-500/30",
+                q: "12. Apakah peran utama Komite Nasional Indonesia Pusat (KNIP) yang dibentuk pada 18 Agustus 1945?",
+                opts: [
+                    "Mengadili para penjahat perang di pengadilan militer",
+                    "Membantu tugas Presiden dan menjalankan fungsi legislatif sementara sebelum MPR/DPR resmi terbentuk",
+                    "Mengawasi perdagangan antar pulau",
+                    "Menjadi organisasi kepemudaan olahraga"
+                ],
+                ans: 1,
+                exp: "KNIP dibentuk untuk membantu Presiden dan menjalankan fungsi legislatif sebelum lembaga perwakilan (MPR/DPR) terpilih lewat Pemilu."
+            },
+
+            // === DUNIA 4: KEKUATAN & HIERARKI HUKUM UUD (LEVEL 13 - 16) ===
+            {
+                level: "Level 13: Sifat UUD NRI 1945",
+                dunia: "Dunia 4",
+                duniaColor: "bg-purple-500/20 text-purple-300 border-purple-500/30",
+                q: "13. UUD NRI Tahun 1945 memiliki sifat 'singkat dan supel'. Apa makna dari sifat tersebut?",
+                opts: [
+                    "Naskahnya hanya memuat aturan-aturan pokok dan garis besar, serta fleksibel dikembangkan melalui UU pelaksana sesuai perkembangan zaman",
+                    "Dapat diubah kapan saja oleh presiden tanpa persetujuan rakyat",
+                    "Naskahnya pendek sehingga tidak memiliki kekuatan hukum",
+                    "Hanya berlaku untuk satu periode kepengurusan saja"
+                ],
+                ans: 0,
+                exp: "Singkat berarti memuat pokok pedoman negara, dan supel berarti fleksibel dikembangkan lewat peraturan perundang-undangan pelaksana."
+            },
+            {
+                level: "Level 14: Fungsi UUD & Lembaga Penguji",
+                dunia: "Dunia 4",
+                duniaColor: "bg-purple-500/20 text-purple-300 border-purple-500/30",
+                q: "14. Sebagai 'Alat Kontrol' hukum, lembaga manakah yang berwenang menguji materi Undang-Undang (UU) terhadap UUD NRI Tahun 1945?",
+                opts: [
+                    "Mahkamah Agung (MA)",
+                    "Dewan Perwakilan Rakyat (DPR)",
+                    "Mahkamah Konstitusi (MK)",
+                    "Komisi Pemberantasan Korupsi (KPK)"
+                ],
+                ans: 2,
+                exp: "Mahkamah Konstitusi (MK) berwenang menguji UU terhadap UUD 1945, sedangkan Mahkamah Agung (MA) menguji peraturan di bawah UU terhadap UU."
+            },
+            {
+                level: "Level 15: Hierarki UU No. 12 Tahun 2011",
+                dunia: "Dunia 4",
+                duniaColor: "bg-purple-500/20 text-purple-300 border-purple-500/30",
+                q: "15. Berdasarkan asas 'Lex Superior Derogat Legi Inferiori', tata urutan peraturan perundang-undangan menuntut bahwa...",
+                opts: [
+                    "Peraturan daerah berkedudukan lebih tinggi dari Undang-Undang",
+                    "Peraturan yang tingkatannya lebih rendah tidak boleh bertentangan sama sekali dengan peraturan yang tingkatannya lebih tinggi",
+                    "Semua peraturan perundang-undangan memiliki kedudukan yang sama persis",
+                    "Peraturan Pemerintah otomatis menghapus UUD 1945"
+                ],
+                ans: 1,
+                exp: "Asas Lex Superior Derogat Legi Inferiori menegaskan aturan hukum yang lebih tinggi mengesampingkan dan menjadi dasar bagi aturan di bawahnya."
+            },
+            {
+                level: "Level 16: Boss Dunia 4 (Analisis Kasus Perda)",
+                dunia: "Dunia 4",
+                duniaColor: "bg-purple-500/20 text-purple-300 border-purple-500/30",
+                q: "16. Jika ada Peraturan Daerah (Perda) yang membatasi hak anak kurang mampu bersekolah di sekolah negeri, maka Perda tersebut...",
+                opts: [
+                    "Tetap sah karena daerah memiliki otonomi mutlak",
+                    "Batal demi hukum karena bertentangan dengan Pasal 31 ayat (1) UUD 1945 tentang hak setiap warga negara memperoleh pendidikan",
+                    "Sah jika disetujui dinas pendidikan setempat",
+                    "Boleh berlaku di sekolah swasta saja"
+                ],
+                ans: 1,
+                exp: "Perda tersebut tidak sah dan dapat dibatalkan oleh Mahkamah Agung karena bertentangan dengan hak asasi pendidikan Pasal 31 ayat (1) UUD 1945."
+            },
+
+            // === DUNIA 5: MENJADI WARGA NEGARA TAAT KONSTITUSI (LEVEL 17 - 20) ===
+            {
+                level: "Level 17: UUD dalam Kehidupan Sehari-hari",
+                dunia: "Dunia 5",
+                duniaColor: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
+                q: "17. Mengikuti upacara bendera hari Senin dan peringatan hari kemerdekaan dengan tertib di sekolah merupakan bentuk nyata pengamalan...",
+                opts: [
+                    "Pasal 30 ayat (1) tentang hak dan kewajiban bela negara serta pertahanan keamanan",
+                    "Pasal 33 ayat (1) tentang asas kekeluargaan ekonomi",
+                    "Pasal 29 ayat (2) tentang kebebasan beragama",
+                    "Pasal 23A tentang pajak dan retribusi"
+                ],
+                ans: 0,
+                exp: "Upacara bendera menumbuhkan rasa cinta tanah air dan semangat bela negara sesuai Pasal 30 ayat (1) UUD NRI 1945."
+            },
+            {
+                level: "Level 18: Hak & Kewajiban Sesuai Pasal",
+                dunia: "Dunia 5",
+                duniaColor: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
+                q: "18. Pasal 27 ayat (1) UUD NRI Tahun 1945 menegaskan prinsip mendasar negara hukum, yaitu...",
+                opts: [
+                    "Kebebasan berdagang tanpa batas",
+                    "Segala warga negara bersamaan kedudukannya di dalam hukum dan pemerintahan tanpa ada kecualinya (Equality Before The Law)",
+                    "Hak istimewa kebal hukum bagi pejabat negara",
+                    "Kebebasan mendirikan partai politik sebanyak-banyaknya"
+                ],
+                ans: 1,
+                exp: "Pasal 27 ayat (1) menjamin prinsip persamaan derajat di depan hukum dan pemerintahan bagi seluruh warga negara tanpa diskriminasi."
+            },
+            {
+                level: "Level 19: Misi Warga Negara (Pemecahan Masalah)",
+                dunia: "Dunia 5",
+                duniaColor: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
+                q: "19. Apabila terjadi perselisihan antarwarga di lingkungan tempat tinggal, tindakan yang paling mencerminkan ketaatan terhadap nilai konstitusi adalah...",
+                opts: [
+                    "Melakukan aksi main hakim sendiri (eigenrichting) dengan merusak fasilitas",
+                    "Mengutamakan dialog musyawarah mufakat difasilitasi pengurus RT/RW atau menempuh jalur hukum resmi",
+                    "Menghasut warga sekitar untuk mengucilkan pihak lain secara sepihak",
+                    "Memviralkan tuduhan di media sosial tanpa bukti yang sah"
+                ],
+                ans: 1,
+                exp: "Negara hukum melarang main hakim sendiri dan mewajibkan penyelesaian masalah melalui musyawarah mufakat atau jalur hukum yang sah."
+            },
+            {
+                level: "Level 20: Final Boss (Komitmen Kebangsaan)",
+                dunia: "Dunia 5",
+                duniaColor: "bg-amber-500/20 text-amber-300 border-amber-500/30",
+                q: "20. Mengapa bangsa Indonesia memiliki komitmen luhur untuk TIDAK PERNAH MENGUBAH bagian Pembukaan UUD NRI Tahun 1945?",
+                opts: [
+                    "Karena naskah aslinya sudah disimpan di museum",
+                    "Karena memuat dasar negara Pancasila dan tujuan proklamasi kemerdekaan (mengubah Pembukaan sama artinya dengan membubarkan NKRI)",
+                    "Karena dilarang oleh aturan hukum penjajah Belanda",
+                    "Karena hanya Presiden yang boleh membacanya"
+                ],
+                ans: 1,
+                exp: "Pembukaan UUD 1945 memuat dasar falsafah Pancasila dan dasar berdirinya NKRI. Mengubah Pembukaan sama dengan membubarkan Negara Kesatuan Republik Indonesia."
+            }
+        ];
+
+        let currentBossIdx = 0;
+        let bossScore = 0;
+        let bossAnswered = false;
+
+        function loadBossQuestion() {
+            bossAnswered = false;
+            const q = bossQuestions[currentBossIdx];
+            
+            document.getElementById('boss-dunia-badge').textContent = q.dunia;
+            document.getElementById('boss-dunia-badge').className = `px-2.5 py-0.5 text-[10px] font-extrabold uppercase rounded-full ${q.duniaColor}`;
+            document.getElementById('boss-level-badge').textContent = q.level;
+            document.getElementById('boss-q-topic').textContent = `🎯 TANTANGAN: ${q.level.toUpperCase()}`;
+            document.getElementById('boss-q-badge').textContent = `Soal ${currentBossIdx + 1} / ${bossQuestions.length}`;
+            
+            const progressPercent = Math.round(((currentBossIdx + 1) / bossQuestions.length) * 100);
+            document.getElementById('boss-bar').style.width = `${progressPercent}%`;
+            document.getElementById('boss-percent').textContent = `${progressPercent}%`;
+            document.getElementById('boss-live-score').textContent = bossScore;
+            document.getElementById('boss-q-text').textContent = q.q;
+
+            const fb = document.getElementById('boss-feedback');
+            fb.classList.add('hidden');
+
+            const box = document.getElementById('boss-options-box');
+            box.innerHTML = '';
+
+            q.opts.forEach((optText, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'opt-btn w-full text-left p-4 bg-slate-900/90 hover:bg-slate-800 border border-gray-700 hover:border-amber-500/50 rounded-2xl text-xs sm:text-sm text-gray-200 shadow-md flex items-start gap-3 transition cursor-pointer';
+                btn.innerHTML = `<span class="w-6 h-6 rounded-lg bg-amber-500/20 text-yellow-400 font-bold flex items-center justify-center shrink-0 text-xs mt-0.5">${String.fromCharCode(65 + idx)}</span> <span class="leading-relaxed">${optText}</span>`;
+                btn.onclick = () => checkBossAnswer(idx, btn);
+                box.appendChild(btn);
+            });
+        }
+
+        function checkBossAnswer(selectedIdx, btnEl) {
+            if (bossAnswered) return;
+            bossAnswered = true;
+
+            const q = bossQuestions[currentBossIdx];
+            const allBtns = document.querySelectorAll('#boss-options-box .opt-btn');
+            const fb = document.getElementById('boss-feedback');
+            fb.classList.remove('hidden');
+
+            if (selectedIdx === q.ans) {
+                bossScore++;
+                playSound('correct');
+                btnEl.classList.remove('bg-slate-900/90', 'border-gray-700');
+                btnEl.classList.add('bg-green-600/30', 'border-green-500', 'text-green-300');
+                fb.className = 'mt-4 p-4 rounded-xl text-xs sm:text-sm font-semibold bg-green-500/20 border border-green-500/40 text-green-300 leading-relaxed';
+                fb.innerHTML = `✅ <strong>Jawaban Tepat! (Level ${currentBossIdx + 1}):</strong> ${q.exp}`;
+            } else {
+                playSound('wrong');
+                btnEl.classList.remove('bg-slate-900/90', 'border-gray-700');
+                btnEl.classList.add('bg-red-600/30', 'border-red-500', 'text-red-300');
+                allBtns[q.ans].classList.remove('bg-slate-900/90', 'border-gray-700');
+                allBtns[q.ans].classList.add('bg-green-600/30', 'border-green-500', 'text-green-300');
+                fb.className = 'mt-4 p-4 rounded-xl text-xs sm:text-sm font-semibold bg-red-500/20 border border-red-500/40 text-red-300 leading-relaxed';
+                fb.innerHTML = `❌ <strong>Kurang Tepat. Kunci Jawaban (Level ${currentBossIdx + 1}):</strong> ${q.exp}`;
+            }
+
+            document.getElementById('boss-live-score').textContent = bossScore;
+
+            setTimeout(() => {
+                currentBossIdx++;
+                if (currentBossIdx < bossQuestions.length) {
+                    loadBossQuestion();
+                } else {
+                    finishFinalGame();
+                }
+            }, 2200);
+        }
+
+        function finishFinalGame() {
+            playCelebrationFanfare();
+            triggerCelebrationConfetti();
+            recordLevelCompleted('d5l4', 50);
+            document.getElementById('quiz-section').classList.add('hidden');
+            document.getElementById('materi-section').classList.add('hidden');
+            const certArea = document.getElementById('certificate-area');
+            certArea.classList.remove('hidden');
+
+            // Save Final Level 20 progress & Bonus Master points
+            const currentProg = getProgress();
+            if (!currentProg.completedLevels.includes('d5l4')) {
+                currentProg.completedLevels.push('d5l4');
+            }
+            // Reward 50 bonus XP for completing all 20 levels!
+            currentProg.poin = (currentProg.poin || 0) + 50;
+            localStorage.setItem('edukacivic_progress', JSON.stringify(currentProg));
+            document.getElementById('nav-poin').textContent = currentProg.poin;
+
+            // Populate Certificate Data & Avatar
+            const studentInfo = typeof getActiveStudent === 'function' ? getActiveStudent() : (JSON.parse(localStorage.getItem('edukacivic_siswa')) || { nama: 'Pelajar Taat Konstitusi', kelas: 'Kelas VIII', sekolah: 'SMP Negeri 5 Purwokerto' });
+            
+            const studentName = studentInfo.nama || 'Pelajar Taat Konstitusi';
+            document.getElementById('cert-student-name').textContent = studentName;
+            document.getElementById('cert-total-poin').textContent = currentProg.poin + ' Poin';
+
+            const rawKelas = studentInfo.kelas || 'VIII';
+            const displayKelas = rawKelas.startsWith('Kelas') ? rawKelas : 'Kelas ' + rawKelas;
+            const displaySekolah = studentInfo.sekolah || 'SMP Negeri 5 Purwokerto';
+            document.getElementById('cert-school-kelas').textContent = `${displaySekolah} · ${displayKelas}`;
+            
+            const certSuffix = rawKelas.replace(/\s+/g, '-').toUpperCase();
+            document.getElementById('cert-no-val').textContent = `Nomor Sertifikat: EDC/2026/KNST/${certSuffix}`;
+
+            // Certificate Avatar Sync
+            if (studentInfo.avatarUrl) {
+                const certAvatar = document.getElementById('cert-avatar-img');
+                if (certAvatar) certAvatar.src = studentInfo.avatarUrl;
+            }
+
+            const today = new Date();
+            const dateStr = today.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+            document.getElementById('cert-date-val').textContent = dateStr;
+
+            certArea.scrollIntoView({ behavior: 'smooth' });
+            playSound('fanfare');
+            triggerEpicConfetti();
+        }
+
+        function triggerEpicConfetti() {
+            try {
+                var duration = 5 * 1000;
+                var animationEnd = Date.now() + duration;
+                var defaults = { startVelocity: 35, spread: 360, ticks: 80, zIndex: 100 };
+                function randomInRange(min, max) { return Math.random() * (max - min) + min; }
+
+                var interval = setInterval(function() {
+                    var timeLeft = animationEnd - Date.now();
+                    if (timeLeft <= 0) return clearInterval(interval);
+                    var particleCount = 70 * (timeLeft / duration);
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.4), y: Math.random() - 0.2 } }));
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.6, 0.9), y: Math.random() - 0.2 } }));
+                }, 250);
+            } catch(e) {}
+        }
+
+        function openImageModal() {
+            document.getElementById('image-modal').classList.remove('hidden');
+        }
+
+        function closeImageModal() {
+            document.getElementById('image-modal').classList.add('hidden');
+        }
+
+        // Initialize student navbar and progress on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateNavbarStudent();
+            const studentInfo = typeof getActiveStudent === 'function' ? getActiveStudent() : (JSON.parse(localStorage.getItem('edukacivic_siswa')) || null);
+            if (studentInfo && studentInfo.avatarUrl) {
+                const certAvatar = document.getElementById('cert-avatar-img');
+                if (certAvatar) certAvatar.src = studentInfo.avatarUrl;
+            }
+        });
+    </script>
+</body>
+</html>

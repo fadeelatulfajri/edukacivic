@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kebijakan Privasi EdukaCivic</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="Logo Edukacivic.png">
+    <!-- Google Fonts Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="student-system.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            red: '#DC2626', redLight: '#EF4444', redDark: '#B91C1C',
+                            dark: '#0F172A', darker: '#020617', light: '#F8FAFC'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-brand-light text-brand-dark min-h-screen font-sans">
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <a href="index.html" class="flex items-center gap-3">
+                <img src="Logo Edukacivic.png" alt="EdukaCivic" class="h-10">
+                <span class="font-bold text-xl text-brand-dark">EdukaCivic</span>
+            </a>
+            <a href="index.html" class="text-brand-red hover:text-brand-redDark font-medium transition flex items-center gap-2">
+                <i class="fas fa-arrow-left"></i> Kembali ke Beranda
+            </a>
+        </div>
+    </header>
+
+    <main class="max-w-3xl mx-auto px-4 py-12">
+        <div class="bg-white p-8 md:p-10 rounded-2xl shadow-sm border border-gray-100">
+            <div class="text-center mb-8 pb-8 border-b border-gray-100">
+                <h1 class="text-3xl font-bold text-brand-dark mb-4">Kebijakan Privasi</h1>
+                <p class="text-gray-500 text-sm"><i class="far fa-calendar-alt mr-2"></i> Terakhir Diperbarui: Agustus 2026</p>
+            </div>
+
+            <div class="prose prose-brand max-w-none text-gray-600 space-y-6">
+                <p>EdukaCivic adalah platform pembelajaran pendidikan kewarganegaraan yang dikembangkan oleh <strong>Fadilatul Fajri</strong>. Kami sangat menghargai privasi pengguna kami dan berkomitmen untuk melindungi informasi pribadi Anda.</p>
+
+                <h3 class="text-xl font-bold text-brand-dark mt-8 mb-3">1. Data yang Kami Kumpulkan</h3>
+                <p>Kami hanya mengumpulkan informasi yang esensial untuk keperluan pembelajaran, yaitu:</p>
+                <ul class="list-disc pl-5 space-y-1">
+                    <li>Nama Siswa</li>
+                    <li>Nomor Absen</li>
+                </ul>
+
+                <h3 class="text-xl font-bold text-brand-dark mt-8 mb-3">2. Penyimpanan Data</h3>
+                <p>Seluruh data progres belajar dan kredensial login (nama & nomor absen) disimpan secara lokal di browser Anda (menggunakan <em>localStorage</em>). Kami tidak menyimpan data Anda di server eksternal, sehingga data Anda sepenuhnya berada dalam kendali perangkat yang Anda gunakan.</p>
+
+                <h3 class="text-xl font-bold text-brand-dark mt-8 mb-3">3. Penggunaan Data</h3>
+                <p>Data Anda hanya digunakan secara eksklusif untuk tujuan edukasi, termasuk:</p>
+                <ul class="list-disc pl-5 space-y-1">
+                    <li>Melacak progres belajar di setiap level dan dunia.</li>
+                    <li>Menyimpan poin dan tingkat lencana.</li>
+                    <li>Personalisasi pengalaman belajar di EdukaCivic.</li>
+                </ul>
+
+                <h3 class="text-xl font-bold text-brand-dark mt-8 mb-3">4. Berbagi Data</h3>
+                <p>Data Anda <strong>tidak pernah</strong> dibagikan, dijual, atau dipertukarkan dengan pihak ketiga manapun.</p>
+
+                <h3 class="text-xl font-bold text-brand-dark mt-8 mb-3">5. Kontak</h3>
+                <p>Jika Anda memiliki pertanyaan, kekhawatiran, atau masukan terkait kebijakan privasi ini, silakan hubungi <strong>Fadilatul Fajri</strong>.</p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-brand-dark text-white py-8 mt-12">
+        <div class="max-w-7xl mx-auto px-4 text-center text-sm text-gray-400">
+            &copy; 2026 EdukaCivic by Fadilatul Fajri. Semua hak dilindungi.
+        </div>
+    </footer>
+</body>
+</html>
+

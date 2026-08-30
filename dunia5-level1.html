@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level 17: Sikap Taat terhadap Konstitusi - EdukaCivic</title>
+    <link rel="icon" type="image/png" href="Logo Edukacivic.png">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="student-system.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            emerald: '#10B981', emeraldLight: '#34D399', emeraldDark: '#059669',
+                            teal: '#14B8A6', tealLight: '#2DD4BF',
+                            cyan: '#06B6D4',
+                            dark: '#0F172A', darker: '#020617', light: '#F8FAFC'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0b1512; }
+        ::-webkit-scrollbar-thumb { background: #065f46; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #059669; }
+
+        .section-card {
+            background: rgba(15, 31, 26, 0.88);
+            backdrop-filter: blur(14px);
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            border-radius: 1.5rem;
+        }
+
+        /* Mind Map Selects */
+        .map-select {
+            background: rgba(8, 20, 16, 0.9);
+            border: 2px solid rgba(16, 185, 129, 0.6);
+            border-radius: 0.75rem;
+            color: white;
+            padding: 0.5rem 0.75rem;
+            width: 100%;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+        .map-select:focus {
+            border-color: #34d399;
+            box-shadow: 0 0 12px rgba(52, 211, 153, 0.35);
+        }
+        .map-select.correct {
+            border-color: #10b981 !important;
+            background: rgba(16, 185, 129, 0.25) !important;
+            color: #ecfdf5 !important;
+        }
+        .map-select.wrong {
+            border-color: #ef4444 !important;
+            background: rgba(239, 68, 68, 0.25) !important;
+            color: #fef2f2 !important;
+            animation: shake 0.35s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            padding: 1rem;
+        }
+        .modal-box {
+            animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes modalPop {
+            0% { opacity: 0; transform: scale(0.9) translateY(15px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+    </style>
+    <script>
+        function getProgress() {
+            try { return JSON.parse(localStorage.getItem('edukacivic_progress')) || { poin: 0, level: 1, dunia: 5, completedLevels: [] }; }
+            catch(e) { return { poin: 0, level: 1, dunia: 5, completedLevels: [] }; }
+        }
+        const prog = getProgress();
+        if (!prog.completedLevels || !prog.completedLevels.includes('d4l4')) {
+            window.location.href = 'index.html';
+        }
+    </script>
+    <script>
+        if (typeof isLevelUnlocked === "function" && !isLevelUnlocked("d5l1")) {
+            alert("🔒 Level ini masih terkunci! Selesaikan Dunia 4 terlebih dahulu.");
+            window.location.href = "index.html";
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-b from-[#0b1b16] via-[#102922] to-[#08120e] text-white font-sans antialiased min-h-screen flex flex-col selection:bg-emerald-600 selection:text-white">
+
+    <!-- Web Audio Sound Effects -->
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            try {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'correct') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.15);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, now);
+                    osc.frequency.exponentialRampToValueAtTime(146.83, now + 0.2);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                }
+            } catch(e) {}
+        }
+    </script>
+
+    <!-- NAVBAR -->
+    <nav class="fixed w-full z-50 bg-[#0c1e18]/90 backdrop-blur-md border-b border-emerald-900/50 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                
+                <div class="flex items-center gap-4">
+                    <a href="dunia5.html" class="flex items-center gap-2 text-gray-400 hover:text-white transition-colors group">
+                        <div class="w-8 h-8 bg-emerald-950/80 border border-emerald-800/60 rounded-lg flex items-center justify-center group-hover:bg-emerald-900 transition-colors">
+                            <i class="fa-solid fa-arrow-left text-sm text-emerald-400"></i>
+                        </div>
+                        <span class="text-sm font-medium hidden sm:inline">Peta Dunia 5</span>
+                    </a>
+                    <div class="w-px h-8 bg-gray-800"></div>
+                    <a href="index.html" class="flex items-center gap-2">
+                        <img src="Logo Edukacivic.png" alt="EdukaCivic" class="h-8 w-auto">
+                        <span class="font-bold text-lg text-white hidden sm:inline">Eduka<span class="text-emerald-400">Civic</span></span>
+                    </a>
+                </div>
+                
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1.5 rounded-full">
+                        <i class="fa-solid fa-seedling text-emerald-400 text-xs"></i>
+                        <span class="text-emerald-400 font-bold text-xs">Dunia 5 · Level 17</span>
+                    </div>
+                    <div class="flex items-center gap-2 bg-emerald-950/80 px-3 py-1.5 rounded-lg border border-emerald-800/60">
+                        <i class="fa-solid fa-bolt text-yellow-400 text-xs"></i>
+                        <span id="nav-poin" class="text-yellow-400 font-bold text-sm">0</span>
+                        <span class="text-gray-500 text-xs">Poin</span>
+                    </div>
+                    <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-emerald-600 to-amber-400 p-0.5 cursor-pointer shadow-md" onclick="window.location.href='profil-siswa.html'">
+                        <img id="nav-avatar-img" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Student" alt="Avatar" class="w-full h-full rounded-full bg-slate-900 object-cover">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </nav>
+    <script>document.getElementById('nav-poin').textContent = prog.poin || 0;</script>
+
+    <!-- HERO SECTION -->
+    <section class="relative pt-24 pb-12 overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-emerald-950/30 via-[#0b1b16] to-[#0b1b16] pointer-events-none"></div>
+        <div class="absolute top-20 right-10 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 relative z-10 text-center">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 mb-4">
+                <i class="fa-solid fa-hand-holding-heart text-emerald-400 text-xs"></i>
+                <span class="text-xs font-bold text-emerald-400 tracking-widest uppercase">Level 17 · Dunia 5</span>
+            </div>
+            
+            <h1 class="text-3xl md:text-5xl font-extrabold leading-tight mb-4">
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-300">Sikap Taat terhadap Konstitusi</span>
+            </h1>
+            
+            <p class="text-gray-300 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
+                Ketaatan konstitusi bukan sekadar menghafal nomor pasal, melainkan <strong>mengamalkan nilai-nilai luhur UUD NRI Tahun 1945</strong> dalam tindakan nyata di lingkungan <strong>Keluarga</strong>, <strong>Sekolah</strong>, dan <strong>Masyarakat</strong>!
+            </p>
+
+            <!-- Reading progress bar -->
+            <div class="mt-6 max-w-sm mx-auto">
+                <div class="flex justify-between text-xs text-gray-500 mb-1">
+                    <span>Progres Membaca</span>
+                    <span id="read-pct">0%</span>
+                </div>
+                <div class="w-full h-1.5 bg-gray-900 rounded-full overflow-hidden border border-emerald-900/40">
+                    <div id="read-bar" class="h-full bg-gradient-to-r from-emerald-600 via-teal-500 to-amber-400 rounded-full transition-all duration-300" style="width:0%"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-grow pb-16 px-4">
+        <div class="max-w-4xl mx-auto space-y-10">
+
+            <!-- ===== SECTION 1: MATERI RECAP 3 LINGKUNGAN PENGAMALAN ===== -->
+            <section class="section-card p-6 md:p-8">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl border border-emerald-500/30">
+                        <i class="fa-solid fa-house-chimney-user"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-emerald-400">Rangkuman Materi Inti</span>
+                        <h2 class="text-xl md:text-2xl font-bold text-white">Sikap Taat Konstitusi di Tiga Lingkungan Kehidupan</h2>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    
+                    <!-- 1. Lingkungan Keluarga -->
+                    <div class="bg-gradient-to-b from-emerald-950/40 to-slate-950/90 p-5 rounded-2xl border border-emerald-500/30 flex flex-col justify-between shadow-lg">
+                        <div>
+                            <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg mb-3 font-bold">1</div>
+                            <h3 class="font-bold text-base text-white mb-2">🏠 Lingkungan Keluarga</h3>
+                            <ul class="space-y-2 text-xs text-gray-300 leading-relaxed mb-3">
+                                <li class="flex items-start gap-1.5">
+                                    <i class="fa-solid fa-check text-emerald-400 mt-0.5"></i>
+                                    <span>Menghormati orang tua dan menyayangi sesama anggota keluarga.</span>
+                                </li>
+                                <li class="flex items-start gap-1.5">
+                                    <i class="fa-solid fa-check text-emerald-400 mt-0.5"></i>
+                                    <span>Membiasakan musyawarah mufakat dalam membagi tugas dan mengambil keputusan (Sila 4).</span>
+                                </li>
+                                <li class="flex items-start gap-1.5">
+                                    <i class="fa-solid fa-check text-emerald-400 mt-0.5"></i>
+                                    <span>Menjaga nama baik, kerukunan, dan kehormatan keluarga.</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <span class="text-[11px] font-semibold text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-lg border border-emerald-500/20 inline-block text-center">
+                            Fondasi Moral Pertama
+                        </span>
+                    </div>
+
+                    <!-- 2. Lingkungan Sekolah -->
+                    <div class="bg-gradient-to-b from-emerald-950/40 to-slate-950/90 p-5 rounded-2xl border border-emerald-500/30 flex flex-col justify-between shadow-lg">
+                        <div>
+                            <div class="w-10 h-10 rounded-xl bg-teal-500/20 text-teal-400 flex items-center justify-center text-lg mb-3 font-bold">2</div>
+                            <h3 class="font-bold text-base text-white mb-2">🏫 Lingkungan Sekolah</h3>
+                            <ul class="space-y-2 text-xs text-gray-300 leading-relaxed mb-3">
+                                <li class="flex items-start gap-1.5">
+                                    <i class="fa-solid fa-check text-teal-400 mt-0.5"></i>
+                                    <span>Mematuhi tata tertib sekolah dan disiplin masuk kelas.</span>
+                                </li>
+                                <li class="flex items-start gap-1.5">
+                                    <i class="fa-solid fa-check text-teal-400 mt-0.5"></i>
+                                    <span>Mengikuti upacara bendera hari Senin dengan khidmat (Pasal 30 ayat 1).</span>
+                                </li>
+                                <li class="flex items-start gap-1.5">
+                                    <i class="fa-solid fa-check text-teal-400 mt-0.5"></i>
+                                    <span>Belajar giat (Pasal 31) serta menolak perundungan (*bullying*) dan diskriminasi.</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <span class="text-[11px] font-semibold text-teal-400 bg-teal-500/10 px-3 py-1 rounded-lg border border-teal-500/20 inline-block text-center">
+                            Wadah Kader Bangsa
+                        </span>
+                    </div>
+
+                    <!-- 3. Lingkungan Masyarakat & Negara -->
+                    <div class="bg-gradient-to-b from-emerald-950/40 to-slate-950/90 p-5 rounded-2xl border border-emerald-500/30 flex flex-col justify-between shadow-lg">
+                        <div>
+                            <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg mb-3 font-bold">3</div>
+                            <h3 class="font-bold text-base text-white mb-2">🏛️ Masyarakat & Negara</h3>
+                            <ul class="space-y-2 text-xs text-gray-300 leading-relaxed mb-3">
+                                <li class="flex items-start gap-1.5">
+                                    <i class="fa-solid fa-check text-amber-400 mt-0.5"></i>
+                                    <span>Taat norma sosial, hukum adat, dan aturan tertib lalu lintas (Pasal 27 ayat 1).</span>
+                                </li>
+                                <li class="flex items-start gap-1.5">
+                                    <i class="fa-solid fa-check text-amber-400 mt-0.5"></i>
+                                    <span>Menjaga toleransi kerukunan umat beragama (Pasal 29) & fasilitas umum.</span>
+                                </li>
+                                <li class="flex items-start gap-1.5">
+                                    <i class="fa-solid fa-check text-amber-400 mt-0.5"></i>
+                                    <span>Ikut gotong royong siskamling dan patuh membayar pajak (Pasal 23A).</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <span class="text-[11px] font-semibold text-amber-400 bg-amber-500/10 px-3 py-1 rounded-lg border border-amber-500/20 inline-block text-center">
+                            Aksi Nyata Berbangsa
+                        </span>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- ===== SECTION 2: GALERI INFOGRAFIS GABUNGAN (LEVEL 17, 18, 19) ===== -->
+            <section class="section-card p-6 md:p-8">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-12 h-12 rounded-2xl bg-teal-500/20 text-teal-400 flex items-center justify-center text-xl border border-teal-500/30">
+                        <i class="fa-solid fa-images"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-teal-400">Galeri Infografis Pembelajaran</span>
+                        <h2 class="text-xl md:text-2xl font-bold text-white">Visualisasi Aksi Nyata Taat Konstitusi</h2>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    
+                    <!-- Image 1: Level 17 (1) - Rumah -->
+                    <div class="bg-slate-950/80 p-3 rounded-2xl border border-emerald-500/30 text-center shadow-lg group">
+                        <div class="relative rounded-xl overflow-hidden mb-2 cursor-pointer border border-emerald-500/20" onclick="openImageModal('Level 17 (1).jfif', 'Pembiasaan Taat Konstitusi di Keluarga')">
+                            <img src="Level 17 (1).jfif" alt="Keluarga Taat Konstitusi" class="w-full h-36 object-cover rounded-lg group-hover:scale-105 transition duration-300">
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-bold gap-1">
+                                <i class="fa-solid fa-magnifying-glass-plus"></i> Perbesar
+                            </div>
+                        </div>
+                        <h4 class="text-xs font-bold text-emerald-300">Di Keluarga</h4>
+                        <p class="text-[10px] text-gray-400 mt-0.5">Musyawarah & Keharmonisan</p>
+                    </div>
+
+                    <!-- Image 2: Level 17 (2) - Sekolah -->
+                    <div class="bg-slate-950/80 p-3 rounded-2xl border border-teal-500/30 text-center shadow-lg group">
+                        <div class="relative rounded-xl overflow-hidden mb-2 cursor-pointer border border-teal-500/20" onclick="openImageModal('Level 17 (2).jfif', 'Pembiasaan Taat Konstitusi di Sekolah')">
+                            <img src="Level 17 (2).jfif" alt="Sekolah Taat Konstitusi" class="w-full h-36 object-cover rounded-lg group-hover:scale-105 transition duration-300">
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-bold gap-1">
+                                <i class="fa-solid fa-magnifying-glass-plus"></i> Perbesar
+                            </div>
+                        </div>
+                        <h4 class="text-xs font-bold text-teal-300">Di Sekolah</h4>
+                        <p class="text-[10px] text-gray-400 mt-0.5">Upacara & Anti-Perundungan</p>
+                    </div>
+
+                    <!-- Image 3: Level 18 - Masyarakat -->
+                    <div class="bg-slate-950/80 p-3 rounded-2xl border border-amber-500/30 text-center shadow-lg group">
+                        <div class="relative rounded-xl overflow-hidden mb-2 cursor-pointer border border-amber-500/20" onclick="openImageModal('Level 18.jfif', 'Penegakan Konstitusi di Masyarakat')">
+                            <img src="Level 18.jfif" alt="Masyarakat Taat Konstitusi" class="w-full h-36 object-cover rounded-lg group-hover:scale-105 transition duration-300">
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-bold gap-1">
+                                <i class="fa-solid fa-magnifying-glass-plus"></i> Perbesar
+                            </div>
+                        </div>
+                        <h4 class="text-xs font-bold text-amber-300">Di Masyarakat</h4>
+                        <p class="text-[10px] text-gray-400 mt-0.5">Tertib Hukum & Toleransi</p>
+                    </div>
+
+                    <!-- Image 4: Level 19 - Aksi Nyata Warga Teladan -->
+                    <div class="bg-slate-950/80 p-3 rounded-2xl border border-cyan-500/30 text-center shadow-lg group">
+                        <div class="relative rounded-xl overflow-hidden mb-2 cursor-pointer border border-cyan-500/20" onclick="openImageModal('Level 19.jfif', 'Aksi Nyata & Pemecahan Masalah Warga')">
+                            <img src="Level 19.jfif" alt="Aksi Warga Teladan" class="w-full h-36 object-cover rounded-lg group-hover:scale-105 transition duration-300">
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-bold gap-1">
+                                <i class="fa-solid fa-magnifying-glass-plus"></i> Perbesar
+                            </div>
+                        </div>
+                        <h4 class="text-xs font-bold text-cyan-300">Aksi Teladan</h4>
+                        <p class="text-[10px] text-gray-400 mt-0.5">Pemecahan Masalah Damai</p>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Image Modal for Fullscreen View -->
+            <div id="image-modal" class="modal-overlay hidden" onclick="closeImageModal()">
+                <div class="modal-box relative max-w-3xl w-full p-3 bg-gray-900/95 border-2 border-emerald-500 rounded-2xl text-center" onclick="event.stopPropagation()">
+                    <button onclick="closeImageModal()" class="absolute -top-4 -right-4 w-10 h-10 bg-red-600 hover:bg-red-500 text-white rounded-full flex items-center justify-center text-lg font-bold shadow-xl border-2 border-white z-10 transition">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                    <img id="modal-img-target" src="" alt="Infografis" class="w-full max-h-[75vh] object-contain rounded-xl mb-2">
+                    <p id="modal-img-caption" class="text-xs font-bold text-emerald-300"></p>
+                </div>
+            </div>
+
+            <!-- ===== SECTION 3: AKTIVITAS INTERAKTIF SISWA (PETA KONSEP 3 LINGKUNGAN) ===== -->
+            <section class="section-card p-6 md:p-8">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl border border-amber-500/30">
+                        <i class="fa-solid fa-puzzle-piece"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-amber-400">Aktivitas Interaktif Siswa</span>
+                        <h2 class="text-xl md:text-2xl font-bold text-white">Mind Map: Klasifikasi Sikap Taat Konstitusi</h2>
+                    </div>
+                </div>
+
+                <p class="text-gray-300 text-xs sm:text-sm leading-relaxed mb-6">
+                    Lengkapilah pengelompokan perilaku taat konstitusi di bawah ini dengan memilih lingkungan yang tepat pada setiap pernyataan tindakan nyata:
+                </p>
+
+                <!-- Interactive Grid of Selects -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                    
+                    <!-- Item 1: Musyawarah Keluarga -->
+                    <div class="p-3.5 bg-slate-950/80 rounded-xl border border-emerald-900/50 shadow-inner">
+                        <label class="block text-xs font-bold text-emerald-400 mb-1.5">1. Membiasakan musyawarah mufakat dalam mengambil keputusan keluarga:</label>
+                        <select id="map-sel-1" class="map-select" data-answer="keluarga">
+                            <option value="">-- Pilih Lingkungan --</option>
+                            <option value="keluarga">Lingkungan Keluarga</option>
+                            <option value="sekolah">Lingkungan Sekolah</option>
+                            <option value="masyarakat">Lingkungan Masyarakat</option>
+                        </select>
+                    </div>
+
+                    <!-- Item 2: Upacara Bendera Khidmat -->
+                    <div class="p-3.5 bg-slate-950/80 rounded-xl border border-emerald-900/50 shadow-inner">
+                        <label class="block text-xs font-bold text-teal-400 mb-1.5">2. Mengikuti upacara bendera hari Senin dengan khidmat dan tertib (Pasal 30 ayat 1):</label>
+                        <select id="map-sel-2" class="map-select" data-answer="sekolah">
+                            <option value="">-- Pilih Lingkungan --</option>
+                            <option value="keluarga">Lingkungan Keluarga</option>
+                            <option value="sekolah">Lingkungan Sekolah</option>
+                            <option value="masyarakat">Lingkungan Masyarakat</option>
+                        </select>
+                    </div>
+
+                    <!-- Item 3: Tertib Lalu Lintas -->
+                    <div class="p-3.5 bg-slate-950/80 rounded-xl border border-emerald-900/50 shadow-inner">
+                        <label class="block text-xs font-bold text-amber-400 mb-1.5">3. Memakai helm standar dan mematuhi rambu lalu lintas di jalan raya:</label>
+                        <select id="map-sel-3" class="map-select" data-answer="masyarakat">
+                            <option value="">-- Pilih Lingkungan --</option>
+                            <option value="keluarga">Lingkungan Keluarga</option>
+                            <option value="sekolah">Lingkungan Sekolah</option>
+                            <option value="masyarakat">Lingkungan Masyarakat</option>
+                        </select>
+                    </div>
+
+                    <!-- Item 4: Belajar Giat Tanpa Perundungan -->
+                    <div class="p-3.5 bg-slate-950/80 rounded-xl border border-emerald-900/50 shadow-inner">
+                        <label class="block text-xs font-bold text-teal-400 mb-1.5">4. Belajar giat dan menolak tindakan perundungan (*bullying*) antarteman (Pasal 31 & 28D):</label>
+                        <select id="map-sel-4" class="map-select" data-answer="sekolah">
+                            <option value="">-- Pilih Lingkungan --</option>
+                            <option value="keluarga">Lingkungan Keluarga</option>
+                            <option value="sekolah">Lingkungan Sekolah</option>
+                            <option value="masyarakat">Lingkungan Masyarakat</option>
+                        </select>
+                    </div>
+
+                    <!-- Item 5: Menghormati Orang Tua -->
+                    <div class="p-3.5 bg-slate-950/80 rounded-xl border border-emerald-900/50 shadow-inner">
+                        <label class="block text-xs font-bold text-emerald-400 mb-1.5">5. Berbakti dan santun kepada orang tua serta menjaga nama baik keluarga:</label>
+                        <select id="map-sel-5" class="map-select" data-answer="keluarga">
+                            <option value="">-- Pilih Lingkungan --</option>
+                            <option value="keluarga">Lingkungan Keluarga</option>
+                            <option value="sekolah">Lingkungan Sekolah</option>
+                            <option value="masyarakat">Lingkungan Masyarakat</option>
+                        </select>
+                    </div>
+
+                    <!-- Item 6: Gotong Royong & Bayar Pajak -->
+                    <div class="p-3.5 bg-slate-950/80 rounded-xl border border-emerald-900/50 shadow-inner">
+                        <label class="block text-xs font-bold text-amber-400 mb-1.5">6. Berpartisipasi dalam kerja bakti RT dan taat membayar pajak negara (Pasal 23A):</label>
+                        <select id="map-sel-6" class="map-select" data-answer="masyarakat">
+                            <option value="">-- Pilih Lingkungan --</option>
+                            <option value="keluarga">Lingkungan Keluarga</option>
+                            <option value="sekolah">Lingkungan Sekolah</option>
+                            <option value="masyarakat">Lingkungan Masyarakat</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <button onclick="checkMindMap()" class="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-emerald-600 via-teal-600 to-amber-500 hover:from-emerald-500 hover:to-amber-400 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/30 transition transform hover:scale-105 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-circle-check"></i> Cek Peta Konsep
+                    </button>
+                    <button onclick="resetMindMap()" class="w-full sm:w-auto px-6 py-3.5 bg-slate-900 hover:bg-slate-800 text-gray-300 font-semibold rounded-xl border border-emerald-900/60 transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-rotate-left"></i> Reset Peta Konsep
+                    </button>
+                </div>
+
+                <!-- Feedback Message -->
+                <div id="mindmap-feedback" class="hidden mt-6 p-4 rounded-xl text-center font-bold text-sm"></div>
+            </section>
+
+            <!-- ===== SECTION 4: GATED CTA TO QUIZ LEVEL 17 ===== -->
+            <div id="quiz-cta-container" class="py-6"></div>
+
+            <!-- NAVIGASI LEVEL (SEBELUMNYA & SELANJUTNYA) -->
+            <div class="mt-8 pt-6 border-t border-gray-800">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <a href="dunia5.html" class="w-full sm:w-auto px-5 py-3 bg-slate-900 hover:bg-slate-800 text-gray-300 hover:text-white font-bold rounded-xl border border-gray-800 transition flex items-center justify-center gap-2 text-xs sm:text-sm">
+                        <i class="fa-solid fa-chevron-left"></i> Peta Dunia 5
+                    </a>
+                    
+                    <a href="dunia5.html" class="text-xs text-gray-400 hover:text-white flex items-center gap-1.5 font-semibold">
+                        <i class="fa-solid fa-map"></i> Peta Dunia 5 (Level 17/20)
+                    </a>
+
+                    <a href="dunia5-level2.html" class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/30 transition transform hover:scale-105 flex items-center justify-center gap-2 text-xs sm:text-sm">
+                        Selanjutnya: Level 18 (Tugas Kelompok) <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-[#07120e]/90 text-gray-400 py-8 border-t border-emerald-950/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-sm text-center flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-2">
+                <img src="Logo Edukacivic.png" alt="EdukaCivic" class="h-6 w-auto">
+                <span class="font-bold text-white">Eduka<span class="text-emerald-400">Civic</span></span>
+            </div>
+            <p>&copy; 2026 EdukaCivic | Fadilatul Fajri</p>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Reading progress tracker
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const pct = docHeight > 0 ? Math.min(100, Math.round((scrollTop / docHeight) * 100)) : 0;
+            document.getElementById('read-bar').style.width = pct + '%';
+            document.getElementById('read-pct').textContent = pct + '%';
+        });
+
+        // Image Modal functions
+        function openImageModal(imgSrc, caption) {
+            document.getElementById('modal-img-target').src = imgSrc;
+            document.getElementById('modal-img-caption').textContent = caption;
+            document.getElementById('image-modal').classList.remove('hidden');
+        }
+        function closeImageModal() {
+            document.getElementById('image-modal').classList.add('hidden');
+        }
+
+        // Mind Map Activity Logic
+        function checkMindMap() {
+            const selects = document.querySelectorAll('.map-select');
+            let correct = 0;
+            let filled = 0;
+
+            selects.forEach(sel => {
+                sel.classList.remove('correct', 'wrong');
+                if (sel.value !== "") {
+                    filled++;
+                    if (sel.value === sel.dataset.answer) {
+                        sel.classList.add('correct');
+                        correct++;
+                    } else {
+                        sel.classList.add('wrong');
+                    }
+                }
+            });
+
+            const fb = document.getElementById('mindmap-feedback');
+            fb.classList.remove('hidden');
+
+            if (correct === selects.length) {
+                playSound('correct');
+                fb.className = 'mt-6 p-4 rounded-xl text-center font-bold text-sm bg-green-500/20 border border-green-500/40 text-green-300';
+                fb.innerHTML = '🎉 Hebat Sekali! Seluruh klasifikasi perilaku taat konstitusi di Keluarga, Sekolah, dan Masyarakat telah kamu jawab dengan 100% tepat!';
+
+                // Mark activity completed & unlock quiz CTA
+                sessionStorage.setItem('edukacivic_act_d5l1', 'true');
+                setQuizButtonUnlocked('d5l1', 'dunia5-level1-kuis.html', 'quiz-cta-container');
+
+            } else if (filled < selects.length) {
+                playSound('wrong');
+                fb.className = 'mt-6 p-4 rounded-xl text-center font-bold text-sm bg-yellow-500/20 border border-yellow-500/40 text-yellow-300';
+                fb.innerHTML = `⚠️ Baru ${filled} dari ${selects.length} bagian yang terisi (${correct} benar). Lengkapi semua bagian ya!`;
+            } else {
+                playSound('wrong');
+                fb.className = 'mt-6 p-4 rounded-xl text-center font-bold text-sm bg-red-500/20 border border-red-500/40 text-red-300';
+                fb.innerHTML = `💪 ${correct} dari ${selects.length} jawaban benar. Periksa kembali kotak yang bertanda merah!`;
+            }
+        }
+
+        function resetMindMap() {
+            document.querySelectorAll('.map-select').forEach(sel => {
+                sel.value = "";
+                sel.classList.remove('correct', 'wrong');
+            });
+            document.getElementById('mindmap-feedback').classList.add('hidden');
+        }
+
+        // Initialize gating on load
+        document.addEventListener('DOMContentLoaded', () => {
+            initInteractiveActivityGating('d5l1', 'dunia5-level1-kuis.html', 'quiz-cta-container');
+            updateNavbarStudent();
+        });
+    </script>
+</body>
+</html>

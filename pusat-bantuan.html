@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pusat Bantuan EdukaCivic</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="Logo Edukacivic.png">
+    <!-- Google Fonts Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="student-system.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            red: '#DC2626', redLight: '#EF4444', redDark: '#B91C1C',
+                            dark: '#0F172A', darker: '#020617', light: '#F8FAFC'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-brand-light text-brand-dark min-h-screen font-sans">
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <a href="index.html" class="flex items-center gap-3">
+                <img src="Logo Edukacivic.png" alt="EdukaCivic" class="h-10">
+                <span class="font-bold text-xl text-brand-dark">EdukaCivic</span>
+            </a>
+            <a href="index.html" class="text-brand-red hover:text-brand-redDark font-medium transition flex items-center gap-2">
+                <i class="fas fa-arrow-left"></i> Kembali ke Beranda
+            </a>
+        </div>
+    </header>
+
+    <main class="max-w-3xl mx-auto px-4 py-12">
+        <div class="text-center mb-10">
+            <h1 class="text-3xl md:text-4xl font-bold text-brand-dark mb-4">Pusat Bantuan</h1>
+            <p class="text-gray-600">Jawaban untuk pertanyaan umum tentang penggunaan EdukaCivic.</p>
+        </div>
+
+        <div class="space-y-6">
+            <!-- FAQ Item 1 -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <h3 class="text-lg font-semibold text-brand-dark mb-2 flex items-center gap-2">
+                    <i class="fas fa-question-circle text-brand-red"></i> Bagaimana cara masuk sebagai siswa?
+                </h3>
+                <p class="text-gray-600">Klik tombol "Mulai Belajar" di halaman utama, kemudian masukkan nama lengkap dan nomor absen Anda. Data akan tersimpan untuk melacak progres belajar Anda.</p>
+            </div>
+
+            <!-- FAQ Item 2 -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <h3 class="text-lg font-semibold text-brand-dark mb-2 flex items-center gap-2">
+                    <i class="fas fa-gamepad text-brand-red"></i> Bagaimana cara bermain game?
+                </h3>
+                <p class="text-gray-600">Pilih dunia yang ingin Anda pelajari, kemudian pilih level yang tersedia. Ikuti instruksi game dan selesaikan tantangan untuk mendapatkan poin.</p>
+            </div>
+
+            <!-- FAQ Item 3 -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <h3 class="text-lg font-semibold text-brand-dark mb-2 flex items-center gap-2">
+                    <i class="fas fa-star text-brand-red"></i> Apa itu sistem poin dan lencana?
+                </h3>
+                <p class="text-gray-600">Sistem poin diberikan ketika Anda menyelesaikan level kuis atau tantangan mini-game. Berdasarkan total poin yang terkumpul, Anda akan mendapatkan tingkatan lencana: <strong>Pemula</strong> (&lt; 100 Poin), <strong>Warga</strong> (100 - 200 Poin), <strong>Aktivis</strong> (200 - 300 Poin), <strong>Pejabat</strong> (300 - 400 Poin), <strong>Menteri</strong> (400 - 500 Poin), dan <strong>Presiden</strong> (&gt; 500 Poin).</p>
+            </div>
+
+            <!-- FAQ Item 4 -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <h3 class="text-lg font-semibold text-brand-dark mb-2 flex items-center gap-2">
+                    <i class="fas fa-chart-line text-brand-red"></i> Bagaimana cara melihat progres saya?
+                </h3>
+                <p class="text-gray-600">Setelah login, progres belajar Anda (poin, lencana, dunia dan level yang telah diselesaikan) akan ditampilkan secara langsung di halaman utama dashboard Anda.</p>
+            </div>
+
+            <!-- FAQ Item 5 -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <h3 class="text-lg font-semibold text-brand-dark mb-2 flex items-center gap-2">
+                    <i class="fas fa-envelope text-brand-red"></i> Siapa yang bisa saya hubungi jika ada masalah?
+                </h3>
+                <p class="text-gray-600">Jika Anda mengalami masalah teknis atau memiliki pertanyaan lain, Anda dapat menghubungi <strong>Fadilatul Fajri</strong> melalui email atau media sosial resmi EdukaCivic.</p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-brand-dark text-white py-8 mt-12">
+        <div class="max-w-7xl mx-auto px-4 text-center text-sm text-gray-400">
+            &copy; 2026 EdukaCivic by Fadilatul Fajri. Semua hak dilindungi.
+        </div>
+    </footer>
+</body>
+</html>
+

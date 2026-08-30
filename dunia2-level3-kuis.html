@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Level 7: Perjalanan Perumusan UUD 1945 - EdukaCivic</title>
+    <link rel="icon" type="image/png" href="Logo Edukacivic.png">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="student-system.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            red: '#DC2626', redLight: '#EF4444', redDark: '#B91C1C',
+                            dark: '#0F172A', darker: '#020617', light: '#F8FAFC'
+                        }
+                    },
+                    animation: {
+                        'float': 'float 3s ease-in-out infinite',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0F172A; }
+        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4B5563; }
+        
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(75, 85, 99, 0.5);
+        }
+
+        .option-btn {
+            background: rgba(15, 23, 42, 0.7);
+            border: 2px solid rgba(75, 85, 99, 0.5);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            user-select: none;
+        }
+        .option-btn:hover:not(:disabled) {
+            border-color: #f97316;
+            background: rgba(249, 115, 22, 0.15);
+            transform: translateY(-2px);
+        }
+        .option-btn.correct {
+            border-color: #10b981 !important;
+            background: rgba(16, 185, 129, 0.25) !important;
+            color: #ecfdf5 !important;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.35);
+        }
+        .option-btn.wrong {
+            border-color: #ef4444 !important;
+            background: rgba(239, 68, 68, 0.25) !important;
+            color: #fef2f2 !important;
+            animation: shake 0.4s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.35s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            padding: 1rem;
+        }
+    </style>
+    <script>
+        function getProgress() {
+            try { return JSON.parse(localStorage.getItem('edukacivic_progress')) || { poin: 0, level: 1, dunia: 2, completedLevels: [] }; }
+            catch(e) { return { poin: 0, level: 1, dunia: 2, completedLevels: [] }; }
+        }
+        const prog = getProgress();
+        if (!prog.completedLevels || !prog.completedLevels.includes('d2l2')) {
+            window.location.href = 'dunia2.html';
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-b from-[#180902] via-[#2b1406] to-[#100501] text-white font-sans antialiased min-h-screen flex flex-col selection:bg-orange-600 selection:text-white">
+
+    <!-- Web Audio Sound Effects -->
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            try {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'correct') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.15);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, now);
+                    osc.frequency.exponentialRampToValueAtTime(146.83, now + 0.2);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                } else if (type === 'victory') {
+                    [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+                        const o = audioCtx.createOscillator();
+                        const g = audioCtx.createGain();
+                        o.connect(g);
+                        g.connect(audioCtx.destination);
+                        o.type = 'triangle';
+                        o.frequency.setValueAtTime(freq, now + i * 0.1);
+                        g.gain.setValueAtTime(0.3, now + i * 0.1);
+                        g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.1 + 0.4);
+                        o.start(now + i * 0.1);
+                        o.stop(now + i * 0.1 + 0.4);
+                    });
+                }
+            } catch(e) {}
+        }
+    </script>
+
+    <!-- NAVBAR -->
+    <nav class="fixed w-full z-50 bg-brand-dark/90 backdrop-blur-md border-b border-gray-800 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-4">
+                    <a href="dunia2-level3.html" class="flex items-center gap-2 text-gray-400 hover:text-white transition-colors group">
+                        <div class="w-8 h-8 bg-gray-800 rounded-lg flex items-center justify-center group-hover:bg-gray-700 transition-colors">
+                            <i class="fa-solid fa-arrow-left text-sm"></i>
+                        </div>
+                        <span class="text-sm font-medium hidden sm:inline">Materi Level 7</span>
+                    </a>
+                    <div class="w-px h-8 bg-gray-700"></div>
+                    <a href="index.html" class="flex items-center gap-2">
+                        <img src="Logo Edukacivic.png" alt="EdukaCivic" class="h-8 w-auto">
+                        <span class="font-bold text-lg text-white hidden sm:inline">Eduka<span class="text-brand-red">Civic</span></span>
+                    </a>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <div class="hidden sm:flex items-center gap-2 bg-gray-800/80 px-3 py-1.5 rounded-lg border border-gray-700 text-xs font-semibold text-gray-300">
+                        <i class="fa-solid fa-clock text-orange-400"></i>
+                        <span id="timer-display">00:00</span>
+                    </div>
+
+                    <div class="flex items-center gap-2 bg-orange-500/10 border border-orange-500/30 px-3 py-1.5 rounded-full">
+                        <i class="fa-solid fa-scroll text-orange-400 text-xs"></i>
+                        <span class="text-orange-400 font-bold text-xs">Level 7</span>
+                    </div>
+
+                    <div class="flex items-center gap-2 bg-gray-800 px-3 py-1.5 rounded-lg border border-gray-700">
+                        <i class="fa-solid fa-bolt text-yellow-400 text-xs"></i>
+                        <span id="nav-poin" class="text-yellow-400 font-bold text-sm">0</span>
+                        <span class="text-gray-500 text-xs">Poin</span>
+                    </div>
+
+                    <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-brand-red to-orange-400 p-0.5 cursor-pointer shadow-md" onclick="window.location.href='profil-siswa.html'">
+                        <img id="nav-avatar-img" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Student" alt="Avatar" class="w-full h-full rounded-full bg-slate-900 object-cover">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <script>document.getElementById('nav-poin').textContent = prog.poin || 0;</script>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-grow flex flex-col justify-start items-center p-4 sm:p-6 w-full max-w-3xl mx-auto pt-28 pb-16">
+        
+        <!-- INTRO CARD -->
+        <div id="intro-card" class="glass-panel w-full p-6 sm:p-10 md:p-12 rounded-3xl shadow-2xl text-center fade-in max-w-2xl border border-gray-700/80">
+            <div class="w-20 h-20 sm:w-24 sm:h-24 bg-orange-500/20 rounded-3xl flex items-center justify-center mx-auto mb-6 border border-orange-500/40 shadow-xl shadow-orange-500/10 animate-float">
+                <i class="fa-solid fa-clock-rotate-left text-4xl sm:text-5xl text-orange-400"></i>
+            </div>
+            
+            <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-orange-500/10 border border-orange-500/30 text-orange-400 text-xs font-bold uppercase tracking-wider mb-3">
+                <i class="fa-solid fa-award text-xs"></i> Kuis Pemahaman Level 7
+            </div>
+
+            <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-3 text-white">
+                Perjalanan Perumusan UUD 1945
+            </h2>
+            <p class="text-gray-300 text-xs sm:text-sm md:text-base mb-8 max-w-lg mx-auto leading-relaxed">
+                Uji pemahamanmu mengenai tahapan sidang 13–16 Juli 1945, Panitia Penghalus Bahasa, laporan 3 naskah Ir. Soekarno, penjelasan Prof. Soepomo, hingga aklamasi naskah UUD 1945!
+            </p>
+            
+            <div class="grid grid-cols-3 gap-2 sm:gap-4 mb-8 text-xs sm:text-sm text-gray-300 bg-gray-900/80 p-4 rounded-2xl border border-gray-800">
+                <div class="flex flex-col items-center">
+                    <span class="text-gray-400 text-[11px] mb-1">Jumlah Soal</span>
+                    <span class="font-extrabold text-orange-400 text-base sm:text-lg">10 Soal</span>
+                </div>
+                <div class="flex flex-col items-center border-x border-gray-800">
+                    <span class="text-gray-400 text-[11px] mb-1">Maksimal Skor</span>
+                    <span class="font-extrabold text-yellow-400 text-base sm:text-lg">25 XP</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <span class="text-gray-400 text-[11px] mb-1">Tingkat</span>
+                    <span class="font-extrabold text-emerald-400 text-base sm:text-lg">Sedang</span>
+                </div>
+            </div>
+            
+            <button onclick="startQuiz()" class="w-full sm:w-auto px-10 py-4 bg-gradient-to-r from-orange-600 via-amber-600 to-yellow-500 hover:from-orange-500 hover:to-yellow-400 text-slate-950 font-black rounded-2xl shadow-xl shadow-orange-600/30 hover:scale-105 transition-all text-base sm:text-lg inline-flex items-center justify-center gap-3">
+                <i class="fa-solid fa-play"></i> Mulai Kuis Sekarang
+            </button>
+        </div>
+
+        <!-- QUIZ CONTAINER -->
+        <div id="quiz-container" class="w-full hidden flex-col gap-5 fade-in max-w-3xl">
+            
+            <!-- Top Header: Progress & Score -->
+            <div class="glass-panel p-4 sm:p-5 rounded-2xl flex flex-wrap items-center justify-between gap-3 border border-orange-500/30 shadow-xl bg-slate-900/90 mb-1 w-full">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-orange-500/20 text-orange-400 font-black text-sm flex items-center justify-center border border-orange-500/40 shadow-inner shrink-0" id="progress-text">
+                        1/10
+                    </div>
+                    <div>
+                        <div class="text-[11px] uppercase font-extrabold tracking-wider text-orange-400 flex items-center gap-1.5">
+                            <i class="fa-solid fa-scroll text-[10px]"></i> Kuis Dunia 2 · Level 7
+                        </div>
+                        <h2 class="text-sm sm:text-base font-bold text-white leading-tight">Perjalanan Perumusan UUD 1945</h2>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2.5">
+                    <div class="flex items-center gap-2 bg-slate-950 px-4 py-2 rounded-xl border border-yellow-500/40 shadow-md">
+                        <i class="fa-solid fa-bolt text-yellow-400 text-base animate-pulse"></i>
+                        <span class="text-xs text-gray-400 font-semibold">Skor:</span>
+                        <span id="score-display" class="font-black text-yellow-400 text-sm sm:text-base">0 / 25 XP</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-gray-900/90 rounded-full h-2.5 overflow-hidden border border-gray-800 shadow-inner mb-1">
+                <div id="progress-bar-fill" class="bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-400 h-full rounded-full transition-all duration-300" style="width: 10%"></div>
+            </div>
+            
+            <!-- Question Card -->
+            <div class="glass-panel p-6 sm:p-8 rounded-3xl relative overflow-hidden shadow-2xl border border-gray-700/80">
+                <!-- Question Badge & Text -->
+                <div class="mb-6">
+                    <span class="inline-block px-3 py-1 bg-orange-500/20 text-orange-300 text-xs font-bold rounded-full mb-3 border border-orange-500/30 uppercase tracking-wider" id="question-tag">
+                        Kronologi Sidang
+                    </span>
+                    <h3 class="text-lg sm:text-xl md:text-2xl font-bold leading-relaxed text-white" id="question-text">
+                        Pertanyaan kuis sedang dimuat...
+                    </h3>
+                </div>
+
+                <!-- Answer Options (4 buttons) -->
+                <div id="options-grid" class="flex flex-col gap-3">
+                    <!-- Dynamic option buttons injected here -->
+                </div>
+
+                <!-- Explanation / Next Button Area -->
+                <div id="post-answer-area" class="mt-6 hidden border-t border-gray-700/80 pt-6 fade-in">
+                    <div id="explanation-box" class="mb-5 p-4 rounded-2xl text-sm leading-relaxed border"></div>
+                    
+                    <button id="next-btn" onclick="nextQuestion()" class="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-bold rounded-xl shadow-lg shadow-orange-600/30 transition transform hover:scale-105 inline-flex items-center justify-center gap-2">
+                        <span>Lanjut ke Soal Berikutnya</span> <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- CELEBRATION MODAL -->
+        <div id="result-modal" class="modal-overlay hidden">
+            <div id="result-content"></div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-brand-dark/80 text-gray-500 py-6 text-center text-xs border-t border-gray-800 mt-auto">
+        <p>&copy; 2026 EdukaCivic | Fadilatul Fajri</p>
+    </footer>
+
+    <script>
+        // 10 SOAL KUIS LEVEL 7 LENGKAP & INTERAKTIF
+        const quizQuestions = [
+            {
+                tag: "Sidang 13 Juli 1945",
+                q: "Pada 13 Juli 1945, Panitia Kecil Perancang UUD yang diketuai Prof. Dr. Soepomo menyerahkan hasil pembahasan naskah UUD yang menyepakati pembentukan...",
+                opts: [
+                    "Panitia Penghalus Bahasa & lambang negara",
+                    "Komite Nasional Indonesia Pusat (KNIP)",
+                    "Kabinet Presidensial Pertama",
+                    "Tentara Keamanan Rakyat (TKR)"
+                ],
+                ans: 0,
+                explain: "Benar! Pada 13 Juli 1945, Panitia Kecil menyepakati isi pokok lambang negara, negara kesatuan, dan pembentukan Panitia Penghalus Bahasa untuk menyempurnakan redaksi naskah UUD."
+            },
+            {
+                tag: "Tokoh Panitia",
+                q: "Siapakah tiga tokoh bangsa yang ditunjuk sebagai anggota Panitia Penghalus Bahasa pada 13 Juli 1945?",
+                opts: [
+                    "Prof. Dr. Soepomo, Prof. Dr. P.A. Hoesein Djajadiningrat, dan H. Agus Salim",
+                    "Ir. Soekarno, Drs. Moh. Hatta, dan Mr. Achmad Soebardjo",
+                    "Mr. Muhammad Yamin, K.H. Wachid Hasjim, dan Abikoesno Tjokrosoejoso",
+                    "Dr. K.R.T. Radjiman Wedyodiningrat, Sutan Sjahrir, dan Chaerul Saleh"
+                ],
+                ans: 0,
+                explain: "Tepat sekali! Panitia Penghalus Bahasa terdiri dari 3 tokoh ahli: Prof. Dr. Soepomo, Prof. Dr. P.A. Hoesein Djajadiningrat, dan H. Agus Salim."
+            },
+            {
+                tag: "Sidang Pleno 14 Juli 1945",
+                q: "Pada rapat pleno 14 Juli 1945, Ir. Soekarno selaku Ketua Panitia Perancang UUD menyampaikan laporan pokok yang berisi 3 naskah penting, yaitu...",
+                opts: [
+                    "Pernyataan Indonesia Merdeka, Pembukaan UUD, dan Batang Tubuh UUD",
+                    "Teks Proklamasi, Lambang Garuda, dan Lagu Indonesia Raya",
+                    "Struktur Kementerian, Pembagian 8 Provinsi, dan Maklumat Presiden",
+                    "Piagam PBB, Deklarasi Hak Asasi Manusia, dan Perjanjian Renville"
+                ],
+                ans: 0,
+                explain: "Luar biasa! Tiga hal pokok laporan 14 Juli 1945 adalah: (1) Pernyataan Indonesia Merdeka, (2) Pembukaan UUD, dan (3) Batang Tubuh UUD (42 pasal)."
+            },
+            {
+                tag: "Pembukaan UUD",
+                q: "Naskah Pembukaan UUD yang dilaporkan pada sidang pleno 14 Juli 1945 bersumber dan diambil dari naskah...",
+                opts: [
+                    "Piagam Jakarta (Jakarta Charter) tanggal 22 Juni 1945",
+                    "Teks Sumpah Pemuda 28 Oktober 1928",
+                    "Manifesto Politik Perhimpunan Indonesia 1925",
+                    "Konstitusi Republik Indonesia Serikat 1949"
+                ],
+                ans: 0,
+                explain: "Benar! Rancangan Pembukaan UUD bersumber langsung dari naskah Piagam Jakarta hasil rumusan Panitia Sembilan tanggal 22 Juni 1945."
+            },
+            {
+                tag: "Sidang 15 Juli 1945",
+                q: "Agenda pokok sidang pleno BPUPKI pada tanggal 15 Juli 1945 adalah...",
+                opts: [
+                    "Pembahasan lanjutan Rancangan UUD & penjelasan mendalam oleh Prof. Soepomo",
+                    "Pemilihan Presiden dan Wakil Presiden Republik Indonesia",
+                    "Penyerahan bendera Pusaka kepada para pemuda pejuang",
+                    "Pembacaan Dekrit Presiden 5 Juli"
+                ],
+                ans: 0,
+                explain: "Tepat! Tanggal 15 Juli 1945 dilanjutkan dengan pembahasan Bab demi Bab rancangan UUD serta penjelasan mendalam oleh Prof. Soepomo."
+            },
+            {
+                tag: "Pikiran Pendiri Bangsa",
+                q: "Dalam pidato penjelasannya pada 15 Juli 1945, Prof. Dr. Soepomo menegaskan bahwa dasar negara Indonesia merdeka dibangun atas asas...",
+                opts: [
+                    "Kekeluargaan dan Negara Integralistik (Persatuan seluruh rakyat)",
+                    "Individualisme murni dan Liberalisme Barat",
+                    "Monarki Absolut kerajaan masa lalu",
+                    "Otoritarianisme dan militeristik mutlak"
+                ],
+                ans: 0,
+                explain: "Tepat! Prof. Soepomo menekankan teori Negara Integralistik dan asas kekeluargaan, di mana negara bersatu dengan seluruh rakyatnya tanpa membedakan golongan."
+            },
+            {
+                tag: "Struktur Batang Tubuh",
+                q: "Berapa jumlah pasal yang terdapat dalam Rancangan Batang Tubuh UUD yang dibahas pada Sidang Kedua BPUPKI (14–16 Juli 1945)?",
+                opts: [
+                    "42 pasal (termasuk pasal peralihan dan tambahan)",
+                    "16 bab tanpa pasal",
+                    "100 pasal lengkap",
+                    "10 pasal pokok saja"
+                ],
+                ans: 0,
+                explain: "Benar! Rancangan Batang Tubuh UUD yang diserahkan terdiri dari 42 pasal yang mengatur sendi-sendi utama ketatanegaraan."
+            },
+            {
+                tag: "Sidang 16 Juli 1945",
+                q: "Peristiwa puncak yang sangat bersejarah pada tanggal 16 Juli 1945 dalam sidang BPUPKI adalah...",
+                opts: [
+                    "Diterima dan disetujuinya Naskah Rancangan UUD secara bulat dan aklamasi",
+                    "Pembacaan Naskah Proklamasi Kemerdekaan di Pegangsaan Timur",
+                    "Pengangkatan Sri Sultan Hamengkubuwono IX",
+                    "Kedatangan tentara Sekutu di Pelabuhan Tanjung Priok"
+                ],
+                ans: 0,
+                explain: "Hebat! Pada 16 Juli 1945, seluruh anggota BPUPKI secara aklamasi menerima dengan suara bulat seluruh naskah rancangan UUD 1945."
+            },
+            {
+                tag: "Suasana Sejarah",
+                q: "Bagaimanakah suasana batin sidang BPUPKI pada 16 Juli 1945 ketika rancangan UUD disetujui secara bulat?",
+                opts: [
+                    "Penuh keharuan, rasa syukur mendalam, dan linangan air mata persatuan",
+                    "Ricuh dan diwarnai perdebatan sengit antargolongan",
+                    "Sepi karena sebagian besar peserta meninggalkan ruangan",
+                    "Dibubarkan secara paksa oleh kepolisian militer Jepang"
+                ],
+                ans: 0,
+                explain: "Tepat sekali! Suasana sidang diliputi rasa haru, linangan air mata bahagia, dan tepuk tangan meriah karena cita-cita hukum dasar bangsa akhirnya terwujud."
+            },
+            {
+                tag: "Nilai Karakter",
+                q: "Nilai keteladanan luhur yang paling menonjol dari para pendiri bangsa selama proses perumusan UUD (13–16 Juli 1945) adalah...",
+                opts: [
+                    "Musyawarah mufakat, toleransi tinggi, dan mengutamakan kepentingan persatuan bangsa",
+                    "Mempertahankan ego kedaerahan masing-masing tanpa kompromi",
+                    "Mengharapkan imbalan materi dan jabatan kedudukan",
+                    "Menyerahkan nasib masa depan konstitusi pada bangsa penjajah"
+                ],
+                ans: 0,
+                explain: "Sempurna! Jiwa kenegarawanan, musyawarah mufakat, dan sikap rela berkorban demi persatuan bangsa adalah warisan terbesar para pendiri bangsa."
+            }
+        ];
+
+        let currentQIndex = 0;
+        let correctCount = 0;
+        let isAnswered = false;
+        let timerSeconds = 0;
+        let timerInterval = null;
+        const totalQ = quizQuestions.length;
+        const letters = ['A', 'B', 'C', 'D'];
+
+        function startQuiz() {
+            document.getElementById('intro-card').classList.add('hidden');
+            const qc = document.getElementById('quiz-container');
+            qc.classList.remove('hidden');
+            qc.classList.add('flex');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            timerSeconds = 0;
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timerSeconds++;
+                const mins = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
+                const secs = String(timerSeconds % 60).padStart(2, '0');
+                const tEl = document.getElementById('timer-display');
+                if (tEl) tEl.textContent = `${mins}:${secs}`;
+            }, 1000);
+
+            currentQIndex = 0;
+            correctCount = 0;
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            isAnswered = false;
+            const q = quizQuestions[currentQIndex];
+
+            // Update Progress & Header
+            document.getElementById('progress-text').textContent = `${currentQIndex + 1}/${totalQ}`;
+            const pct = ((currentQIndex + 1) / totalQ) * 100;
+            document.getElementById('progress-bar-fill').style.width = pct + '%';
+            document.getElementById('score-display').textContent = `${Math.round(correctCount * 2.5)} / 25 XP`;
+
+            // Tag & text
+            document.getElementById('question-tag').textContent = q.tag;
+            document.getElementById('question-text').textContent = q.q;
+
+            // Options Grid
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = '';
+            q.opts.forEach((optText, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn w-full text-left p-4 rounded-2xl flex items-start gap-3.5 text-sm font-medium';
+                btn.innerHTML = `
+                    <span class="w-7 h-7 rounded-xl bg-gray-800 text-orange-400 font-black flex items-center justify-center shrink-0 text-xs border border-gray-700">
+                        ${letters[index]}
+                    </span>
+                    <span class="pt-0.5 text-gray-200">${optText}</span>
+                `;
+                btn.onclick = () => selectOption(index, btn);
+                grid.appendChild(btn);
+            });
+
+            // Hide explanation & post answer area
+            document.getElementById('post-answer-area').classList.add('hidden');
+            
+            // If last question, adjust button text
+            const nextBtn = document.getElementById('next-btn');
+            if (currentQIndex === totalQ - 1) {
+                nextBtn.innerHTML = `<span>Selesaikan Kuis</span> <i class="fa-solid fa-check-double"></i>`;
+                nextBtn.className = 'w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/30 transition transform hover:scale-105 inline-flex items-center justify-center gap-2';
+            } else {
+                nextBtn.innerHTML = `<span>Lanjut ke Soal Berikutnya</span> <i class="fa-solid fa-arrow-right"></i>`;
+                nextBtn.className = 'w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-bold rounded-xl shadow-lg shadow-orange-600/30 transition transform hover:scale-105 inline-flex items-center justify-center gap-2';
+            }
+        }
+
+        function selectOption(selectedIndex, btnEl) {
+            if (isAnswered) return;
+            isAnswered = true;
+
+            const q = quizQuestions[currentQIndex];
+            const isCorrect = (selectedIndex === q.ans);
+
+            const allBtns = document.querySelectorAll('.option-btn');
+            allBtns.forEach(b => b.disabled = true);
+
+            const explBox = document.getElementById('explanation-box');
+            document.getElementById('post-answer-area').classList.remove('hidden');
+
+            if (isCorrect) {
+                correctCount++;
+                btnEl.classList.add('correct');
+                playSound('correct');
+                explBox.className = 'mb-5 p-4 rounded-2xl text-sm font-medium bg-green-500/20 border border-green-500/40 text-green-300 fade-in';
+                explBox.innerHTML = `
+                    <div class="flex items-center gap-2 font-bold mb-1">
+                        <i class="fa-solid fa-circle-check text-green-400 text-base"></i> Jawaban Kamu Tepat Sekali! (+2.5 Poin)
+                    </div>
+                    <p class="text-xs text-green-200/90 leading-relaxed">${q.explain}</p>
+                `;
+            } else {
+                btnEl.classList.add('wrong');
+                allBtns[q.ans].classList.add('correct');
+                playSound('wrong');
+                explBox.className = 'mb-5 p-4 rounded-2xl text-sm font-medium bg-red-500/20 border border-red-500/40 text-red-300 fade-in';
+                explBox.innerHTML = `
+                    <div class="flex items-center gap-2 font-bold mb-1">
+                        <i class="fa-solid fa-circle-xmark text-red-400 text-base"></i> Jawaban Belum Tepat!
+                    </div>
+                    <p class="text-xs text-red-200/90 leading-relaxed">${q.explain}</p>
+                `;
+            }
+
+            document.getElementById('score-display').textContent = `${Math.round(correctCount * 2.5)} / 25 XP`;
+        }
+
+        function nextQuestion() {
+            if (currentQIndex < totalQ - 1) {
+                currentQIndex++;
+                loadQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        function finishQuiz() {
+            if (timerInterval) clearInterval(timerInterval);
+            document.getElementById('quiz-container').classList.add('hidden');
+            
+            const mins = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
+            const secs = String(timerSeconds % 60).padStart(2, '0');
+            const timeFormatted = `${mins}:${secs}`;
+            const earnedPoints = Math.round((correctCount / totalQ) * 25);
+
+            renderQuizCelebration({
+                levelKey: 'd2l3',
+                score: earnedPoints,
+                maxScore: 25,
+                correctCount: correctCount,
+                totalQuestions: totalQ,
+                timeText: timeFormatted,
+                modalId: 'result-modal',
+                containerId: 'result-content'
+            });
+        }
+
+        // Initialize avatar & points on load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateNavbarStudent();
+        });
+    </script>
+</body>
+</html>

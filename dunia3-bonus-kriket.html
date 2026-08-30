@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EdukaCivic - Kriket Konstitusi</title>
+    
+    <link rel="icon" type="image/png" href="Logo Edukacivic.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="student-system.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            red: '#DC2626', redLight: '#EF4444', redDark: '#B91C1C',
+                            dark: '#0F172A', darker: '#020617', light: '#F8FAFC'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #020617; color: white; overflow-x: hidden; user-select: none; }
+        #gameCanvas {
+            display: block;
+            margin: 0 auto;
+            background: #15803d;
+            border-radius: 24px;
+            box-shadow: 0 0 35px rgba(220, 38, 38, 0.35);
+            border: 3px solid rgba(220, 38, 38, 0.5);
+            max-width: 100%;
+            cursor: pointer;
+        }
+        .hit-btn:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col font-sans">
+
+    <!-- NAVBAR -->
+    <nav class="fixed w-full z-50 top-0 bg-brand-darker/90 backdrop-blur-md border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex items-center gap-4">
+                    <a href="dunia3.html" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:text-white hover:bg-gray-700 transition-colors">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </a>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center text-brand-redLight text-xl">
+                            🏏
+                        </div>
+                        <div>
+                            <h1 class="font-bold text-lg leading-tight">Kriket Konstitusi</h1>
+                            <p class="text-xs text-brand-redLight">Level Bonus Dunia 3</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="bg-gray-800/80 px-4 py-2 rounded-full border border-gray-700 flex items-center gap-2">
+                        <i class="fa-solid fa-bolt text-yellow-500"></i>
+                        <span id="nav-poin" class="font-bold">0</span>
+                        <span class="text-xs text-gray-400 hidden sm:inline">Poin</span>
+                    </div>
+                    <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-brand-red to-orange-400 p-0.5">
+                        <img id="nav-avatar-img" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Student" alt="Avatar" class="w-full h-full rounded-full bg-slate-900 object-cover">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-grow pt-24 pb-8 flex flex-col items-center justify-center relative z-10 px-4">
+        
+        <!-- Scoreboard Header -->
+        <div class="w-full max-w-lg mb-4 flex flex-col items-center">
+            <div class="grid grid-cols-4 gap-2 w-full text-center">
+                <div class="bg-gray-800/90 border border-gray-700 p-2.5 rounded-2xl">
+                    <p class="text-[11px] text-gray-400 font-medium">RUNS</p>
+                    <p id="score-runs" class="text-2xl font-black text-yellow-400">0</p>
+                </div>
+                <div class="bg-gray-800/90 border border-gray-700 p-2.5 rounded-2xl">
+                    <p class="text-[11px] text-gray-400 font-medium">WICKETS</p>
+                    <p id="score-wickets" class="text-2xl font-black text-red-400">0<span class="text-xs text-gray-500 font-normal">/3</span></p>
+                </div>
+                <div class="bg-gray-800/90 border border-gray-700 p-2.5 rounded-2xl">
+                    <p class="text-[11px] text-gray-400 font-medium">BALLS</p>
+                    <p id="score-balls" class="text-2xl font-black text-blue-400">0</p>
+                </div>
+                <div class="bg-gray-800/90 border border-gray-700 p-2.5 rounded-2xl">
+                    <p class="text-[11px] text-gray-400 font-medium">TERBAIK</p>
+                    <p id="score-best" class="text-2xl font-black text-green-400">0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Canvas Container -->
+        <div class="relative w-full max-w-[420px]">
+            <canvas id="gameCanvas" width="400" height="520"></canvas>
+            
+            <!-- OVERLAY START -->
+            <div id="startScreen" class="absolute inset-0 flex flex-col items-center justify-center bg-black/85 rounded-[24px] backdrop-blur-md z-20 p-6 text-center">
+                <div class="w-20 h-20 bg-red-500/20 text-brand-redLight rounded-full flex items-center justify-center text-4xl mb-4 border border-red-500/30 animate-bounce">
+                    🏏
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-black text-white mb-2">Kriket Konstitusi</h2>
+                <p class="text-gray-300 text-sm mb-6 max-w-xs leading-relaxed">
+                    Tunggu bola memasuki <span class="text-yellow-400 font-bold">Zona Pukul</span> lalu klik atau tekan <span class="text-red-400 font-bold">PUKUL!</span> Cetak <span class="text-green-400 font-bold">6 Runs</span>!
+                </p>
+                <button onclick="startGame()" class="px-8 py-3.5 bg-gradient-to-r from-brand-red to-rose-600 hover:from-red-500 hover:to-rose-500 text-white rounded-2xl font-bold text-lg transition-transform hover:scale-105 shadow-xl shadow-red-600/40 flex items-center gap-2">
+                    <i class="fa-solid fa-play"></i> Mulai Bertanding
+                </button>
+            </div>
+
+            <!-- OVERLAY GAMEOVER -->
+            <div id="gameOverScreen" class="absolute inset-0 flex flex-col items-center justify-center bg-black/90 rounded-[24px] backdrop-blur-md z-20 p-6 text-center hidden">
+                <div class="w-16 h-16 bg-red-500/20 text-red-400 rounded-full flex items-center justify-center text-3xl mb-3 border border-red-500/30">
+                    💥
+                </div>       </div>
+                <h3 class="text-3xl font-black text-red-500 mb-1">INNINGS SELESAI!</h3>
+                <p class="text-gray-400 text-xs mb-4">Semua Wicket Telah Tumbang</p>
+                
+                <div class="bg-gray-800/80 border border-gray-700 rounded-2xl p-4 w-full max-w-xs mb-6 space-y-2">
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-gray-400">Total Runs:</span>
+                        <span id="final-score" class="text-2xl font-black text-yellow-400">0</span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-gray-400">Bola Dihadapi:</span>
+                        <span id="final-balls" class="text-lg font-bold text-white">0</span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-gray-400">Pukulan 6 Runs (Max):</span>
+                        <span id="final-sixes" class="text-lg font-bold text-green-400">0</span>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-2.5 w-full max-w-xs">
+                    <button onclick="startGame()" class="w-full py-3.5 bg-gradient-to-r from-brand-red to-rose-600 hover:from-red-500 hover:to-rose-500 text-white rounded-2xl font-bold text-base transition-transform hover:scale-105 shadow-lg shadow-red-600/30">
+                        <i class="fa-solid fa-rotate-right mr-1.5"></i> Main Lagi
+                    </button>
+                    <a href="dunia3.html" class="w-full py-2.5 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-2xl font-medium text-sm transition-colors border border-gray-700 block">
+                        Kembali ke Peta Dunia 3
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- BIG HIT BUTTON -->
+        <div class="mt-4 w-full max-w-[420px] flex justify-center">
+            <button id="hitButton" onclick="handleSwing()" class="hit-btn w-full py-4 bg-gradient-to-r from-red-600 via-rose-600 to-orange-500 hover:from-red-500 hover:to-orange-400 text-white font-extrabold text-xl rounded-2xl shadow-xl shadow-red-600/40 border border-white/20 flex items-center justify-center gap-3 transition-transform">
+                <i class="fa-solid fa-baseball-bat-ball text-2xl"></i> PUKUL BOLA! (SPASI)
+            </button>
+        </div>
+
+        <p class="text-gray-500 text-xs mt-3 text-center">
+            Tips: Pukul tepat saat bola melintasi lingkaran kuning untuk mencetak 6 Runs!
+        </p>
+
+    </main>
+
+    <script>
+        // Audio Synthesizer (Web Audio API)
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) audioCtx = new AudioContext();
+        }
+
+        function playSound(type) {
+            try {
+                if (!audioCtx) audioCtx = new AudioContext();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                const now = audioCtx.currentTime;
+
+                if (type === 'bat') {
+                    // Crisp wooden crack sound
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(450, now);
+                    osc.frequency.exponentialRampToValueAtTime(80, now + 0.12);
+                    gain.gain.setValueAtTime(0.6, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+                    osc.start(now);
+                    osc.stop(now + 0.12);
+                } else if (type === 'six') {
+                    // High cheer tone
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now); // C5
+                    osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+                    osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
+                    osc.frequency.setValueAtTime(1046.50, now + 0.24); // C6
+                    gain.gain.setValueAtTime(0.4, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.45);
+                    osc.start(now);
+                    osc.stop(now + 0.45);
+                } else if (type === 'out') {
+                    // Downward fail sound
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, now);
+                    osc.frequency.exponentialRampToValueAtTime(60, now + 0.35);
+                    gain.gain.setValueAtTime(0.5, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                } else if (type === 'bowl') {
+                    // Soft whoosh
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(180, now);
+                    osc.frequency.exponentialRampToValueAtTime(120, now + 0.08);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+                    osc.start(now);
+                    osc.stop(now + 0.08);
+                }
+            } catch(e) {}
+        }
+
+        // Progress & High Score
+        let prog = JSON.parse(localStorage.getItem('edukacivic_progress')) || { poin: 0, level: 1, dunia: 1, completedLevels: [] };
+        document.getElementById('nav-poin').textContent = prog.poin || 0;
+
+        let bestScore = parseInt(localStorage.getItem('edukacivic_cricket_best')) || 0;
+        document.getElementById('score-best').textContent = bestScore;
+
+        // Canvas Setup
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Game State
+        let isPlaying = false;
+        let runs = 0;
+        let wickets = 0;
+        const maxWickets = 3;
+        let ballsCount = 0;
+        let sixesCount = 0;
+        let animationFrameId = null;
+
+        // Visual Feedback Text (e.g., "6 RUNS! PERFECT!")
+        let feedbackText = '';
+        let feedbackColor = '#ffffff';
+        let feedbackAlpha = 0;
+        let feedbackScale = 1;
+
+        // Batsman & Pitch geometry
+        const pitch = {
+            topX: 160, topW: 80, topY: 100,
+            botX: 100, botW: 200, botY: 480
+        };
+
+        const batsman = {
+            x: 200, y: 440,
+            swingAngle: 0,
+            isSwinging: false,
+            swingProgress: 0
+        };
+
+        // Ball State
+        let ball = {
+            active: false,
+            x: 200, y: 110,
+            startX: 200, startY: 110,
+            targetX: 200, targetY: 450,
+            progress: 0,
+            speed: 0.015,
+            radius: 8,
+            hit: false,
+            hitType: null, // 'six', 'four', 'two', 'one', 'miss', 'out'
+            vx: 0, vy: 0,
+            rotation: 0
+        };
+
+        let nextBallTimer = null;
+
+        function updateScoreboard() {
+            document.getElementById('score-runs').textContent = runs;
+            document.getElementById('score-wickets').innerHTML = `${wickets}<span class="text-xs text-gray-500 font-normal">/${maxWickets}</span>`;
+            document.getElementById('score-balls').textContent = ballsCount;
+            document.getElementById('score-best').textContent = bestScore;
+        }
+
+        function showFeedback(text, color) {
+            feedbackText = text;
+            feedbackColor = color;
+            feedbackAlpha = 1;
+            feedbackScale = 1.6;
+        }
+
+        function spawnBall() {
+            if (!isPlaying || wickets >= maxWickets) return;
+
+            playSound('bowl');
+            ballsCount++;
+            updateScoreboard();
+
+            // Randomize delivery speed and target angle
+            const speeds = [0.014, 0.017, 0.020, 0.023];
+            const chosenSpeed = speeds[Math.floor(Math.random() * speeds.length)];
+
+            // Target around batsman crease (x between 160 and 240)
+            const targetX = 175 + Math.random() * 50;
+
+            ball = {
+                active: true,
+                x: 200,
+                y: 110,
+                startX: 200 + (Math.random() * 20 - 10),
+                startY: 110,
+                targetX: targetX,
+                targetY: 450,
+                progress: 0,
+                speed: chosenSpeed,
+                radius: 7,
+                hit: false,
+                hitType: null,
+                vx: 0,
+                vy: 0,
+                rotation: 0
+            };
+        }
+
+        function handleSwing() {
+            initAudio();
+            if (!isPlaying) {
+                startGame();
+                return;
+            }
+
+            // Animate bat swing
+            batsman.isSwinging = true;
+            batsman.swingProgress = 0;
+
+            if (!ball.active || ball.hit) return;
+
+            // Check timing relative to crease (targetY = 450)
+            const dist = Math.abs(ball.y - 440);
+
+            if (dist <= 18) {
+                // PERFECT! 6 RUNS!
+                ball.hit = true;
+                ball.hitType = 'six';
+                runs += 6;
+                sixesCount++;
+                playSound('bat');
+                setTimeout(() => playSound('six'), 60);
+                showFeedback('💥 6 RUNS! LUAR BIASA! 💥', '#4ade80');
+                
+                // Ball flies up into the sky
+                ball.vx = (Math.random() - 0.5) * 6;
+                ball.vy = -18 - Math.random() * 4;
+
+                // Confetti blast
+                try {
+                    confetti({
+                        particleCount: 50,
+                        spread: 60,
+                        origin: { y: 0.7 }
+                    });
+                } catch(e) {}
+
+            } else if (dist <= 38) {
+                // GREAT! 4 RUNS!
+                ball.hit = true;
+                ball.hitType = 'four';
+                runs += 4;
+                playSound('bat');
+                showFeedback('🔥 4 RUNS! PUKULAN MANTAP!', '#facc15');
+
+                ball.vx = (Math.random() > 0.5 ? 1 : -1) * (10 + Math.random() * 5);
+                ball.vy = -8 - Math.random() * 4;
+
+            } else if (dist <= 65) {
+                // 1 or 2 RUNS
+                const gained = Math.random() > 0.5 ? 2 : 1;
+                ball.hit = true;
+                ball.hitType = gained === 2 ? 'two' : 'one';
+                runs += gained;
+                playSound('bat');
+                showFeedback(`⚡ ${gained} RUNS! BAGUS!`, '#60a5fa');
+
+                ball.vx = (Math.random() - 0.5) * 8;
+                ball.vy = -4 - Math.random() * 3;
+
+            } else {
+                // Swing and miss
+                showFeedback('💨 AYUNAN MELESET!', '#9ca3af');
+            }
+
+            updateScoreboard();
+        }
+
+        function startGame() {
+            initAudio();
+            document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('gameOverScreen').classList.add('hidden');
+
+            runs = 0;
+            wickets = 0;
+            ballsCount = 0;
+            sixesCount = 0;
+            isPlaying = true;
+            ball.active = false;
+
+            updateScoreboard();
+            clearTimeout(nextBallTimer);
+            nextBallTimer = setTimeout(spawnBall, 800);
+
+            if (!animationFrameId) {
+                gameLoop();
+            }
+        }
+
+        function gameOver() {
+            isPlaying = false;
+            ball.active = false;
+            clearTimeout(nextBallTimer);
+            playSound('out');
+
+            document.getElementById('final-score').textContent = runs;
+            document.getElementById('final-balls').textContent = ballsCount;
+            document.getElementById('final-sixes').textContent = sixesCount;
+            document.getElementById('gameOverScreen').classList.remove('hidden');
+
+            if (runs > bestScore) {
+                bestScore = runs;
+                localStorage.setItem('edukacivic_cricket_best', bestScore);
+                document.getElementById('score-best').textContent = bestScore;
+
+                try {
+                    confetti({
+                        particleCount: 120,
+                        spread: 80,
+                        origin: { y: 0.6 }
+                    });
+                } catch(e) {}
+            }
+        }
+
+        function gameLoop() {
+            update();
+            draw();
+            animationFrameId = requestAnimationFrame(gameLoop);
+        }
+
+        function update() {
+            // Batsman swing animation decay
+            if (batsman.isSwinging) {
+                batsman.swingProgress += 0.18;
+                if (batsman.swingProgress >= Math.PI) {
+                    batsman.isSwinging = false;
+                    batsman.swingProgress = 0;
+                }
+            }
+
+            // Ball Physics
+            if (ball.active) {
+                if (!ball.hit) {
+                    ball.progress += ball.speed;
+                    ball.x = ball.startX + (ball.targetX - ball.startX) * ball.progress;
+                    ball.y = ball.startY + (ball.targetY - ball.startY) * ball.progress;
+                    ball.radius = 6 + ball.progress * 4.5; // Perspective scaling
+
+                    // Ball passed crease without being hit
+                    if (ball.progress >= 1.15) {
+                        ball.active = false;
+                        wickets++;
+                        playSound('out');
+                        showFeedback('âŒ WICKET! BOLA KENA GAYANG!', '#ef4444');
+                        updateScoreboard();
+
+                        if (wickets >= maxWickets) {
+                            setTimeout(gameOver, 800);
+                        } else {
+                            nextBallTimer = setTimeout(spawnBall, 1400);
+                        }
+                    }
+                } else {
+                    // Ball hit animation
+                    ball.x += ball.vx;
+                    ball.y += ball.vy;
+                    ball.vy += 0.5; // Gravity
+                    ball.radius = Math.max(3, ball.radius * 0.985);
+
+                    if (ball.y < -30 || ball.y > canvas.height + 30 || ball.x < -30 || ball.x > canvas.width + 30) {
+                        ball.active = false;
+                        if (wickets < maxWickets) {
+                            nextBallTimer = setTimeout(spawnBall, 900);
+                        }
+                    }
+                }
+            }
+
+            // Feedback fade
+            if (feedbackAlpha > 0) {
+                feedbackAlpha -= 0.02;
+                if (feedbackScale > 1) feedbackScale -= 0.03;
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 1. Grass Stadium Field
+            ctx.fillStyle = '#166534';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Mow stripes
+            ctx.fillStyle = '#15803d';
+            for (let i = 0; i < canvas.height; i += 40) {
+                if ((i / 40) % 2 === 0) {
+                    ctx.fillRect(0, i, canvas.width, 40);
+                }
+            }
+
+            // Stadium Boundary Ring (Perspective ellipse)
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+            ctx.lineWidth = 3;
+            ctx.setLineDash([8, 8]);
+            ctx.beginPath();
+            ctx.ellipse(200, 260, 185, 240, 0, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // 2. Cricket Pitch (Perspective Trapezoid)
+            ctx.fillStyle = '#d97706'; // Mud/Clay pitch
+            ctx.beginPath();
+            ctx.moveTo(160, 90);
+            ctx.lineTo(240, 90);
+            ctx.lineTo(280, 480);
+            ctx.lineTo(120, 480);
+            ctx.closePath();
+            ctx.fill();
+
+            // Inner grass wear texture on pitch
+            ctx.fillStyle = '#b45309';
+            ctx.beginPath();
+            ctx.moveTo(170, 110);
+            ctx.lineTo(230, 110);
+            ctx.lineTo(260, 460);
+            ctx.lineTo(140, 460);
+            ctx.closePath();
+            ctx.fill();
+
+            // Crease lines (Bowling crease & Batting crease)
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2.5;
+
+            // Bowling Crease (Top)
+            ctx.beginPath();
+            ctx.moveTo(150, 110);
+            ctx.lineTo(250, 110);
+            ctx.stroke();
+
+            // Batting Crease / Popping Crease (Bottom)
+            ctx.beginPath();
+            ctx.moveTo(110, 435);
+            ctx.lineTo(290, 435);
+            ctx.stroke();
+
+            // 3. Perfect Hit Zone Guide Circle
+            ctx.strokeStyle = 'rgba(250, 204, 21, 0.4)';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            ctx.ellipse(200, 440, 50, 18, 0, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // 4. Stumps / Wickets at Bowler end
+            ctx.fillStyle = '#fef08a';
+            for (let i = -1; i <= 1; i++) {
+                ctx.fillRect(200 + i * 5 - 1.5, 92, 3, 14);
+            }
+            // Bail
+            ctx.fillRect(193, 91, 14, 2);
+
+            // 5. Stumps / Wickets at Batsman end
+            ctx.fillStyle = '#fef08a';
+            for (let i = -1; i <= 1; i++) {
+                ctx.fillRect(200 + i * 8 - 2, 455, 4, 26);
+            }
+            // Bail
+            ctx.fillRect(190, 453, 20, 3);
+
+            // 6. Bowler Character (Top)
+            ctx.fillStyle = '#dc2626'; // Red jersey
+            ctx.beginPath();
+            ctx.arc(200, 78, 9, 0, Math.PI * 2);
+            ctx.fill();
+            // Bowler Head
+            ctx.fillStyle = '#fde047';
+            ctx.beginPath();
+            ctx.arc(200, 65, 6, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 7. Batsman Character (Bottom)
+            const bx = batsman.x;
+            const by = batsman.y;
+
+            // Batsman Shadow
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+            ctx.beginPath();
+            ctx.ellipse(bx, by + 18, 18, 7, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Batsman Body (Navy / Red outfit)
+            ctx.fillStyle = '#1e3a8a';
+            ctx.beginPath();
+            ctx.arc(bx - 12, by - 5, 14, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Batsman Helmet / Head
+            ctx.fillStyle = '#dc2626';
+            ctx.beginPath();
+            ctx.arc(bx - 12, by - 24, 10, 0, Math.PI * 2);
+            ctx.fill();
+            // Helmet Grille
+            ctx.fillStyle = '#94a3b8';
+            ctx.fillRect(bx - 6, by - 24, 4, 8);
+
+            // Batsman Bat (Ayunkan saat dipukul)
+            ctx.save();
+            ctx.translate(bx - 4, by - 5);
+            let batAngle = -0.4;
+            if (batsman.isSwinging) {
+                batAngle = -0.4 + Math.sin(batsman.swingProgress) * 2.2;
+            }
+            ctx.rotate(batAngle);
+
+            // Bat Handle & Blade
+            ctx.fillStyle = '#ffffff'; // Grip
+            ctx.fillRect(-2, -32, 4, 12);
+            ctx.fillStyle = '#d97706'; // Wood blade
+            ctx.fillRect(-4, -20, 8, 28);
+            ctx.fillStyle = '#b45309';
+            ctx.fillRect(-4, 4, 8, 4); // Bat toe
+            ctx.restore();
+
+            // 8. Draw Ball
+            if (ball.active) {
+                // Ball Shadow
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+                ctx.beginPath();
+                ctx.ellipse(ball.x, ball.y + ball.radius * 0.8, ball.radius, ball.radius * 0.5, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Ball Body (Red Cricket Ball)
+                ctx.fillStyle = '#ef4444';
+                ctx.beginPath();
+                ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Ball Seam (White stitched line)
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.arc(ball.x, ball.y, ball.radius * 0.85, -0.6, 1.8);
+                ctx.stroke();
+            }
+
+            // 9. Floating Feedback Text
+            if (feedbackAlpha > 0) {
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, feedbackAlpha);
+                ctx.font = `900 ${Math.floor(18 * feedbackScale)}px Poppins, sans-serif`;
+                ctx.fillStyle = feedbackColor;
+                ctx.textAlign = 'center';
+                ctx.shadowColor = 'rgba(0,0,0,0.8)';
+                ctx.shadowBlur = 8;
+                ctx.fillText(feedbackText, 200, 260);
+                ctx.restore();
+            }
+        }
+
+        // Controls
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' || e.key === ' ' || e.code === 'Enter') {
+                e.preventDefault();
+                handleSwing();
+            }
+        });
+
+        canvas.addEventListener('click', (e) => {
+            e.preventDefault();
+            handleSwing();
+        });
+
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            handleSwing();
+        });
+
+        // Initialize canvas drawing
+        draw();
+    </script>
+</body>
+</html>
+

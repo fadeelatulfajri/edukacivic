@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Menjodohkan - Level 3 | EdukaCivic</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="Logo Edukacivic.png">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="student-system.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            red: '#DC2626', redLight: '#EF4444', redDark: '#B91C1C',
+                            dark: '#0F172A', darker: '#020617', light: '#F8FAFC'
+                        }
+                    },
+                    animation: {
+                        'shake': 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both',
+                        'pulse-green': 'pulse-green 1s ease-out'
+                    },
+                    keyframes: {
+                        shake: {
+                            '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
+                            '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
+                            '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
+                            '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
+                        },
+                        'pulse-green': {
+                            '0%, 100%': { backgroundColor: 'transparent' },
+                            '50%': { backgroundColor: 'rgba(34, 197, 94, 0.2)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+        .connecting-line {
+            stroke: #3b82f6; /* Blue for active */
+            stroke-width: 3;
+            stroke-dasharray: 8;
+            animation: dash 1s linear infinite;
+        }
+        .connected-line {
+            stroke: #22c594; /* Green for success */
+            stroke-width: 4;
+        }
+        @keyframes dash {
+            to { stroke-dashoffset: -16; }
+        }
+    </style>
+</head>
+<body class="bg-brand-darker text-brand-light min-h-screen flex flex-col relative overflow-x-hidden">
+
+    <!-- Auth / Progress Check Script -->
+    <script>
+        const progress = JSON.parse(localStorage.getItem('edukacivic_progress')) || { poin: 0, level: 1, dunia: 1, completedLevels: [] };
+        if (!progress.completedLevels.includes('d1l2')) {
+            window.location.href = 'dunia1.html';
+        }
+    </script>
+
+    <!-- Header -->
+    <header class="bg-brand-dark/80 backdrop-blur-md border-b border-white/10 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-brand-red flex items-center justify-center">
+                    <i class="fas fa-graduation-cap text-white text-sm"></i>
+                </div>
+                <h1 class="font-bold text-lg hidden sm:block">EdukaCivic</h1>
+            </div>
+            
+            <div id="game-stats" class="flex gap-4 items-center hidden">
+                <div class="bg-white/10 px-4 py-1.5 rounded-full flex items-center gap-2">
+                    <i class="fas fa-clock text-yellow-400"></i>
+                    <span id="timer" class="font-mono font-bold">00:00</span>
+                </div>
+                <div class="bg-white/10 px-4 py-1.5 rounded-full flex items-center gap-2">
+                    <i class="fas fa-star text-brand-redLight"></i>
+                    <span id="score-display" class="font-bold">0 / 25</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow flex flex-col relative">
+        <!-- SVG Canvas for Lines -->
+        <svg id="lines-svg" class="absolute top-0 left-0 w-full h-full pointer-events-none z-10" style="min-height: 100vh;"></svg>
+
+        <!-- Intro Screen -->
+        <div id="intro-screen" class="max-w-2xl mx-auto w-full px-4 flex-grow flex items-center justify-center relative z-20">
+            <div class="bg-brand-dark rounded-2xl p-8 border border-white/10 shadow-2xl text-center w-full">
+                <div class="w-20 h-20 bg-brand-red/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-link text-4xl text-brand-redLight"></i>
+                </div>
+                <h2 class="text-3xl font-bold mb-2">Kuis Menjodohkan</h2>
+                <h3 class="text-xl text-gray-400 mb-6">Level 3</h3>
+                <p class="text-gray-300 mb-8 leading-relaxed">
+                    Sambungkan istilah di kolom kiri dengan jawaban yang tepat di kolom kanan! Pilih satu dari kiri, lalu pilih jodohnya di kanan.
+                </p>
+                <div class="flex justify-center gap-8 mb-8">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-white mb-1">5</div>
+                        <div class="text-sm text-gray-400">Pasang</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-brand-redLight mb-1">25</div>
+                        <div class="text-sm text-gray-400">Poin Maks</div>
+                    </div>
+                </div>
+                <button onclick="startGame()" class="w-full sm:w-auto px-8 py-4 bg-brand-red hover:bg-brand-redLight text-white font-bold rounded-xl transition-colors shadow-lg hover:shadow-brand-red/20">
+                    Mulai Bermain <i class="fas fa-play ml-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Game Area -->
+        <div id="game-screen" class="max-w-5xl mx-auto w-full px-4 py-8 flex-grow hidden relative z-20">
+            <div class="flex flex-col md:flex-row gap-8 justify-between w-full h-full relative" id="match-container">
+                <!-- Kolom Kiri -->
+                <div class="flex-1 flex flex-col gap-4" id="col-left"></div>
+                
+                <!-- Spacer for mobile -->
+                <div class="md:w-32 flex-shrink-0 flex items-center justify-center pointer-events-none md:hidden">
+                    <i class="fas fa-arrow-down text-2xl text-white/20"></i>
+                </div>
+
+                <!-- Kolom Kanan -->
+                <div class="flex-1 flex flex-col gap-4" id="col-right"></div>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="result-screen" class="max-w-2xl mx-auto w-full px-4 flex-grow flex items-center justify-center hidden relative z-30">
+            <div class="bg-brand-dark rounded-2xl p-8 border border-white/10 shadow-2xl text-center w-full">
+                <div id="result-icon" class="w-24 h-24 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-check text-5xl text-green-400"></i>
+                </div>
+                <h2 id="result-title" class="text-3xl font-bold mb-2">Luar Biasa!</h2>
+                <p class="text-gray-400 mb-8">Level 3 Selesai</p>
+                
+                <div class="grid grid-cols-2 gap-4 mb-8">
+                    <div class="bg-white/5 p-4 rounded-xl border border-white/10">
+                        <div class="text-sm text-gray-400 mb-1">Total Poin</div>
+                        <div class="text-3xl font-bold text-brand-redLight" id="final-score">0</div>
+                    </div>
+                    <div class="bg-white/5 p-4 rounded-xl border border-white/10">
+                        <div class="text-sm text-gray-400 mb-1">Waktu</div>
+                        <div class="text-3xl font-bold text-white" id="final-time">00:00</div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="dunia1-level4.html" class="px-8 py-3.5 bg-gradient-to-r from-brand-red to-orange-600 hover:from-brand-redLight hover:to-orange-500 text-white font-bold rounded-xl transition-all shadow-xl shadow-red-600/30 hover:scale-[1.02] flex items-center justify-center gap-2 text-sm">
+                        <span>Lanjut ke Level 4</span> <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                    <a href="dunia1.html" class="px-6 py-3.5 bg-white/10 hover:bg-white/20 text-gray-200 hover:text-white font-semibold rounded-xl border border-white/10 transition flex items-center justify-center gap-2 text-sm">
+                        <i class="fas fa-map mr-1"></i> Kembali ke Peta Level
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-brand-dark border-t border-white/10 py-6 text-center text-sm text-gray-400 relative z-20">
+        <p>&copy; 2026 EdukaCivic | Fadilatul Fajri</p>
+    </footer>
+
+    <script>
+        const pairsData = [
+            { id: 1, left: "Konstitusi Indonesia", right: "UUD NRI Tahun 1945" },
+            { id: 2, left: "Bab pada UUD 1945", right: "16 Bab" },
+            { id: 3, left: "Pasal pada UUD 1945", right: "37 Pasal" },
+            { id: 4, left: "Pasal Aturan Peralihan pada UUD 1945", right: "3 Pasal Aturan Peralihan" },
+            { id: 5, left: "Pasal Aturan Tambahan pada UUD 1945", right: "2 Pasal Aturan Tambahan" }
+        ];
+
+        let leftItems = [];
+        let rightItems = [];
+        let selectedLeft = null;
+        let selectedRight = null;
+        let matchedPairs = [];
+        
+        let score = 0;
+        let attempts = {};
+        const maxPairScore = 5;
+        
+        let timer = 0;
+        let timerInterval;
+
+        // Shuffle function
+        function shuffle(array) {
+            let currentIndex = array.length, randomIndex;
+            while (currentIndex !== 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+            }
+            return array;
+        }
+
+        function startGame() {
+            document.getElementById('intro-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('game-stats').classList.remove('hidden');
+            
+            // Initialize attempts tracking
+            pairsData.forEach(p => {
+                attempts[p.id] = 0;
+            });
+
+            // Prepare UI
+            leftItems = shuffle([...pairsData]);
+            rightItems = shuffle([...pairsData]);
+            
+            renderItems();
+
+            timerInterval = setInterval(() => {
+                timer++;
+                const m = String(Math.floor(timer / 60)).padStart(2, '0');
+                const s = String(timer % 60).padStart(2, '0');
+                document.getElementById('timer').innerText = `${m}:${s}`;
+                updateLines();
+            }, 1000);
+
+            // Update lines on window resize
+            window.addEventListener('resize', updateLines);
+            // Update lines on scroll
+            window.addEventListener('scroll', updateLines);
+        }
+
+        function renderItems() {
+            const colLeft = document.getElementById('col-left');
+            const colRight = document.getElementById('col-right');
+            
+            colLeft.innerHTML = '';
+            colRight.innerHTML = '';
+
+            leftItems.forEach((item) => {
+                const div = document.createElement('div');
+                div.className = `match-item bg-brand-dark border-2 border-blue-500/50 rounded-xl p-4 cursor-pointer hover:border-blue-500 transition-all z-20 flex items-center shadow-lg relative min-h-[80px]`;
+                div.id = `left-${item.id}`;
+                div.dataset.id = item.id;
+                div.dataset.side = 'left';
+                div.innerHTML = `<span class="font-medium text-white">${item.left}</span>`;
+                div.onclick = () => handleSelect(div, 'left');
+                colLeft.appendChild(div);
+            });
+
+            rightItems.forEach((item) => {
+                const div = document.createElement('div');
+                div.className = `match-item bg-brand-dark border-2 border-orange-500/50 rounded-xl p-4 cursor-pointer hover:border-orange-500 transition-all z-20 flex items-center justify-end text-right shadow-lg relative min-h-[80px]`;
+                div.id = `right-${item.id}`;
+                div.dataset.id = item.id;
+                div.dataset.side = 'right';
+                div.innerHTML = `<span class="font-medium text-white">${item.right}</span>`;
+                div.onclick = () => handleSelect(div, 'right');
+                colRight.appendChild(div);
+            });
+        }
+
+        function handleSelect(element, side) {
+            const id = parseInt(element.dataset.id);
+
+            // Prevent selecting already matched
+            if (matchedPairs.includes(id)) return;
+
+            // Handle selection logic
+            if (side === 'left') {
+                if (selectedLeft) {
+                    selectedLeft.classList.remove('border-blue-400', 'bg-blue-900/30', 'scale-[1.02]');
+                    selectedLeft.classList.add('border-blue-500/50');
+                }
+                if (selectedLeft === element) {
+                    selectedLeft = null;
+                } else {
+                    selectedLeft = element;
+                    selectedLeft.classList.remove('border-blue-500/50');
+                    selectedLeft.classList.add('border-blue-400', 'bg-blue-900/30', 'scale-[1.02]');
+                }
+            } else {
+                if (selectedRight) {
+                    selectedRight.classList.remove('border-orange-400', 'bg-orange-900/30', 'scale-[1.02]');
+                    selectedRight.classList.add('border-orange-500/50');
+                }
+                if (selectedRight === element) {
+                    selectedRight = null;
+                } else {
+                    selectedRight = element;
+                    selectedRight.classList.remove('border-orange-500/50');
+                    selectedRight.classList.add('border-orange-400', 'bg-orange-900/30', 'scale-[1.02]');
+                }
+            }
+
+            checkMatch();
+            updateLines();
+        }
+
+        function checkMatch() {
+            if (selectedLeft && selectedRight) {
+                const idLeft = parseInt(selectedLeft.dataset.id);
+                const idRight = parseInt(selectedRight.dataset.id);
+
+                if (idLeft === idRight) {
+                    // Correct Match
+                    const id = idLeft;
+                    matchedPairs.push(id);
+                    
+                    // Score calc
+                    let pScore = maxPairScore - attempts[id];
+                    if (pScore < 1) pScore = 1; // Min 1 poin for getting it right eventually
+                    score += pScore;
+                    document.getElementById('score-display').innerText = `${score} / 25`;
+
+                    // Animate success
+                    selectedLeft.classList.remove('border-blue-400', 'bg-blue-900/30', 'scale-[1.02]', 'cursor-pointer', 'hover:border-blue-500');
+                    selectedRight.classList.remove('border-orange-400', 'bg-orange-900/30', 'scale-[1.02]', 'cursor-pointer', 'hover:border-orange-500');
+                    
+                    selectedLeft.classList.add('border-green-500', 'bg-green-900/20', 'animate-pulse-green', 'opacity-80');
+                    selectedRight.classList.add('border-green-500', 'bg-green-900/20', 'animate-pulse-green', 'opacity-80');
+                    
+                    // Add checkmarks
+                    selectedLeft.innerHTML += `<div class="absolute -right-3 -top-3 bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs shadow-lg"><i class="fas fa-check"></i></div>`;
+                    selectedRight.innerHTML += `<div class="absolute -left-3 -top-3 bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs shadow-lg"><i class="fas fa-check"></i></div>`;
+
+                    selectedLeft.onclick = null;
+                    selectedRight.onclick = null;
+                    
+                    selectedLeft = null;
+                    selectedRight = null;
+
+                    if (matchedPairs.length === pairsData.length) {
+                        setTimeout(endGame, 1000);
+                    }
+                } else {
+                    // Wrong Match
+                    attempts[idLeft]++;
+                    
+                    const l = selectedLeft;
+                    const r = selectedRight;
+                    
+                    l.classList.add('border-red-500', 'bg-red-900/30', 'animate-shake');
+                    r.classList.add('border-red-500', 'bg-red-900/30', 'animate-shake');
+                    
+                    setTimeout(() => {
+                        l.classList.remove('border-blue-400', 'bg-blue-900/30', 'scale-[1.02]', 'border-red-500', 'bg-red-900/30', 'animate-shake');
+                        r.classList.remove('border-orange-400', 'bg-orange-900/30', 'scale-[1.02]', 'border-red-500', 'bg-red-900/30', 'animate-shake');
+                        
+                        l.classList.add('border-blue-500/50');
+                        r.classList.add('border-orange-500/50');
+                    }, 500);
+
+                    selectedLeft = null;
+                    selectedRight = null;
+                }
+            }
+        }
+
+        function updateLines() {
+            const svg = document.getElementById('lines-svg');
+            svg.innerHTML = '';
+            
+            // Draw active connecting line
+            if (selectedLeft || selectedRight) {
+                // If only one selected, we could draw line to cursor (not implemented for touch friendliness)
+            }
+
+            // Draw matched lines
+            matchedPairs.forEach(id => {
+                const el1 = document.getElementById(`left-${id}`);
+                const el2 = document.getElementById(`right-${id}`);
+                if (el1 && el2) {
+                    drawLine(svg, el1, el2, 'connected-line');
+                }
+            });
+        }
+
+        function drawLine(svg, el1, el2, className) {
+            const rect1 = el1.getBoundingClientRect();
+            const rect2 = el2.getBoundingClientRect();
+            
+            // Get positions relative to document
+            const x1 = rect1.right;
+            const y1 = rect1.top + rect1.height / 2 + window.scrollY;
+            
+            const x2 = rect2.left;
+            const y2 = rect2.top + rect2.height / 2 + window.scrollY;
+
+            // Adjust width if stacking vertically on mobile
+            if (window.innerWidth < 768) {
+               // Mobile stacking logic - connect bottom of left to top of right
+               const x1_m = rect1.left + rect1.width / 2;
+               const y1_m = rect1.bottom + window.scrollY;
+               const x2_m = rect2.left + rect2.width / 2;
+               const y2_m = rect2.top + window.scrollY;
+               
+               const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+               line.setAttribute('x1', x1_m);
+               line.setAttribute('y1', y1_m);
+               line.setAttribute('x2', x2_m);
+               line.setAttribute('y2', y2_m);
+               line.setAttribute('class', className);
+               svg.appendChild(line);
+               return;
+            }
+
+            // Path with curve for desktop
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            const d = `M ${x1} ${y1} C ${x1 + 50} ${y1}, ${x2 - 50} ${y2}, ${x2} ${y2}`;
+            
+            path.setAttribute('d', d);
+            path.setAttribute('fill', 'none');
+            path.setAttribute('class', className);
+            
+            svg.appendChild(path);
+        }
+
+        function endGame() {
+            clearInterval(timerInterval);
+            
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('game-stats').classList.add('hidden');
+            document.getElementById('lines-svg').style.display = 'none';
+            document.getElementById('result-screen').classList.remove('hidden');
+            
+            // Format time
+            const m = String(Math.floor(timer / 60)).padStart(2, '0');
+            const s = String(timer % 60).padStart(2, '0');
+            
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('final-time').innerText = `${m}:${s}`;
+            
+            // Save Progress
+            if (typeof recordLevelCompleted === "function") {
+                recordLevelCompleted("d1l3", score);
+            } else {
+                let progress = JSON.parse(localStorage.getItem('edukacivic_progress') || '{"poin":0,"level":1,"dunia":1,"completedLevels":[]}');
+                progress.poin = (progress.poin || 0) + score;
+                if (!progress.completedLevels.includes('d1l3')) {
+                    progress.completedLevels.push('d1l3');
+                }
+                if (progress.level < 4) {
+                    progress.level = 4;
+                }
+                localStorage.setItem('edukacivic_progress', JSON.stringify(progress));
+            }
+            
+            // Confetti
+            if (score > 15) {
+                const duration = 3000;
+                const end = Date.now() + duration;
+
+                (function frame() {
+                    confetti({
+                        particleCount: 5,
+                        angle: 60,
+                        spread: 55,
+                        origin: { x: 0 },
+                        colors: ['#DC2626', '#3b82f6', '#22c594']
+                    });
+                    confetti({
+                        particleCount: 5,
+                        angle: 120,
+                        spread: 55,
+                        origin: { x: 1 },
+                        colors: ['#DC2626', '#3b82f6', '#22c594']
+                    });
+
+                    if (Date.now() < end) {
+                        requestAnimationFrame(frame);
+                    }
+                }());
+            }
+        }
+    </script>
+</body>
+</html>
+

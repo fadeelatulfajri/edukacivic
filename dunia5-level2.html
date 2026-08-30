@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level 18: 👥 Game Bersama — Kolaborasi Pembiasaan Konstitusi - EdukaCivic</title>
+    <link rel="icon" type="image/png" href="Logo Edukacivic.png">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="student-system.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            emerald: '#10B981', emeraldLight: '#34D399', emeraldDark: '#059669',
+                            teal: '#14B8A6', tealLight: '#2DD4BF',
+                            cyan: '#06B6D4',
+                            dark: '#0F172A', darker: '#020617', light: '#F8FAFC'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0b1512; }
+        ::-webkit-scrollbar-thumb { background: #0d9488; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #14b8a6; }
+
+        .game-card {
+            background: rgba(13, 33, 29, 0.9);
+            backdrop-filter: blur(14px);
+            border: 2px solid rgba(20, 184, 166, 0.4);
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 30px -5px rgba(20, 184, 166, 0.2);
+        }
+
+        .avatar-slot {
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .avatar-slot:hover {
+            transform: translateY(-4px);
+        }
+
+        .opt-btn {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .opt-btn:hover {
+            transform: translateX(4px);
+        }
+    </style>
+    <script>
+        function getProgress() {
+            try { return JSON.parse(localStorage.getItem('edukacivic_progress')) || { poin: 0, level: 1, dunia: 5, completedLevels: [] }; }
+            catch(e) { return { poin: 0, level: 1, dunia: 5, completedLevels: [] }; }
+        }
+        const prog = getProgress();
+    </script>
+</head>
+<body class="bg-gradient-to-b from-[#081714] via-[#0e2722] to-[#071310] text-white font-sans antialiased min-h-screen flex flex-col justify-between selection:bg-teal-600 selection:text-white">
+
+    <!-- Web Audio Sound Effects -->
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            try {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'click') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(440, now);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                    osc.start(now);
+                    osc.stop(now + 0.1);
+                } else if (type === 'join') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.setValueAtTime(659.25, now + 0.08);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                } else if (type === 'correct') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.setValueAtTime(659.25, now + 0.08);
+                    osc.frequency.setValueAtTime(783.99, now + 0.16);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                } else if (type === 'victory') {
+                    [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+                        const o = audioCtx.createOscillator();
+                        const g = audioCtx.createGain();
+                        o.connect(g);
+                        g.connect(audioCtx.destination);
+                        o.type = 'triangle';
+                        o.frequency.setValueAtTime(freq, now + i * 0.1);
+                        g.gain.setValueAtTime(0.3, now + i * 0.1);
+                        g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.1 + 0.4);
+                        o.start(now + i * 0.1);
+                        o.stop(now + i * 0.1 + 0.4);
+                    });
+                }
+            } catch(e) {}
+        }
+    </script>
+
+    <!-- NAVBAR -->
+    <nav class="fixed w-full z-50 bg-[#091b17]/90 backdrop-blur-md border-b border-teal-900/50 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                
+                <div class="flex items-center gap-4">
+                    <a href="dunia5.html" class="flex items-center gap-2 text-gray-400 hover:text-white transition-colors group">
+                        <div class="w-8 h-8 bg-teal-950/80 border border-teal-800/60 rounded-lg flex items-center justify-center group-hover:bg-teal-900 transition-colors">
+                            <i class="fa-solid fa-arrow-left text-sm text-teal-400"></i>
+                        </div>
+                        <span class="text-sm font-medium hidden sm:inline">Peta Dunia 5</span>
+                    </a>
+                    <div class="w-px h-8 bg-gray-800"></div>
+                    <a href="index.html" class="flex items-center gap-2">
+                        <img src="Logo Edukacivic.png" alt="EdukaCivic" class="h-8 w-auto">
+                        <span class="font-bold text-lg text-white hidden sm:inline">Eduka<span class="text-teal-400">Civic</span></span>
+                    </a>
+                </div>
+                
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2 bg-teal-500/10 border border-teal-500/30 px-3 py-1.5 rounded-full">
+                        <i class="fa-solid fa-people-group text-teal-400 text-xs"></i>
+                        <span class="text-teal-400 font-bold text-xs">Level 18 · Game Kelompok</span>
+                    </div>
+                    <div class="flex items-center gap-2 bg-teal-950/80 px-3 py-1.5 rounded-lg border border-teal-800/60">
+                        <i class="fa-solid fa-bolt text-yellow-400 text-xs"></i>
+                        <span id="nav-poin" class="text-yellow-400 font-bold text-sm">0</span>
+                        <span class="text-gray-500 text-xs">Poin</span>
+                    </div>
+                    <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-teal-600 to-amber-400 p-0.5 cursor-pointer shadow-md" onclick="window.location.href='profil-siswa.html'">
+                        <img id="nav-avatar-img" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Student" alt="Avatar" class="w-full h-full rounded-full bg-slate-900 object-cover">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </nav>
+    <script>document.getElementById('nav-poin').textContent = prog.poin || 0;</script>
+
+    <!-- HERO SECTION -->
+    <section class="relative pt-24 pb-8 overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-teal-950/30 via-[#081714] to-[#081714] pointer-events-none"></div>
+
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 relative z-10 text-center">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-teal-500/15 border border-teal-500/40 mb-3 shadow-lg">
+                <i class="fa-solid fa-users text-teal-300 text-xs"></i>
+                <span class="text-xs font-bold text-teal-300 tracking-widest uppercase">LEVEL 18 · GAME BERSAMA KELOMPOK</span>
+            </div>
+            
+            <h1 class="text-3xl md:text-5xl font-black leading-tight mb-3">
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-300 via-emerald-300 to-amber-300">Kolaborasi Pembiasaan Konstitusi</span>
+            </h1>
+            
+            <p class="text-gray-300 text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
+                Berkumpullah bersama teman sekelompok di <strong>Ruang Tunggu Tim</strong>. Setelah seluruh anggota siap, mulailah memecahkan 4 studi kasus musyawarah konstitusi bersama-sama!
+            </p>
+        </div>
+    </section>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-grow pb-16 px-4">
+        <div class="max-w-4xl mx-auto space-y-8">
+
+            <!-- ===== FASE 1: RUANG TUNGGU / LOBBY KELOMPOK ===== -->
+            <section id="lobby-section" class="game-card p-6 md:p-8">
+                
+                <div class="flex items-center gap-3 mb-6 pb-4 border-b border-teal-900/60">
+                    <div class="w-12 h-12 rounded-2xl bg-teal-500/20 text-teal-400 flex items-center justify-center text-2xl border border-teal-500/30">
+                        <i class="fa-solid fa-door-open"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-teal-400">Lobby Permainan</span>
+                        <h2 class="text-xl md:text-2xl font-black text-white">Ruang Kumpul & Pembentukan Tim</h2>
+                    </div>
+                </div>
+
+                <!-- Input Identitas Tim -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label class="block text-xs font-bold text-teal-300 mb-1.5">Nama Kelompok:</label>
+                        <input type="text" id="input-team-name" placeholder="Contoh: Kelompok 1 - Garuda Konstitusi" class="w-full p-3 bg-slate-950 border border-teal-800 rounded-xl text-white text-xs sm:text-sm font-bold focus:border-teal-400 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-teal-300 mb-1.5">Pilih Tema Kelompok:</label>
+                        <select id="select-team-theme" onchange="updateThemeBadge()" class="w-full p-3 bg-slate-950 border border-teal-800 rounded-xl text-white text-xs sm:text-sm font-bold focus:border-teal-400 focus:outline-none">
+                            <option value="Garuda">🦅 Tim Garuda (Semangat Persatuan)</option>
+                            <option value="Bhinneka">🌈 Tim Bhinneka (Toleransi & Keragaman)</option>
+                            <option value="Pancasila">⭐ Tim Pancasila (Integritas Nilai Luhur)</option>
+                            <option value="Nusantara">🏝️ Tim Nusantara (Gotong Royong Kebangsaan)</option>
+                            <option value="Konstitusi">⚖️ Tim Konstitusi (Penegak Supremasi Hukum)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Tambah Teman ke Tim -->
+                <div class="bg-slate-950/80 p-4 sm:p-5 rounded-2xl border border-teal-900/60 mb-6">
+                    <label class="block text-xs font-bold text-gray-300 mb-2">Tambah Anggota ke Ruang Tunggu (3 - 5 Siswa):</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="input-member-name" placeholder="Ketik nama teman sekelompok..." class="flex-grow p-3 bg-slate-900 border border-gray-700 rounded-xl text-white text-xs sm:text-sm focus:border-teal-400 focus:outline-none">
+                        <button onclick="addTeamMember()" class="px-5 py-3 bg-teal-600 hover:bg-teal-500 text-white font-bold rounded-xl text-xs sm:text-sm transition flex items-center gap-1.5 shrink-0 cursor-pointer">
+                            <i class="fa-solid fa-user-plus"></i> Tambah
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Daftar Anggota di Ruang Tunggu -->
+                <h3 class="text-xs font-bold text-teal-400 uppercase tracking-wider mb-3 flex items-center justify-between">
+                    <span>Anggota di Ruang Tunggu (<span id="member-count">1</span> Siswa):</span>
+                    <span id="lobby-status-badge" class="text-[11px] bg-teal-500/20 text-teal-300 px-2.5 py-0.5 rounded-full border border-teal-500/30">
+                        🟢 Menunggu Teman...
+                    </span>
+                </h3>
+
+                <div id="members-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+                    <!-- Dynamic Injected by JS -->
+                </div>
+
+                <!-- Tombol Mulai Game Bersama -->
+                <div class="text-center">
+                    <button onclick="startTeamGame()" id="btn-start-game" class="w-full sm:w-auto px-10 py-4 bg-gradient-to-r from-teal-500 via-emerald-500 to-amber-500 hover:from-teal-400 hover:to-emerald-400 text-slate-950 font-black rounded-2xl text-sm shadow-xl shadow-teal-500/30 transition transform hover:scale-105 flex items-center justify-center gap-2 mx-auto cursor-pointer">
+                        <i class="fa-solid fa-play text-base"></i> Mulai Misi Game Bersama Sekarang!
+                    </button>
+                </div>
+
+            </section>
+
+            <!-- ===== FASE 2: ARENA GAME BERSAMA (4 KASUS MUSYAWARAH TIM) ===== -->
+            <section id="game-section" class="hidden game-card p-6 md:p-8">
+                
+                <!-- Game Header -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-teal-900/60">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-teal-500/20 text-teal-300 flex items-center justify-center text-xl font-bold border border-teal-500/30">
+                            🎮
+                        </div>
+                        <div>
+                            <span id="game-team-badge" class="text-xs font-extrabold text-amber-300">Tim: Garuda</span>
+                            <h3 class="text-base font-black text-white">Misi Musyawarah & Solusi Konstitusi</h3>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-3 text-xs">
+                        <span class="bg-teal-500/20 text-teal-300 px-3 py-1 rounded-full font-bold border border-teal-500/30" id="game-round-badge">
+                            Kasus 1 / 4
+                        </span>
+                        <span class="bg-amber-500/20 text-yellow-300 px-3 py-1 rounded-full font-bold border border-amber-500/30">
+                            Skor Tim: <strong id="team-score">0</strong> XP
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Scenario Question Box -->
+                <div class="mb-6 bg-slate-950/80 p-5 rounded-2xl border border-teal-900/60">
+                    <span id="case-category" class="inline-block text-[11px] font-black text-teal-400 uppercase tracking-widest mb-1">
+                        🏠 LINGKUNGAN KELUARGA
+                    </span>
+                    <h2 id="case-title" class="text-base sm:text-lg font-bold text-white leading-relaxed mb-2">
+                        Memuat skenario studi kasus tim...
+                    </h2>
+                    <p id="case-story" class="text-xs sm:text-sm text-gray-300 leading-relaxed">
+                        Deskripsi skenario masalah...
+                    </p>
+                </div>
+
+                <!-- Discussion Decision Options -->
+                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">
+                    Diskusikan bersama tim, lalu pilih keputusan musyawarah terbaik:
+                </p>
+                <div id="case-options-box" class="space-y-3">
+                    <!-- Injected by JS -->
+                </div>
+
+                <!-- Feedback Toast -->
+                <div id="case-feedback" class="hidden mt-4 p-4 rounded-xl text-xs sm:text-sm font-semibold leading-relaxed"></div>
+
+            </section>
+
+            <!-- ===== FASE 3: VICTORY & RINGKASAN KELOMPOK ===== -->
+            <section id="victory-section" class="hidden game-card p-6 md:p-8 text-center border-2 border-teal-500/70">
+                <div class="w-20 h-20 bg-gradient-to-tr from-teal-500 to-emerald-400 text-slate-950 rounded-full flex items-center justify-center text-4xl mx-auto mb-4 border-2 border-white shadow-2xl">
+                    🏆
+                </div>
+                
+                <h2 class="text-2xl sm:text-3xl font-black text-white mb-2">
+                    Misi Game Bersama Berhasil Dituntaskan!
+                </h2>
+                <p class="text-xs sm:text-sm text-gray-300 max-w-lg mx-auto mb-6 leading-relaxed">
+                    Kerja sama dan musyawarah tim kamu sangat hebat! Data kelompok ini telah disimpan dan otomatis terhubung ke <strong>Level 19 (Tugas Proyek Aksi Nyata)</strong>.
+                </p>
+
+                <!-- Team Summary Card -->
+                <div class="bg-slate-950/80 p-5 rounded-2xl border border-teal-900/80 max-w-md mx-auto mb-6 text-left text-xs">
+                    <div class="flex justify-between items-center border-b border-gray-800 pb-2 mb-3">
+                        <span class="text-gray-400 font-semibold">Nama Kelompok:</span>
+                        <strong id="v-team-name" class="text-teal-300 text-sm">Garuda</strong>
+                    </div>
+                    <div class="border-b border-gray-800 pb-2 mb-3">
+                        <span class="text-gray-400 font-semibold block mb-1">Anggota Tim:</span>
+                        <p id="v-team-members" class="text-white font-bold leading-relaxed">Nama Siswa</p>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-400 font-semibold">Capaian Poin Bersama:</span>
+                        <strong id="v-team-score" class="text-yellow-400 text-base font-black">+25 Poin</strong>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                    <a href="dunia5-level3.html" class="px-8 py-4 bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-400 hover:to-cyan-400 text-slate-950 font-black rounded-2xl text-xs sm:text-sm shadow-xl shadow-teal-500/30 transition transform hover:scale-105 flex items-center justify-center gap-2">
+                        <span>Lanjut ke Level 19 (Tugas Proyek Bersama)</span> <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                    <a href="dunia5.html" class="px-6 py-4 bg-slate-900 hover:bg-slate-800 text-gray-300 font-semibold rounded-2xl text-xs sm:text-sm border border-gray-700 transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-map"></i> Peta Dunia 5
+                    </a>
+                </div>
+            </section>
+
+            <!-- NAVIGASI LEVEL (SEBELUMNYA & SELANJUTNYA) -->
+            <div class="mt-8 pt-6 border-t border-gray-800">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <a href="dunia5-level1.html" class="w-full sm:w-auto px-5 py-3 bg-slate-900 hover:bg-slate-800 text-gray-300 hover:text-white font-bold rounded-xl border border-gray-800 transition flex items-center justify-center gap-2 text-xs sm:text-sm">
+                        <i class="fa-solid fa-chevron-left"></i> Sebelumnya: Level 17 (Materi Sikap Taat)
+                    </a>
+                    
+                    <a href="dunia5.html" class="text-xs text-gray-400 hover:text-white flex items-center gap-1.5 font-semibold">
+                        <i class="fa-solid fa-map"></i> Peta Dunia 5 (Level 18/20)
+                    </a>
+
+                    <a href="dunia5-level3.html" class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-500 hover:to-cyan-500 text-white font-bold rounded-xl shadow-lg shadow-teal-600/30 transition transform hover:scale-105 flex items-center justify-center gap-2 text-xs sm:text-sm">
+                        Selanjutnya: Level 19 (Tugas Proyek) <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-[#05100d]/90 text-gray-400 py-6 border-t border-teal-950/80 text-center text-xs">
+        <p>&copy; 2026 EdukaCivic | Fadilatul Fajri · SMP Negeri 5 Purwokerto</p>
+    </footer>
+
+    <!-- JAVASCRIPT GAME BERSAMA ENGINE -->
+    <script>
+        let teamMembers = [];
+        let currentRound = 0;
+        let teamScore = 0;
+        let caseAnswered = false;
+
+        const groupCases = [
+            {
+                category: "🏠 LINGKUNGAN KELUARGA (SILA 4 & 5)",
+                title: "Dilema Musyawarah Pembagian Tugas Rumah",
+                story: "Di sebuah keluarga, dua orang saudara kandung sering berselisih karena merasa pembagian tugas membersihkan rumah tidak adil saat orang tua sedang bekerja.",
+                opts: [
+                    "Menuntut saudara mengerjakan semuanya sendiri tanpa mau saling membantu",
+                    "Mengadakan musyawarah keluarga secara tenang untuk menyusun jadwal pembagian tugas yang adil sesuai kesepakatan bersama",
+                    "Membiarkan rumah berantakan hingga orang tua pulang",
+                    "Mengadu ke tetangga sekitar tanpa bicara baik-baik di rumah"
+                ],
+                ans: 1,
+                exp: "Musyawarah mufakat di ruang keluarga adalah wujud nyata nilai Sila Ke-4 Pancasila dan ketaatan norma konstitusi dalam lingkup keluarga."
+            },
+            {
+                category: "🏫 LINGKUNGAN SEKOLAH (PASAL 28D & 31)",
+                title: "Tantangan Mencegah Perundungan (Stop Bullying)",
+                story: "Seorang teman sekelas sering diejek dan dikucilkan oleh sekelompok siswa lain saat jam istirahat sekolah sehingga merasa takut masuk kelas.",
+                opts: [
+                    "Ikut mengejek agar tidak dimusuhi oleh kelompok perundung",
+                    "Merekam kejadian dan menyebarkannya di media sosial",
+                    "Merangkul teman tersebut, menegur pelaku secara santun, dan melaporkan kejadian kepada Guru BK/Wali Kelas",
+                    "Pura-pura tidak tahu dan menjauhi korban"
+                ],
+                ans: 2,
+                exp: "Menolak dan menghentikan perundungan mencerminkan jaminan perlindungan martabat dan hak asasi manusia sesuai amanat Pasal 28D UUD NRI 1945."
+            },
+            {
+                category: "🏛️ LINGKUNGAN MASYARAKAT (PASAL 27 AYAT 1)",
+                title: "Kepatuhan Hukum & Menjaga Ketertiban Umum",
+                story: "Warga di suatu perumahan sering memarkir kendaraan sembarangan di badan jalan sempit sehingga menghalangi akses jalan tetangga dan ambulans.",
+                opts: [
+                    "Merusak ban kendaraan yang parkir sembarangan (main hakim sendiri)",
+                    "Menyampaikan saran secara santun dalam rapat musyawarah warga RT untuk membuat aturan parkir bersama yang tertib",
+                    "Menutup total jalanan dengan batu besar",
+                    "Membuat keributan antartetangga di depan rumah"
+                ],
+                ans: 1,
+                exp: "Penyelesaian masalah melalui musyawarah RT menjunjung tinggi prinsip negara hukum (Pasal 27 ayat 1) dan menghindari tindakan main hakim sendiri."
+            },
+            {
+                category: "🇮🇩 IKRAR AKSI NYATA TIM KONSTITUSI",
+                title: "Komitmen Aksi Nyata Duta Konstitusi Muda",
+                story: "Sebagai tim pelajar penerus bangsa, langkah nyata apakah yang paling efektif dilakukan oleh kelompokmu untuk menyebarkan budaya taat konstitusi?",
+                opts: [
+                    "Membuat karya edukasi kreatif (poster/video) dan selalu menjadi teladan disiplin tata tertib di sekolah dan rumah",
+                    "Hanya menghafal nomor pasal tanpa pernah mempraktikkannya",
+                    "Menilai dan menyalahkan orang lain tanpa memperbaiki diri sendiri",
+                    "Menolak bekerja sama dengan teman yang berbeda suku atau agama"
+                ],
+                ans: 0,
+                exp: "Aksi nyata yang konsisten dan keteladanan sikap adalah kunci utama membentuk generasi bangsa yang berkarakter konstitusional."
+            }
+        ];
+
+        function initLobby() {
+            const active = getActiveStudent();
+            const studentName = active ? active.nama : 'Siswa 1 (Ketua)';
+            const studentAvatar = active && active.avatarUrl ? active.avatarUrl : 'https://api.dicebear.com/7.x/adventurer/svg?seed=Leader';
+            
+            // Check existing group data if any
+            const savedGroup = JSON.parse(localStorage.getItem('edukacivic_group_data'));
+            if (savedGroup && savedGroup.members && savedGroup.members.length > 0) {
+                teamMembers = savedGroup.members;
+                document.getElementById('input-team-name').value = savedGroup.name || 'Kelompok Garuda';
+            } else {
+                teamMembers = [
+                    { nama: studentName, avatarUrl: studentAvatar, role: 'Ketua Tim' }
+                ];
+            }
+            renderMembersGrid();
+        }
+
+        function addTeamMember() {
+            const inp = document.getElementById('input-member-name');
+            const name = inp.value.trim();
+            if (!name) {
+                alert('Silakan ketik nama teman terlebih dahulu.');
+                return;
+            }
+            if (teamMembers.some(m => m.nama.toLowerCase() === name.toLowerCase())) {
+                alert('Nama teman ini sudah ada di dalam tim.');
+                return;
+            }
+            if (teamMembers.length >= 6) {
+                alert('Jumlah anggota tim maksimal 6 siswa.');
+                return;
+            }
+
+            playSound('join');
+            const seed = encodeURIComponent(name);
+            const avatarUrl = `https://api.dicebear.com/7.x/adventurer/svg?seed=${seed}&backgroundColor=b6e3f4`;
+            
+            teamMembers.push({
+                nama: name,
+                avatarUrl: avatarUrl,
+                role: `Anggota ${teamMembers.length}`
+            });
+
+            inp.value = '';
+            renderMembersGrid();
+        }
+
+        function removeMember(idx) {
+            if (idx === 0) {
+                alert('Ketua tim tidak dapat dihapus dari daftar.');
+                return;
+            }
+            teamMembers.splice(idx, 1);
+            renderMembersGrid();
+        }
+
+        function renderMembersGrid() {
+            const grid = document.getElementById('members-grid');
+            grid.innerHTML = '';
+            document.getElementById('member-count').textContent = teamMembers.length;
+
+            const badge = document.getElementById('lobby-status-badge');
+            if (teamMembers.length >= 2) {
+                badge.className = 'text-[11px] bg-green-500/20 text-green-300 px-2.5 py-0.5 rounded-full border border-green-500/40 font-bold';
+                badge.innerHTML = '🟢 Tim Siap Memulai!';
+            } else {
+                badge.className = 'text-[11px] bg-yellow-500/20 text-yellow-300 px-2.5 py-0.5 rounded-full border border-yellow-500/40 font-bold';
+                badge.innerHTML = '⏳ Menunggu Teman (Min. 2 Siswa)...';
+            }
+
+            teamMembers.forEach((m, idx) => {
+                const card = document.createElement('div');
+                card.className = 'avatar-slot bg-slate-950/90 border border-teal-800/80 rounded-2xl p-3 text-center relative shadow-md';
+                card.innerHTML = `
+                    ${idx > 0 ? `<button onclick="removeMember(${idx})" class="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-red-600/80 hover:bg-red-500 text-white text-[10px] flex items-center justify-center transition" title="Hapus"><i class="fa-solid fa-xmark"></i></button>` : ''}
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-teal-500 to-amber-400 p-0.5 mx-auto mb-2 shadow-xs">
+                        <img src="${m.avatarUrl}" alt="${m.nama}" class="w-full h-full rounded-xl bg-slate-900 object-cover">
+                    </div>
+                    <h4 class="text-xs font-bold text-white truncate">${m.nama}</h4>
+                    <span class="text-[10px] text-teal-400 font-semibold">${m.role}</span>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function updateThemeBadge() {
+            const theme = document.getElementById('select-team-theme').value;
+            const tNameInput = document.getElementById('input-team-name');
+            if (!tNameInput.value || tNameInput.value.includes('Kelompok')) {
+                tNameInput.value = `Kelompok ${theme}`;
+            }
+        }
+
+        function startTeamGame() {
+            const teamName = document.getElementById('input-team-name').value.trim() || 'Kelompok Garuda';
+            
+            // Save to localStorage for Level 19 sharing!
+            const groupData = {
+                name: teamName,
+                theme: document.getElementById('select-team-theme').value,
+                members: teamMembers,
+                timestamp: new Date().toISOString()
+            };
+            localStorage.setItem('edukacivic_group_data', JSON.stringify(groupData));
+
+            playSound('victory');
+            document.getElementById('lobby-section').classList.add('hidden');
+            document.getElementById('game-section').classList.remove('hidden');
+            document.getElementById('game-team-badge').textContent = `Tim: ${teamName}`;
+            
+            currentRound = 0;
+            teamScore = 0;
+            loadCaseRound();
+        }
+
+        function loadCaseRound() {
+            caseAnswered = false;
+            const c = groupCases[currentRound];
+
+            document.getElementById('game-round-badge').textContent = `Kasus ${currentRound + 1} / ${groupCases.length}`;
+            document.getElementById('case-category').textContent = c.category;
+            document.getElementById('case-title').textContent = c.title;
+            document.getElementById('case-story').textContent = c.story;
+            document.getElementById('team-score').textContent = teamScore;
+
+            const fb = document.getElementById('case-feedback');
+            fb.classList.add('hidden');
+
+            const box = document.getElementById('case-options-box');
+            box.innerHTML = '';
+
+            c.opts.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'opt-btn w-full text-left p-4 bg-slate-950 border border-teal-900 hover:border-teal-400 rounded-2xl text-xs sm:text-sm text-gray-200 shadow-md flex items-start gap-3 transition cursor-pointer';
+                btn.innerHTML = `<span class="w-6 h-6 rounded-lg bg-teal-500/20 text-teal-300 font-bold flex items-center justify-center shrink-0 text-xs mt-0.5">${String.fromCharCode(65 + idx)}</span> <span class="leading-relaxed">${opt}</span>`;
+                btn.onclick = () => checkCaseAnswer(idx, btn);
+                box.appendChild(btn);
+            });
+        }
+
+        function checkCaseAnswer(selectedIdx, btnEl) {
+            if (caseAnswered) return;
+            caseAnswered = true;
+
+            const c = groupCases[currentRound];
+            const allBtns = document.querySelectorAll('#case-options-box .opt-btn');
+            const fb = document.getElementById('case-feedback');
+            fb.classList.remove('hidden');
+
+            if (selectedIdx === c.ans) {
+                teamScore += 25;
+                playSound('correct');
+                btnEl.classList.remove('bg-slate-950', 'border-teal-900');
+                btnEl.classList.add('bg-green-600/30', 'border-green-500', 'text-green-300');
+                fb.className = 'mt-4 p-4 rounded-xl text-xs sm:text-sm font-semibold bg-green-500/20 border border-green-500/40 text-green-300 leading-relaxed';
+                fb.innerHTML = `✅ <strong>Keputusan Tim Tepat!</strong> ${c.exp}`;
+            } else {
+                playSound('correct'); // Support team positive reinforcement
+                teamScore += 10;
+                btnEl.classList.remove('bg-slate-950', 'border-teal-900');
+                btnEl.classList.add('bg-amber-600/30', 'border-amber-500', 'text-yellow-300');
+                allBtns[c.ans].classList.remove('bg-slate-950', 'border-teal-900');
+                allBtns[c.ans].classList.add('bg-green-600/30', 'border-green-500', 'text-green-300');
+                fb.className = 'mt-4 p-4 rounded-xl text-xs sm:text-sm font-semibold bg-yellow-500/20 border border-yellow-500/40 text-yellow-300 leading-relaxed';
+                fb.innerHTML = `💡 <strong>Pilihan Bagus, Solusi Ideal:</strong> ${c.exp}`;
+            }
+
+            document.getElementById('team-score').textContent = teamScore;
+
+            setTimeout(() => {
+                currentRound++;
+                if (currentRound < groupCases.length) {
+                    loadCaseRound();
+                } else {
+                    finishTeamGame();
+                }
+            }, 2200);
+        }
+
+        function finishTeamGame() {
+            playSound('victory');
+            triggerCelebrationConfetti();
+            recordLevelCompleted('d5l2', 25);
+
+            document.getElementById('game-section').classList.add('hidden');
+            const vic = document.getElementById('victory-section');
+            vic.classList.remove('hidden');
+
+            const groupData = JSON.parse(localStorage.getItem('edukacivic_group_data')) || { name: 'Kelompok Garuda', members: teamMembers };
+            document.getElementById('v-team-name').textContent = groupData.name;
+            document.getElementById('v-team-members').textContent = groupData.members.map(m => m.nama).join(', ');
+            document.getElementById('v-team-score').textContent = `+25 Poin (Skor Tim: ${teamScore} XP)`;
+
+            const curProg = getProgress();
+            document.getElementById('nav-poin').textContent = curProg.poin || 0;
+            vic.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initLobby();
+            updateNavbarStudent();
+        });
+    </script>
+</body>
+</html>

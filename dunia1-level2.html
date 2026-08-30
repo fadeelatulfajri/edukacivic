@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level 2 - Mengapa Negara Membutuhkan Konstitusi? | EdukaCivic</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="Logo Edukacivic.png">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="student-system.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            red: '#DC2626', redLight: '#EF4444', redDark: '#B91C1C',
+                            dark: '#0F172A', darker: '#020617', light: '#F8FAFC'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Script: Check Progress -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const progress = JSON.parse(localStorage.getItem('edukacivic_progress')) || { poin: 0, level: 1, dunia: 1, completedLevels: [] };
+            if (!progress.completedLevels.includes('d1l1')) {
+                window.location.href = 'dunia1.html';
+                return;
+            }
+            // Update UI with poin
+            document.getElementById('player-poin').textContent = progress.poin || 0;
+        });
+    </script>
+
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+
+        /* Card Match Game Styles */
+        .match-card {
+            cursor: pointer;
+            transition: all 0.25s ease;
+            user-select: none;
+        }
+        .match-card:hover:not(.matched) {
+            transform: translateY(-3px);
+        }
+        .match-card.selected {
+            border-color: #f59e0b !important;
+            background-color: rgba(245, 158, 11, 0.15) !important;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+        }
+        .match-card.matched {
+            border-color: #10b981 !important;
+            background-color: rgba(16, 185, 129, 0.15) !important;
+            cursor: default;
+            opacity: 0.9;
+        }
+        .match-card.wrong {
+            border-color: #ef4444 !important;
+            background-color: rgba(239, 68, 68, 0.15) !important;
+            animation: shake 0.4s;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+    </style>
+<script>
+        if (typeof isLevelUnlocked === "function" && !isLevelUnlocked("d1l2")) {
+            alert("🔒 Level ini masih terkunci! Selesaikan Level 1 terlebih dahulu.");
+            window.location.href = "index.html";
+        }
+    </script>
+</head>
+<body class="bg-brand-darker text-brand-light min-h-screen flex flex-col">
+
+    <!-- NAVBAR -->
+    <nav class="bg-brand-dark/90 backdrop-blur border-b border-white/10 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Left: Back Button & Logo -->
+                <div class="flex items-center gap-4">
+                    <a href="dunia1.html" class="text-gray-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/5">
+                        <i class="fas fa-arrow-left text-xl"></i>
+                    </a>
+                    <img src="Logo Edukacivic.png" alt="EdukaCivic" class="h-8">
+                </div>
+                
+                <!-- Center: Title -->
+                <div class="hidden md:flex flex-col items-center">
+                    <h1 class="text-sm font-semibold text-white">Level 2 — Mengapa Negara Membutuhkan Konstitusi?</h1>
+                    <span class="text-xs text-gray-400">Dunia 1: Mengenal Konstitusi</span>
+                </div>
+                
+                <!-- Right: Stats -->
+                <div class="flex items-center gap-4">
+                    <div class="bg-white/10 rounded-full px-4 py-1.5 flex items-center gap-2 border border-white/10 shadow-[0_0_10px_rgba(234,179,8,0.2)]">
+                        <i class="fas fa-bolt text-yellow-400"></i>
+                        <span id="player-poin" class="font-bold text-white">0</span>
+                        <span class="text-xs text-gray-400">Poin</span>
+                    </div>
+                    <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-brand-red to-orange-400 p-0.5 cursor-pointer shadow-md" onclick="window.location.href='profil-siswa.html'"><img id="nav-avatar-img" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Student" alt="Avatar" class="w-full h-full rounded-full bg-slate-900 object-cover"></div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-grow max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-8">
+        
+        <!-- Hero Section -->
+        <div class="bg-gradient-to-r from-green-900 to-emerald-900 rounded-2xl p-8 border border-green-500/30 shadow-lg relative overflow-hidden text-center">
+            <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjIiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSIvPjwvc3ZnPg==')] opacity-30"></div>
+            <div class="relative z-10">
+                <span class="inline-block px-3 py-1 bg-green-500/20 text-green-300 rounded-full text-xs font-bold mb-4 border border-green-500/30">
+                    <i class="fas fa-book-open mr-2"></i> MATERI LEVEL 2
+                </span>
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Mengapa Negara Membutuhkan Konstitusi?</h2>
+                <p class="text-green-100 text-base md:text-lg max-w-2xl mx-auto">Pelajari alasan pentingnya konstitusi bagi keberlangsungan sebuah negara berdaulat</p>
+            </div>
+        </div>
+
+        <!-- GAMBAR LEVEL 2 (Diletakkan Dibawah Judul) -->
+        <div class="bg-brand-dark rounded-2xl p-4 md:p-6 border border-gray-700 shadow-xl text-center">
+            <div class="flex items-center gap-2 justify-center mb-3 text-emerald-400">
+                <i class="fa-solid fa-image"></i>
+                <span class="text-xs font-bold uppercase tracking-wider">Infografis Level 2</span>
+            </div>
+            <div class="overflow-hidden rounded-xl border border-gray-700 bg-slate-950/60 shadow-lg">
+                <img src="Level 2.jfif" alt="Gambar Level 2" class="w-full max-h-[420px] object-contain mx-auto rounded-lg hover:scale-[1.01] transition-transform duration-300">
+            </div>
+            <p class="text-gray-400 text-xs mt-3 italic">Pentingnya Konstitusi dalam Penyelenggaraan Negara</p>
+        </div>
+
+        <!-- Illustration Section -->
+        <div class="bg-brand-dark rounded-2xl p-6 border border-white/10 shadow-lg">
+            <h3 class="text-xl font-semibold mb-6 text-center text-white">Tanpa vs Dengan Konstitusi</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Chaotic Side -->
+                <div class="bg-red-950/40 rounded-xl p-6 border border-red-500/30 relative overflow-hidden flex flex-col items-center justify-center min-h-[220px]">
+                    <div class="absolute inset-0 opacity-10 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-red-500 via-transparent to-transparent"></div>
+                    <div class="z-10 text-center">
+                        <div class="flex justify-center gap-4 mb-4 text-3xl text-red-500">
+                            <i class="fas fa-meteor"></i>
+                            <i class="fas fa-fire"></i>
+                            <i class="fas fa-skull-crossbones"></i>
+                        </div>
+                        <h4 class="text-xl font-bold text-red-400 mb-2">Tanpa Konstitusi</h4>
+                        <p class="text-red-200/70 text-sm">Kekacauan (Anarki)<br>Kekuasaan Tanpa Batas (Otoriter)</p>
+                    </div>
+                </div>
+
+                <!-- Orderly Side -->
+                <div class="bg-green-950/40 rounded-xl p-6 border border-green-500/30 relative overflow-hidden flex flex-col items-center justify-center min-h-[220px]">
+                    <div class="absolute inset-0 opacity-10 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-green-500 via-transparent to-transparent"></div>
+                    <div class="z-10 text-center">
+                        <div class="flex justify-center gap-4 mb-4 text-3xl text-green-400">
+                            <i class="fas fa-dove"></i>
+                            <i class="fas fa-scale-balanced"></i>
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                        <h4 class="text-xl font-bold text-green-400 mb-2">Dengan Konstitusi</h4>
+                        <p class="text-green-200/70 text-sm">Kedamaian & Keadilan<br>Pemerintahan yang Tertib</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Section -->
+        <div class="text-center max-w-3xl mx-auto py-2">
+            <p class="text-lg text-gray-300 leading-relaxed">
+                Tanpa konstitusi, sebuah negara akan berada dalam <span class="bg-red-900/50 text-red-300 px-2 py-0.5 rounded font-medium border border-red-700/50">kekacauan (anarki)</span> dan kekuasaan pemerintah menjadi tanpa batas (<span class="bg-red-900/50 text-red-300 px-2 py-0.5 rounded font-medium border border-red-700/50">otoriter</span>). Tiga alasan utama pentingnya konstitusi:
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Card 1 -->
+            <div class="bg-blue-950/30 border border-blue-500/30 rounded-2xl p-6 hover:-translate-y-2 transition-transform duration-300 shadow-lg">
+                <div class="w-14 h-14 bg-blue-500/20 text-blue-400 rounded-2xl flex items-center justify-center text-2xl mb-4 shadow-[0_0_15px_rgba(59,130,246,0.2)]">
+                    <i class="fas fa-gavel"></i>
+                </div>
+                <h3 class="text-lg font-bold text-blue-300 mb-2">Membatasi Kekuasaan Penguasa</h3>
+                <p class="text-gray-400 text-sm leading-relaxed">Menjamin pemerintah tidak bertindak <span class="text-blue-200 font-semibold">sewenang-wenang</span> terhadap rakyatnya.</p>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="bg-green-950/30 border border-green-500/30 rounded-2xl p-6 hover:-translate-y-2 transition-transform duration-300 shadow-lg">
+                <div class="w-14 h-14 bg-green-500/20 text-green-400 rounded-2xl flex items-center justify-center text-2xl mb-4 shadow-[0_0_15px_rgba(34,197,94,0.2)]">
+                    <i class="fas fa-shield-halved"></i>
+                </div>
+                <h3 class="text-lg font-bold text-green-300 mb-2">Melindungi Hak Asasi Manusia (HAM)</h3>
+                <p class="text-gray-400 text-sm leading-relaxed">Menjamin hak dasar setiap warga negara <span class="text-green-200 font-semibold">terlindungi oleh hukum</span>.</p>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="bg-orange-950/30 border border-orange-500/30 rounded-2xl p-6 hover:-translate-y-2 transition-transform duration-300 shadow-lg">
+                <div class="w-14 h-14 bg-orange-500/20 text-orange-400 rounded-2xl flex items-center justify-center text-2xl mb-4 shadow-[0_0_15px_rgba(249,115,22,0.2)]">
+                    <i class="fas fa-landmark"></i>
+                </div>
+                <h3 class="text-lg font-bold text-orange-300 mb-2">Pedoman Penyelenggaraan Negara</h3>
+                <p class="text-gray-400 text-sm leading-relaxed">Memberikan arah, tujuan, dan struktur lembaga negara agar pemerintahan <span class="text-orange-200 font-semibold">berjalan tertib</span>.</p>
+            </div>
+        </div>
+
+        <!-- AKTIVITAS 2: KARTU ANALISIS "SEBAB-AKIBAT" (Sebelum Kuis) -->
+        <div class="bg-slate-900/90 border-2 border-emerald-500/40 rounded-3xl p-6 md:p-8 shadow-2xl relative">
+            <div class="flex items-center gap-3 mb-3">
+                <div class="w-12 h-12 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center text-2xl border border-emerald-500/30">
+                    <i class="fa-solid fa-code-compare"></i>
+                </div>
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-emerald-400">Aktivitas Interaktif 2</span>
+                    <h3 class="text-2xl font-bold text-white">Kartu Analisis "Sebab-Akibat"</h3>
+                </div>
+            </div>
+            <p class="text-slate-300 text-sm mb-6 leading-relaxed">
+                Pasangkan <strong>Kartu Situasi (Sebab)</strong> di kolom kiri dengan <strong>Kartu Dampak Nyata (Akibat)</strong> yang tepat di kolom kanan. Klik 1 kartu dari kolom kiri lalu klik pasangannya di kolom kanan!
+            </p>
+
+            <!-- Status Progres Matching -->
+            <div class="flex items-center justify-between bg-slate-800/80 px-4 py-2 rounded-xl border border-slate-700 mb-6">
+                <span class="text-xs text-slate-300 font-medium">Pasangan Terhubung:</span>
+                <span id="match-status" class="text-xs font-bold text-emerald-400">0 / 4 Pasangan Selesai</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Kolom Kiri: Sebab / Situasi -->
+                <div>
+                    <h4 class="text-sm font-bold text-blue-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-question"></i> Situasi (Sebab)
+                    </h4>
+                    <div class="space-y-3" id="sebab-container">
+                        <div class="match-card bg-slate-800 border-2 border-slate-700 hover:border-blue-400 p-4 rounded-xl text-sm leading-relaxed" data-pair="1" data-type="sebab" onclick="handleCardClick(this)">
+                            <div class="flex items-start gap-3">
+                                <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">A</span>
+                                <span>Jika suatu negara <strong>tidak memiliki konstitusi</strong>...</span>
+                            </div>
+                        </div>
+                        <div class="match-card bg-slate-800 border-2 border-slate-700 hover:border-blue-400 p-4 rounded-xl text-sm leading-relaxed" data-pair="2" data-type="sebab" onclick="handleCardClick(this)">
+                            <div class="flex items-start gap-3">
+                                <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">B</span>
+                                <span>Jika konstitusi berhasil <strong>membatasi kekuasaan penguasa</strong>...</span>
+                            </div>
+                        </div>
+                        <div class="match-card bg-slate-800 border-2 border-slate-700 hover:border-blue-400 p-4 rounded-xl text-sm leading-relaxed" data-pair="3" data-type="sebab" onclick="handleCardClick(this)">
+                            <div class="flex items-start gap-3">
+                                <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">C</span>
+                                <span>Jika konstitusi secara tegas <strong>menjamin Hak Asasi Manusia (HAM)</strong>...</span>
+                            </div>
+                        </div>
+                        <div class="match-card bg-slate-800 border-2 border-slate-700 hover:border-blue-400 p-4 rounded-xl text-sm leading-relaxed" data-pair="4" data-type="sebab" onclick="handleCardClick(this)">
+                            <div class="flex items-start gap-3">
+                                <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">D</span>
+                                <span>Jika konstitusi menjadi <strong>pedoman penyelenggaraan negara</strong>...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kolom Kanan: Akibat / Dampak -->
+                <div>
+                    <h4 class="text-sm font-bold text-emerald-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-check"></i> Dampak Nyata (Akibat)
+                    </h4>
+                    <div class="space-y-3" id="akibat-container">
+                        <div class="match-card bg-slate-800 border-2 border-slate-700 hover:border-emerald-400 p-4 rounded-xl text-sm leading-relaxed" data-pair="3" data-type="akibat" onclick="handleCardClick(this)">
+                            <div class="flex items-start gap-3">
+                                <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">1</span>
+                                <span>...Maka setiap warga negara terlindungi hak dasarnya secara adil di mata hukum.</span>
+                            </div>
+                        </div>
+                        <div class="match-card bg-slate-800 border-2 border-slate-700 hover:border-emerald-400 p-4 rounded-xl text-sm leading-relaxed" data-pair="1" data-type="akibat" onclick="handleCardClick(this)">
+                            <div class="flex items-start gap-3">
+                                <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">2</span>
+                                <span>...Maka kekuasaan pemerintah menjadi tanpa batas (otoriter) dan terjadi anarki.</span>
+                            </div>
+                        </div>
+                        <div class="match-card bg-slate-800 border-2 border-slate-700 hover:border-emerald-400 p-4 rounded-xl text-sm leading-relaxed" data-pair="4" data-type="akibat" onclick="handleCardClick(this)">
+                            <div class="flex items-start gap-3">
+                                <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">3</span>
+                                <span>...Maka struktur lembaga negara dan pemerintahan berjalan tertib dan teratur.</span>
+                            </div>
+                        </div>
+                        <div class="match-card bg-slate-800 border-2 border-slate-700 hover:border-emerald-400 p-4 rounded-xl text-sm leading-relaxed" data-pair="2" data-type="akibat" onclick="handleCardClick(this)">
+                            <div class="flex items-start gap-3">
+                                <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">4</span>
+                                <span>...Maka pemerintah tidak dapat bertindak sewenang-wenang terhadap rakyatnya.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reset Button & Feedback -->
+            <div class="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
+                <button onclick="resetMatchGame()" class="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl border border-slate-700 transition flex items-center gap-2 text-sm">
+                    <i class="fa-solid fa-rotate-left"></i> Reset Pasangan Kartu
+                </button>
+            </div>
+
+            <div id="match-feedback" class="hidden mt-4 p-4 rounded-xl text-center font-bold text-sm"></div>
+        </div>
+
+        
+
+        <div id="quiz-cta-container"></div>
+
+        <!-- NAVIGASI LEVEL (SEBELUMNYA & SELANJUTNYA) -->
+        <div class="mt-8 pt-6 border-t border-slate-800">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <a href="dunia1-level1.html" class="w-full sm:w-auto px-5 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold rounded-xl border border-slate-700 transition flex items-center justify-center gap-2 text-xs sm:text-sm">
+                    <i class="fa-solid fa-chevron-left"></i> Sebelumnya: Level 1
+                </a>
+                
+                <a href="dunia1.html" class="text-xs text-slate-400 hover:text-white flex items-center gap-1.5 font-semibold">
+                    <i class="fa-solid fa-map"></i> Peta Dunia 1 (Level 2/20)
+                </a>
+
+                <a href="dunia1-level3.html" class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/30 transition transform hover:scale-105 flex items-center justify-center gap-2 text-xs sm:text-sm">
+                    Selanjutnya: Level 3 <i class="fa-solid fa-chevron-right"></i>
+                </a>
+            </div>
+        </div>
+        
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-brand-dark border-t border-white/10 py-6 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-gray-500 text-sm">&copy; 2026 EdukaCivic | Fadilatul Fajri</p>
+        </div>
+    </footer>
+
+    <script>
+        // Sebab-Akibat Matching Logic
+        let selectedSebab = null;
+        let selectedAkibat = null;
+        let matchedPairsCount = 0;
+
+        function handleCardClick(card) {
+            if (card.classList.contains('matched')) return;
+
+            const type = card.dataset.type;
+
+            if (type === 'sebab') {
+                if (selectedSebab) selectedSebab.classList.remove('selected');
+                card.classList.add('selected');
+                selectedSebab = card;
+            } else if (type === 'akibat') {
+                if (selectedAkibat) selectedAkibat.classList.remove('selected');
+                card.classList.add('selected');
+                selectedAkibat = card;
+            }
+
+            // Check if both sides are selected
+            if (selectedSebab && selectedAkibat) {
+                checkMatch();
+            }
+        }
+
+        function checkMatch() {
+            const pair1 = selectedSebab.dataset.pair;
+            const pair2 = selectedAkibat.dataset.pair;
+
+            if (pair1 === pair2) {
+                // Correct match!
+                selectedSebab.classList.remove('selected');
+                selectedAkibat.classList.remove('selected');
+                selectedSebab.classList.add('matched');
+                selectedAkibat.classList.add('matched');
+
+                matchedPairsCount++;
+                document.getElementById('match-status').textContent = `${matchedPairsCount} / 4 Pasangan Selesai`;
+
+                selectedSebab = null;
+                selectedAkibat = null;
+
+                if (matchedPairsCount === 4) {
+                    const fb = document.getElementById('match-feedback');
+                    if (fb) {
+                        fb.className = 'mt-6 p-5 rounded-2xl text-center font-bold text-sm bg-green-500/20 border border-green-500/40 text-green-300 block shadow-lg';
+                        fb.innerHTML = '<div class="flex flex-col items-center gap-2">' +
+                            '<span class="text-lg">🎉 Hebat sekali! Semua sebab dan dampak nyata telah dipasangkan dengan tepat!</span>' +
+                            '<p class="text-xs text-green-200 font-normal">Kuis Level 2 di bawah telah terbuka. Silakan lanjut ke kuis!</p>' +
+                            '</div>';
+                    }
+                    setQuizButtonUnlocked("d1l2", "dunia1-level2-kuis.html");
+                    try { playCelebrationFanfare(); } catch(e) {}
+                    try { triggerCelebrationConfetti(); } catch(e) {}
+                }
+            } else {
+                // Wrong match
+                const s = selectedSebab;
+                const a = selectedAkibat;
+                s.classList.add('wrong');
+                a.classList.add('wrong');
+
+                setTimeout(() => {
+                    s.classList.remove('wrong', 'selected');
+                    a.classList.remove('wrong', 'selected');
+                }, 500);
+
+                selectedSebab = null;
+                selectedAkibat = null;
+            }
+        }
+
+        function resetMatchGame() {
+            document.querySelectorAll('.match-card').forEach(card => {
+                card.classList.remove('selected', 'matched', 'wrong');
+            });
+            selectedSebab = null;
+            selectedAkibat = null;
+            matchedPairsCount = 0;
+            document.getElementById('match-status').textContent = '0 / 4 Pasangan Selesai';
+            document.getElementById('match-feedback').classList.add('hidden');
+        }
+    
+        document.addEventListener("DOMContentLoaded", () => {
+            initInteractiveActivityGating("d1l2", "dunia1-level2-kuis.html");
+        });
+    </script>
+</body>
+</html>
+
+
+

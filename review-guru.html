@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EdukaCivic — Mode Review Guru</title>
+    <link rel="icon" type="image/png" href="Logo Edukacivic.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="student-system.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            red: '#DC2626', redLight: '#EF4444', redDark: '#B91C1C',
+                            emerald: '#10B981', emeraldDark: '#059669',
+                            dark: '#0F172A', darker: '#020617', light: '#F8FAFC'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0F172A; }
+        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4B5563; }
+
+        .card-glass {
+            background: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(75, 85, 99, 0.5);
+            box-shadow: 0 0 50px rgba(249, 115, 22, 0.2);
+        }
+
+        .level-pill {
+            background: rgba(249, 115, 22, 0.15);
+            border: 1px solid rgba(249, 115, 22, 0.3);
+            border-radius: 0.5rem;
+            padding: 0.35rem 0;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #f97316;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+        .level-pill.done {
+            background: rgba(34, 197, 94, 0.2);
+            border-color: rgba(34, 197, 94, 0.5);
+            color: #4ade80;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-b from-brand-darker via-[#141b2b] to-brand-darker text-white font-sans min-h-screen flex items-center justify-center p-4 selection:bg-brand-red selection:text-white">
+
+    <div class="card-glass rounded-3xl p-6 sm:p-8 max-w-lg w-full text-center shadow-2xl relative">
+        
+        <!-- Icon & Header -->
+        <div class="w-16 h-16 bg-orange-500/20 text-orange-400 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 border border-orange-500/30 shadow-lg shadow-orange-500/10">
+            <i class="fa-solid fa-unlock-keyhole"></i>
+        </div>
+
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/30 text-orange-400 text-xs font-bold uppercase tracking-wider mb-2">
+            <i class="fa-solid fa-user-shield"></i> Fitur Khusus Guru
+        </div>
+
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-white mb-2">
+            Mode Review Guru
+        </h1>
+        <p class="text-gray-300 text-xs sm:text-sm leading-relaxed mb-6">
+            Buka seluruh 5 Dunia & 20 Level secara instan untuk meninjau materi pembelajaran, kuis, aktivitas interaktif, dan boss battle.
+        </p>
+
+        <!-- Status Bar -->
+        <div class="bg-gray-900/90 border border-gray-700/80 rounded-2xl p-3.5 mb-5 flex items-center justify-between text-xs font-semibold">
+            <span class="text-gray-400">Status Progres Saat Ini:</span>
+            <span id="current-status" class="text-emerald-400 font-bold flex items-center gap-1.5">
+                <i class="fa-solid fa-circle-notch fa-spin text-xs"></i> Memuat...
+            </span>
+        </div>
+
+        <!-- Levels 1 - 20 Grid -->
+        <div class="grid grid-cols-5 gap-1.5 sm:gap-2 mb-6" id="levels-grid"></div>
+
+        <!-- Warning Note -->
+        <div class="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-3.5 text-xs text-amber-200/90 text-left mb-6 flex items-start gap-2.5">
+            <i class="fa-solid fa-circle-info text-amber-400 mt-0.5 text-sm shrink-0"></i>
+            <div>
+                <strong class="text-amber-300">Catatan Pengajar:</strong> Setelah selesai meninjau materi, Anda dapat mengunci kembali progress agar siswa memulai dari Level 1, atau langsung kembali ke Dashboard Guru tanpa perlu login ulang.
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="space-y-3">
+            <!-- 1. Buka Semua Dunia & Level -->
+            <button onclick="unlockAll()" id="btn-unlock" class="w-full py-3.5 px-6 bg-gradient-to-r from-orange-600 via-amber-600 to-yellow-500 hover:from-orange-500 hover:to-yellow-400 text-slate-950 font-black rounded-2xl shadow-xl shadow-orange-600/30 hover:scale-[1.02] active:scale-98 transition-all flex items-center justify-center gap-2 text-sm sm:text-base">
+                <i class="fa-solid fa-unlock"></i>
+                <span id="btn-text">Buka Semua Dunia & Level (Mulai Review)</span>
+            </button>
+
+            <!-- 2. KEMBALI KE DASHBOARD GURU (Utama yang diminta user) -->
+            <a href="dashboard-guru.html" class="w-full py-3.5 px-6 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-2xl shadow-lg shadow-emerald-600/30 hover:scale-[1.02] active:scale-98 transition-all flex items-center justify-center gap-2 text-xs sm:text-sm">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Kembali ke Dashboard Guru</span>
+            </a>
+
+            <!-- 3. Kembalikan ke Awal (Reset Progress Tanpa Logout Guru) -->
+            <button onclick="resetAll()" class="w-full py-3 px-6 bg-gray-800 hover:bg-gray-750 text-gray-300 hover:text-white font-semibold rounded-2xl border border-gray-700 transition flex items-center justify-center gap-2 text-xs sm:text-sm">
+                <i class="fa-solid fa-lock"></i>
+                <span>Kembalikan ke Awal (Kunci Semua Level)</span>
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        const ALL_LEVELS = [
+            'd1l1','d1l2','d1l3','d1l4',
+            'd2l1','d2l2','d2l3','d2l4',
+            'd3l1','d3l2','d3l3','d3l4',
+            'd4l1','d4l2','d4l3','d4l4',
+            'd5l1','d5l2','d5l3','d5l4'
+        ];
+
+        const LEVEL_LABELS = {
+            'd1l1': 'D1L1', 'd1l2': 'D1L2', 'd1l3': 'D1L3', 'd1l4': 'D1L4',
+            'd2l1': 'D2L1', 'd2l2': 'D2L2', 'd2l3': 'D2L3', 'd2l4': 'D2L4',
+            'd3l1': 'D3L1', 'd3l2': 'D3L2', 'd3l3': 'D3L3', 'd3l4': 'D3L4',
+            'd4l1': 'D4L1', 'd4l2': 'D4L2', 'd4l3': 'D4L3', 'd4l4': 'D4L4',
+            'd5l1': 'D5L1', 'd5l2': 'D5L2', 'd5l3': 'D5L3', 'd5l4': 'D5L4',
+        };
+
+        function getProgress() {
+            try { return JSON.parse(localStorage.getItem('edukacivic_progress')) || { poin: 0, level: 1, dunia: 1, completedLevels: [] }; }
+            catch(e) { return { poin: 0, level: 1, dunia: 1, completedLevels: [] }; }
+        }
+
+        function renderStatus() {
+            const prog = getProgress();
+            const completed = prog.completedLevels || [];
+            document.getElementById('current-status').innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i> ${completed.length} / 20 level selesai`;
+
+            const grid = document.getElementById('levels-grid');
+            grid.innerHTML = '';
+            ALL_LEVELS.forEach(lv => {
+                const pill = document.createElement('div');
+                const isDone = completed.includes(lv);
+                pill.className = 'level-pill' + (isDone ? ' done' : '');
+                pill.textContent = LEVEL_LABELS[lv] + (isDone ? ' ✓' : '');
+                grid.appendChild(pill);
+            });
+        }
+
+        function unlockAll() {
+            const btn = document.getElementById('btn-text');
+            btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Membuka Semua Level...`;
+
+            // Pastikan sesi guru tetap aktif
+            localStorage.setItem('edukacivic_guru', JSON.stringify({ email: 'jeeploong@gmail.com', loggedIn: true }));
+
+            // Set data sesi siswa review agar halaman tidak redirect
+            const existingSiswa = localStorage.getItem('edukacivic_siswa');
+            if (!existingSiswa) {
+                localStorage.setItem('edukacivic_siswa', JSON.stringify({
+                    id: 'guru_review_mode',
+                    nama: 'Mode Review Guru',
+                    noAbsen: '0',
+                    kelas: 'Kelas Guru',
+                    sekolah: 'SMP Negeri 5 Purwokerto',
+                    poin: 500,
+                    level: 20,
+                    dunia: 5,
+                    completedLevels: [...ALL_LEVELS]
+                }));
+            }
+
+            const fullProgress = {
+                poin: 500,
+                level: 20,
+                dunia: 5,
+                completedLevels: [...ALL_LEVELS]
+            };
+            localStorage.setItem('edukacivic_unlocked_tokens', JSON.stringify([2, 3, 4, 5]));
+            for (let i = 2; i <= 5; i++) localStorage.setItem(`edukacivic_token_dunia_${i}`, 'true');
+
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 500);
+        }
+
+        function resetAll() {
+            if (!confirm('Yakin ingin mereset progress belajar? Seluruh level akan dikunci kembali ke Level 1.\n\nCatatan: Anda akan tetap dalam status login Guru.')) return;
+
+            // Kunci kembali level tapi PERTAHANKAN sesi login guru
+            localStorage.setItem('edukacivic_progress', JSON.stringify({
+                poin: 0,
+                level: 1,
+                dunia: 1,
+                completedLevels: []
+            }));
+            localStorage.removeItem('edukacivic_siswa');
+            localStorage.removeItem('edukacivic_unlocked_tokens');
+            for (let i = 2; i <= 5; i++) localStorage.removeItem(`edukacivic_token_dunia_${i}`);
+
+            // Pastikan sesi guru tetap terjaga
+            localStorage.setItem('edukacivic_guru', JSON.stringify({ email: 'jeeploong@gmail.com', loggedIn: true }));
+
+            renderStatus();
+            alert('✅ Seluruh level telah dikunci kembali ke Level 1. Sesi login Guru Anda tetap aktif.');
+        }
+
+        // Initialize status on load
+        document.addEventListener('DOMContentLoaded', () => {
+            renderStatus();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Guru EdukaCivic</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="Logo Edukacivic.png">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            red: '#DC2626', redLight: '#EF4444', redDark: '#B91C1C',
+                            dark: '#0F172A', darker: '#020617', light: '#F8FAFC'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-brand-dark min-h-screen flex items-center justify-center font-sans text-brand-light p-4">
+    <div class="bg-brand-darker border border-gray-800 p-8 rounded-2xl shadow-2xl w-full max-w-md">
+        <div class="flex justify-center mb-6">
+            <img src="Logo Edukacivic.png" alt="EdukaCivic" class="h-12">
+        </div>
+        <h1 class="text-2xl font-bold text-center mb-2">Portal Guru EdukaCivic</h1>
+        <p class="text-gray-400 text-center text-sm mb-8">Masuk untuk memantau progres siswa Anda</p>
+        
+        <div id="errorMsg" class="hidden bg-brand-red text-white p-3 rounded-lg mb-4 text-sm text-center">
+            Email atau password salah!
+        </div>
+
+        <form id="loginForm" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-1">Email</label>
+                <input type="email" id="email" required class="w-full bg-brand-dark border border-gray-700 text-white rounded-lg px-4 py-2.5 focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red transition">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-1">Password</label>
+                <input type="password" id="password" required class="w-full bg-brand-dark border border-gray-700 text-white rounded-lg px-4 py-2.5 focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red transition">
+            </div>
+            <button type="submit" class="w-full bg-brand-red hover:bg-brand-redLight text-white font-semibold py-2.5 rounded-lg transition shadow-lg shadow-brand-red/30">
+                Masuk <i class="fas fa-sign-in-alt ml-2"></i>
+            </button>
+        </form>
+
+        <div class="mt-6 text-center">
+            <a href="index.html" class="text-sm text-gray-400 hover:text-white transition"><i class="fas fa-arrow-left mr-2"></i>Kembali ke Beranda</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorMsg = document.getElementById('errorMsg');
+
+            if (email === 'jeeploong@gmail.com' && password === '12345678') {
+                localStorage.setItem('edukacivic_guru', JSON.stringify({email: 'jeeploong@gmail.com', loggedIn: true}));
+                window.location.href = 'dashboard-guru.html';
+            } else {
+                errorMsg.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

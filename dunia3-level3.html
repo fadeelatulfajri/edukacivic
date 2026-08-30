@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level 11: UUD Disahkan & Tiga Keputusan Bersejarah Sidang PPKI - EdukaCivic</title>
+    <link rel="icon" type="image/png" href="Logo Edukacivic.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="student-system.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            red: '#DC2626', redLight: '#EF4444', redDark: '#B91C1C',
+                            dark: '#0F172A', darker: '#020617', light: '#F8FAFC'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0F172A; }
+        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4B5563; }
+
+        .section-card {
+            background: rgba(30, 41, 59, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(75, 85, 99, 0.5);
+            border-radius: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        .section-card:hover {
+            border-color: rgba(239, 68, 68, 0.4);
+        }
+
+        .hero-glow {
+            background: radial-gradient(circle at 50% 30%, rgba(220, 38, 38, 0.22) 0%, rgba(2, 6, 23, 0) 70%);
+        }
+
+        .gold-border-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+            border: 2px solid rgba(245, 158, 11, 0.4);
+            border-radius: 1.25rem;
+            box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.1);
+        }
+
+        .decision-card {
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(75, 85, 99, 0.5);
+            border-radius: 1.25rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .decision-card:hover {
+            transform: translateY(-4px);
+            border-color: #ef4444;
+            box-shadow: 0 15px 30px -10px rgba(239, 68, 68, 0.3);
+        }
+
+        .match-card {
+            background: rgba(15, 23, 42, 0.85);
+            border: 2px solid rgba(75, 85, 99, 0.6);
+            border-radius: 1rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            user-select: none;
+        }
+        .match-card:hover:not(.matched):not(.disabled) {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.12);
+            transform: translateY(-2px);
+        }
+        .match-card.selected {
+            border-color: #f59e0b !important;
+            background: rgba(245, 158, 11, 0.2) !important;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+            transform: scale(1.02);
+        }
+        .match-card.matched {
+            border-color: #10b981 !important;
+            background: rgba(16, 185, 129, 0.2) !important;
+            cursor: default;
+            opacity: 0.9;
+        }
+        .match-card.wrong {
+            border-color: #ef4444 !important;
+            background: rgba(239, 68, 68, 0.25) !important;
+            animation: shake 0.35s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            padding: 1rem;
+        }
+        .modal-box {
+            animation: modalPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes modalPop {
+            0% { opacity: 0; transform: scale(0.85) translateY(20px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+    </style>
+    <script>
+        function getProgress() {
+            try { return JSON.parse(localStorage.getItem('edukacivic_progress')) || { poin: 0, level: 1, dunia: 3, completedLevels: [] }; }
+            catch(e) { return { poin: 0, level: 1, dunia: 3, completedLevels: [] }; }
+        }
+        const prog = getProgress();
+        if (!prog.completedLevels || !prog.completedLevels.includes('d3l2')) {
+            window.location.href = 'dunia3.html';
+        }
+    </script>
+<script>
+        if (typeof isLevelUnlocked === "function" && !isLevelUnlocked("d3l3")) {
+            alert("🔒 Level ini masih terkunci! Selesaikan Level 10 terlebih dahulu.");
+            window.location.href = "index.html";
+        }
+    </script>
+</head>
+<body class="bg-brand-darker text-white font-sans antialiased min-h-screen flex flex-col selection:bg-red-600 selection:text-white">
+
+    <!-- Web Audio Sound Effects -->
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            try {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'correct') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.15);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, now);
+                    osc.frequency.exponentialRampToValueAtTime(146.83, now + 0.2);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                } else if (type === 'victory') {
+                    [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+                        const o = audioCtx.createOscillator();
+                        const g = audioCtx.createGain();
+                        o.connect(g);
+                        g.connect(audioCtx.destination);
+                        o.type = 'triangle';
+                        o.frequency.setValueAtTime(freq, now + i * 0.1);
+                        g.gain.setValueAtTime(0.3, now + i * 0.1);
+                        g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.1 + 0.4);
+                        o.start(now + i * 0.1);
+                        o.stop(now + i * 0.1 + 0.4);
+                    });
+                }
+            } catch(e) {}
+        }
+    </script>
+
+    <!-- NAVBAR -->
+    <nav class="fixed w-full z-50 bg-brand-dark/90 backdrop-blur-md border-b border-gray-800 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-4">
+                    <a href="dunia3.html" class="flex items-center gap-2 text-gray-400 hover:text-white transition-colors group">
+                        <div class="w-8 h-8 bg-gray-800 rounded-lg flex items-center justify-center group-hover:bg-gray-700 transition-colors">
+                            <i class="fa-solid fa-arrow-left text-sm"></i>
+                        </div>
+                        <span class="text-sm font-medium hidden sm:inline">Peta Dunia 3</span>
+                    </a>
+                    <div class="w-px h-8 bg-gray-700"></div>
+                    <a href="index.html" class="flex items-center gap-2">
+                        <img src="Logo Edukacivic.png" alt="EdukaCivic" class="h-8 w-auto">
+                        <span class="font-bold text-lg text-white hidden sm:inline">Eduka<span class="text-brand-red">Civic</span></span>
+                    </a>
+                </div>
+                
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2 bg-red-500/10 border border-red-500/30 px-3 py-1.5 rounded-full">
+                        <i class="fa-solid fa-stamp text-red-400 text-xs"></i>
+                        <span class="text-red-400 font-bold text-xs">Dunia 3 · Level 11</span>
+                    </div>
+                    <div class="flex items-center gap-2 bg-gray-800 px-3 py-1.5 rounded-lg border border-gray-700">
+                        <i class="fa-solid fa-bolt text-yellow-400 text-xs"></i>
+                        <span id="nav-poin" class="text-yellow-400 font-bold text-sm">0</span>
+                        <span class="text-gray-500 text-xs">Poin</span>
+                    </div>
+                    <div id="nav-avatar-box">
+                        <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-brand-red to-orange-400 p-0.5 cursor-pointer shadow-md" onclick="window.location.href='profil-siswa.html'"><img id="nav-avatar-img" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Student" alt="Avatar" class="w-full h-full rounded-full bg-slate-900 object-cover"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <script>
+        document.getElementById('nav-poin').textContent = prog.poin || 0;
+        try {
+            const curStudent = JSON.parse(localStorage.getItem('edukacivic_siswa'));
+            if (curStudent && curStudent.avatarUrl) {
+                document.getElementById('nav-avatar-img').src = curStudent.avatarUrl;
+            }
+        } catch(e) {}
+    </script>
+
+    <!-- HERO SECTION -->
+    <section class="relative pt-24 pb-12 overflow-hidden hero-glow">
+        <div class="absolute inset-0 bg-gradient-to-br from-red-950/30 via-brand-darker to-brand-darker pointer-events-none"></div>
+        <div class="absolute top-20 right-10 w-72 h-72 bg-red-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute bottom-0 left-10 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 relative z-10 text-center">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/10 border border-red-500/30 mb-4">
+                <i class="fa-solid fa-scroll text-red-400 text-xs"></i>
+                <span class="text-xs font-bold text-red-400 tracking-widest uppercase">Level 11 · 18 Agustus 1945</span>
+            </div>
+            
+            <h1 class="text-3xl md:text-5xl font-extrabold leading-tight mb-4">
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-rose-300 to-amber-400">Pengesahan UUD NRI 1945</span>
+                <br>
+                <span class="text-white text-2xl md:text-3xl font-semibold">& Tiga Keputusan Bersejarah Sidang PPKI</span>
+            </h1>
+            
+            <p class="text-gray-300 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
+                Pelajari momen agung kelahiran konstitusi negara, penetapan Presiden dan Wakil Presiden pertama, serta pembentukan lembaga pemerintahan pertama Republik Indonesia!
+            </p>
+
+            <!-- Reading Progress Bar -->
+            <div class="mt-6 max-w-sm mx-auto">
+                <div class="flex justify-between text-xs text-gray-500 mb-1">
+                    <span>Progres Membaca</span>
+                    <span id="read-pct">0%</span>
+                </div>
+                <div class="w-full h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                    <div id="read-bar" class="h-full bg-gradient-to-r from-red-500 via-rose-400 to-amber-400 rounded-full transition-all duration-300" style="width:0%"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-grow pb-16 px-4">
+        <div class="max-w-4xl mx-auto space-y-10">
+
+            <!-- ===== SECTION 1: PELAKSANAAN SIDANG PPKI 18 AGUSTUS 1945 ===== -->
+            <section class="section-card p-6 md:p-8">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-12 h-12 rounded-2xl bg-red-500/20 text-red-400 flex items-center justify-center text-xl border border-red-500/30">
+                        <i class="fa-solid fa-landmark"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-red-400">Bagian 1</span>
+                        <h2 class="text-xl md:text-2xl font-bold text-white">Pelaksanaan Sidang PPKI 18 Agustus 1945</h2>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                    <!-- Text Description -->
+                    <div class="md:col-span-7 space-y-4 text-gray-300 text-sm sm:text-base leading-relaxed">
+                        <p>
+                            Sehari setelah Proklamasi Kemerdekaan 17 Agustus 1945 dibacakan, para pendiri bangsa segera berkumpul untuk mengadakan <strong>Sidang Pleno Pertama PPKI</strong> pada tanggal <strong>18 Agustus 1945</strong>.
+                        </p>
+                        
+                        <div class="bg-gray-900/90 border border-gray-700 rounded-2xl p-4 space-y-2">
+                            <div class="flex items-start gap-3">
+                                <span class="w-8 h-8 rounded-xl bg-red-500/20 text-red-400 flex items-center justify-center font-bold text-sm shrink-0 mt-0.5">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                </span>
+                                <div>
+                                    <h4 class="text-white font-bold text-sm">Lokasi Bersejarah</h4>
+                                    <p class="text-xs text-gray-300">
+                                        Bertempat di <strong>Gedung Tyuuoo Sangi-in</strong> (kini dikenal sebagai <em>Gedung Pancasila</em>, Jl. Pejambon No. 6, Jakarta Pusat).
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-gradient-to-r from-red-950/40 to-gray-900 border border-red-500/40 rounded-2xl p-4 space-y-2">
+                            <div class="flex items-start gap-3">
+                                <span class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-sm shrink-0 mt-0.5">
+                                    <i class="fa-solid fa-handshake"></i>
+                                </span>
+                                <div>
+                                    <h4 class="text-white font-bold text-sm">Suasana Musyawarah Luhur</h4>
+                                    <p class="text-xs text-gray-300">
+                                        Sidang dibuka dan dipimpin oleh <strong>Ir. Sukarno</strong> dan <strong>Drs. Mohammad Hatta</strong> dalam suasana <em>musyawarah untuk mufakat, toleransi kebangsaan, dan kekeluargaan yang sangat tinggi</em> demi keutuhan NKRI.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Authentic Photo Visual Card -->
+                    <div class="md:col-span-5">
+                        <div class="gold-border-card p-3 group relative cursor-pointer overflow-hidden" onclick="openImageModal()">
+                            <div class="relative w-full h-56 rounded-xl overflow-hidden bg-black">
+                                <img src="sidang bpupki1.jpg" alt="Foto Arsip Sidang PPKI 18 Agustus 1945" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 opacity-90 group-hover:opacity-100">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-3">
+                                    <div>
+                                        <span class="inline-flex items-center gap-1 text-[10px] font-bold bg-red-600 text-white px-2 py-0.5 rounded-full mb-1">
+                                            <i class="fa-solid fa-camera"></i> Arsip Autentik
+                                        </span>
+                                        <p class="text-xs text-gray-200 font-semibold leading-tight">
+                                            Suasana Sidang Para Pemimpin Bangsa di Meja Panjang (ANRI)
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="absolute top-2 right-2 bg-black/60 backdrop-blur-md text-white p-2 rounded-lg text-xs opacity-0 group-hover:opacity-100 transition">
+                                    <i class="fa-solid fa-expand"></i> Perbesar
+                                </div>
+                            </div>
+                            <p class="text-[11px] text-center text-amber-300/80 mt-2 font-medium">
+                                🔍 Klik foto untuk melihat dokumen arsip beresolusi tinggi
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Image Modal for Fullscreen View -->
+            <div id="image-modal" class="modal-overlay hidden" onclick="closeImageModal()">
+                <div class="modal-box relative max-w-4xl w-full p-2 bg-gray-900/95 border-2 border-red-500 rounded-2xl" onclick="event.stopPropagation()">
+                    <button onclick="closeImageModal()" class="absolute -top-4 -right-4 w-10 h-10 bg-red-600 hover:bg-red-500 text-white rounded-full flex items-center justify-center text-lg font-bold shadow-xl border-2 border-white z-10 transition">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                    <img src="sidang bpupki1.jpg" alt="Foto Arsip Sidang PPKI 18 Agustus 1945" class="w-full max-h-[85vh] object-contain rounded-xl">
+                    <div class="p-3 text-center bg-gray-900 rounded-b-xl">
+                        <h4 class="font-bold text-white text-sm">Dokumentasi Sidang Bersejarah PPKI (18 Agustus 1945)</h4>
+                        <p class="text-xs text-gray-400">Gedung Tyuuoo Sangi-in (kini Gedung Pancasila, Jakarta) — Arsip Nasional Republik Indonesia</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== SECTION 2: TIGA KEPUTUSAN BERSEJARAH SIDANG PPKI ===== -->
+            <section class="section-card p-6 md:p-8">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl border border-amber-500/30">
+                        <i class="fa-solid fa-trophy"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-amber-400">Bagian 2</span>
+                        <h2 class="text-xl md:text-2xl font-bold text-white">Tiga Keputusan Bersejarah Sidang PPKI</h2>
+                    </div>
+                </div>
+
+                <p class="text-gray-300 text-sm mb-6 leading-relaxed">
+                    Dalam sidang tanggal 18 Agustus 1945, PPKI menetapkan <strong>3 keputusan fundamental</strong> yang menjadi tonggak berdirinya tata kelola negara Republik Indonesia:
+                </p>
+
+                <!-- 3 Decision Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                    <!-- KEPUTUSAN 1 -->
+                    <div class="decision-card p-5 flex flex-col justify-between border-t-4 border-t-red-500">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="w-10 h-10 rounded-xl bg-red-500/20 text-red-400 font-black flex items-center justify-center text-lg">
+                                    1
+                                </span>
+                                <span class="text-[10px] font-bold uppercase px-2.5 py-1 bg-red-500/10 text-red-400 rounded-full border border-red-500/30">
+                                    Konstitusi
+                                </span>
+                            </div>
+                            <h3 class="font-bold text-white text-base mb-2">Mengesahkan UUD NRI Tahun 1945</h3>
+                            <p class="text-xs text-gray-300 leading-relaxed mb-4">
+                                Mengesahkan naskah hukum dasar tertulis Republik Indonesia yang terdiri dari:
+                            </p>
+                            <ul class="text-xs text-gray-300 space-y-1.5 list-disc list-inside bg-slate-950/70 p-3 rounded-xl border border-slate-800">
+                                <li><strong>Pembukaan (Preambule):</strong> Terdiri dari 4 alinea yang memuat dasar negara Pancasila.</li>
+                                <li><strong>Batang Tubuh:</strong> Terdiri dari 16 Bab, 37 Pasal, 3 Pasal Aturan Peralihan, & 2 Ayat Aturan Tambahan.</li>
+                            </ul>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-gray-800 text-[11px] text-red-300 flex items-center gap-1.5 font-medium">
+                            <i class="fa-solid fa-check-double text-red-400"></i> Pedoman Hukum Tertinggi
+                        </div>
+                    </div>
+
+                    <!-- KEPUTUSAN 2 -->
+                    <div class="decision-card p-5 flex flex-col justify-between border-t-4 border-t-amber-500">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 font-black flex items-center justify-center text-lg">
+                                    2
+                                </span>
+                                <span class="text-[10px] font-bold uppercase px-2.5 py-1 bg-amber-500/10 text-amber-400 rounded-full border border-amber-500/30">
+                                    Eksekutif
+                                </span>
+                            </div>
+                            <h3 class="font-bold text-white text-base mb-2">Memilih Presiden & Wakil Presiden RI</h3>
+                            <p class="text-xs text-gray-300 leading-relaxed mb-3">
+                                Secara <strong>aklamasi</strong> (kesepakatan bulat tanpa voting) atas usulan <strong>Otto Iskandardinata</strong>, menetapkan:
+                            </p>
+                            
+                            <!-- Duo Leaders Card -->
+                            <div class="grid grid-cols-2 gap-2 bg-slate-950/70 p-2.5 rounded-xl border border-slate-800 mb-2">
+                                <div class="text-center">
+                                    <div class="w-12 h-14 bg-black rounded-lg overflow-hidden mx-auto mb-1 border border-red-500/40">
+                                        <img src="soekarno.jpg" alt="Ir. Sukarno" class="w-full h-full object-cover">
+                                    </div>
+                                    <h4 class="text-[11px] font-bold text-white">Ir. Sukarno</h4>
+                                    <p class="text-[9px] text-amber-400 font-semibold">Presiden Pertama</p>
+                                </div>
+                                <div class="text-center">
+                                    <div class="w-12 h-14 bg-black rounded-lg overflow-hidden mx-auto mb-1 border border-blue-500/40">
+                                        <img src="Moh. Hatta.webp" alt="Drs. Mohammad Hatta" class="w-full h-full object-cover">
+                                    </div>
+                                    <h4 class="text-[11px] font-bold text-white">Moh. Hatta</h4>
+                                    <p class="text-[9px] text-blue-400 font-semibold">Wapres Pertama</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-gray-800 text-[11px] text-amber-300 flex items-center gap-1.5 font-medium">
+                            <i class="fa-solid fa-crown text-amber-400"></i> Terpilih Secara Aklamasi
+                        </div>
+                    </div>
+
+                    <!-- KEPUTUSAN 3 -->
+                    <div class="decision-card p-5 flex flex-col justify-between border-t-4 border-t-blue-500">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 font-black flex items-center justify-center text-lg">
+                                    3
+                                </span>
+                                <span class="text-[10px] font-bold uppercase px-2.5 py-1 bg-blue-500/10 text-blue-400 rounded-full border border-blue-500/30">
+                                    Legislatif Sementara
+                                </span>
+                            </div>
+                            <h3 class="font-bold text-white text-base mb-2">Membentuk Komite Nasional (KNIP)</h3>
+                            <p class="text-xs text-gray-300 leading-relaxed mb-4">
+                                Membentuk <strong>Komite Nasional Indonesia Pusat (KNIP)</strong> sebagai komite pembantu yang bertugas:
+                            </p>
+                            <div class="bg-slate-950/70 p-3 rounded-xl border border-slate-800 text-xs text-gray-300 space-y-2">
+                                <p>
+                                    🤝 <strong>Mendampingi Presiden</strong> dalam menjalankan roda pemerintahan.
+                                </p>
+                                <p>
+                                    🏛️ <strong>Menjalankan fungsi legislatif</strong> sementara waktu sebelum lembaga perwakilan rakyat (MPR/DPR) terbentuk resmi melalui Pemilu.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-gray-800 text-[11px] text-blue-300 flex items-center gap-1.5 font-medium">
+                            <i class="fa-solid fa-building-columns text-blue-400"></i> Penopang Tugas Pemerintahan
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- ===== SECTION 3: MAKNA PENGESAHAN UUD 1945 ===== -->
+            <section class="section-card p-6 md:p-8 bg-gradient-to-br from-red-950/40 via-slate-900 to-slate-950 border-2 border-red-500/50">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-12 h-12 rounded-2xl bg-rose-500/20 text-rose-400 flex items-center justify-center text-xl border border-rose-500/30">
+                        <i class="fa-solid fa-scale-balanced"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-rose-400">Makna Konstitusi</span>
+                        <h2 class="text-xl md:text-2xl font-bold text-white">Arti Penting & Makna Pengesahan UUD 1945</h2>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="bg-slate-950/80 p-4 rounded-2xl border border-gray-700 flex items-start gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-red-500/20 text-red-400 flex items-center justify-center text-lg shrink-0">
+                            ⚖️
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-bold text-white mb-1">Negara Berdasarkan Hukum (Rechtsstaat)</h4>
+                            <p class="text-xs text-gray-300 leading-relaxed">
+                                Indonesia resmi memiliki hukum dasar tertulis tertinggi, bukan negara kekuasaan belaka (<em>Machtsstaat</em>).
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-950/80 p-4 rounded-2xl border border-gray-700 flex items-start gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg shrink-0">
+                            🛡️
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-bold text-white mb-1">Pedoman Penyelenggaraan Negara</h4>
+                            <p class="text-xs text-gray-300 leading-relaxed">
+                                Menjadi acuan pembentukan lembaga negara, tata kelola pemerintahan, dan batas kewenangan para pejabat.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-950/80 p-4 rounded-2xl border border-gray-700 flex items-start gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-lg shrink-0">
+                            🇮🇩
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-bold text-white mb-1">Kedaulatan De Jure & De Facto</h4>
+                            <p class="text-xs text-gray-300 leading-relaxed">
+                                Memenuhi syarat mutlak berdirinya suatu negara merdeka yang berdaulat di hadapan hukum internasional.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-950/80 p-4 rounded-2xl border border-gray-700 flex items-start gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-green-500/20 text-green-400 flex items-center justify-center text-lg shrink-0">
+                            👥
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-bold text-white mb-1">Jaminan Hak Asasi Warga Negara</h4>
+                            <p class="text-xs text-gray-300 leading-relaxed">
+                                Memuat perlindungan hak-hak dasar rakyat serta kewajiban setiap warga negara dalam bela negara dan persatuan.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== SECTION 4: AKTIVITAS INTERAKTIF MENJODOHKAN KEPUTUSAN SIDANG ===== -->
+            <section class="section-card p-6 md:p-8 border-2 border-amber-500/60 shadow-2xl relative overflow-hidden">
+                <div class="flex items-center justify-between flex-wrap gap-4 mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-2xl border border-amber-500/30">
+                            <i class="fa-solid fa-puzzle-piece"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs font-bold uppercase tracking-wider text-amber-400">Aktivitas Interaktif</span>
+                            <h2 class="text-xl md:text-2xl font-black text-white">Menjodohkan Tokoh, Lembaga & Dokumen Sidang PPKI</h2>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-2 bg-slate-900/90 px-3.5 py-1.5 rounded-full border border-amber-500/40 text-xs text-amber-300 font-bold">
+                        <i class="fa-solid fa-star text-yellow-400"></i>
+                        <span id="match-counter">0 / 5 Terjodohkan</span>
+                    </div>
+                </div>
+
+                <p class="text-gray-300 text-xs sm:text-sm mb-6 leading-relaxed">
+                    <strong>Cara Bermain:</strong> Klik 1 kartu <em>Tokoh / Lembaga / Dokumen</em> di kolom sebelah kiri, lalu klik kartu <em>Peran & Makna Hasil Sidang PPKI</em> yang cocok di kolom sebelah kanan!
+                </p>
+
+                <!-- Matching Game Container -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <!-- Left Column: Tokoh & Dokumen -->
+                    <div class="space-y-3">
+                        <p class="text-xs font-bold text-red-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                            <i class="fa-solid fa-id-card"></i> 1. Tokoh, Lembaga & Dokumen (Klik untuk Pilih):
+                        </p>
+
+                        <!-- Item 1 -->
+                        <div id="left-1" onclick="handleSelectLeft(1)" data-id="1" class="match-card p-3.5 flex items-center gap-3">
+                            <span class="text-2xl">🇮🇩</span>
+                            <div>
+                                <h4 class="font-bold text-white text-xs sm:text-sm">Ir. Sukarno & Drs. Mohammad Hatta</h4>
+                                <p class="text-[11px] text-gray-400">Dua Tokoh Proklamator Bangsa</p>
+                            </div>
+                        </div>
+
+                        <!-- Item 2 -->
+                        <div id="left-2" onclick="handleSelectLeft(2)" data-id="2" class="match-card p-3.5 flex items-center gap-3">
+                            <span class="text-2xl">🏛️</span>
+                            <div>
+                                <h4 class="font-bold text-white text-xs sm:text-sm">Komite Nasional Indonesia Pusat (KNIP)</h4>
+                                <p class="text-[11px] text-gray-400">Lembaga Pembantu Presiden Pertama</p>
+                            </div>
+                        </div>
+
+                        <!-- Item 3 -->
+                        <div id="left-3" onclick="handleSelectLeft(3)" data-id="3" class="match-card p-3.5 flex items-center gap-3">
+                            <span class="text-2xl">📜</span>
+                            <div>
+                                <h4 class="font-bold text-white text-xs sm:text-sm">UUD NRI Tahun 1945 (Pembukaan & Batang Tubuh)</h4>
+                                <p class="text-[11px] text-gray-400">Naskah Konstitusi Tertulis Negara</p>
+                            </div>
+                        </div>
+
+                        <!-- Item 4 -->
+                        <div id="left-4" onclick="handleSelectLeft(4)" data-id="4" class="match-card p-3.5 flex items-center gap-3">
+                            <span class="text-2xl">🗣️</span>
+                            <div>
+                                <h4 class="font-bold text-white text-xs sm:text-sm">Otto Iskandardinata</h4>
+                                <p class="text-[11px] text-gray-400">Tokoh Pahlawan Nasional Jawa Barat</p>
+                            </div>
+                        </div>
+
+                        <!-- Item 5 -->
+                        <div id="left-5" onclick="handleSelectLeft(5)" data-id="5" class="match-card p-3.5 flex items-center gap-3">
+                            <span class="text-2xl">📍</span>
+                            <div>
+                                <h4 class="font-bold text-white text-xs sm:text-sm">Gedung Tyuuoo Sangi-in (Gedung Pancasila)</h4>
+                                <p class="text-[11px] text-gray-400">Jl. Pejambon No. 6, Jakarta Pusat</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Peran / Hasil Sidang (Shuffled order) -->
+                    <div class="space-y-3">
+                        <p class="text-xs font-bold text-amber-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                            <i class="fa-solid fa-crosshairs"></i> 2. Peran & Makna Hasil Sidang (Pasangkan ke sini):
+                        </p>
+
+                        <!-- Right Slot C (Matches Left 3) -->
+                        <div id="right-3" onclick="handleSelectRight(3)" data-id="3" class="match-card p-3.5 flex items-start gap-3">
+                            <span class="w-6 h-6 rounded-full bg-slate-800 text-amber-400 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 border border-slate-700">A</span>
+                            <div class="text-xs text-gray-200">
+                                <strong class="text-white block mb-0.5">Hukum Dasar Tertinggi Negara:</strong>
+                                Pedoman utama penyelenggaraan negara merdeka dan landasan hukum positif tertinggi di Indonesia.
+                            </div>
+                        </div>
+
+                        <!-- Right Slot A (Matches Left 1) -->
+                        <div id="right-1" onclick="handleSelectRight(1)" data-id="1" class="match-card p-3.5 flex items-start gap-3">
+                            <span class="w-6 h-6 rounded-full bg-slate-800 text-amber-400 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 border border-slate-700">B</span>
+                            <div class="text-xs text-gray-200">
+                                <strong class="text-white block mb-0.5">Presiden & Wakil Presiden Pertama:</strong>
+                                Ditetapkan secara bulat (aklamasi) sebagai Kepala Negara dan Wakil Kepala Negara pertama Republik Indonesia.
+                            </div>
+                        </div>
+
+                        <!-- Right Slot E (Matches Left 5) -->
+                        <div id="right-5" onclick="handleSelectRight(5)" data-id="5" class="match-card p-3.5 flex items-start gap-3">
+                            <span class="w-6 h-6 rounded-full bg-slate-800 text-amber-400 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 border border-slate-700">C</span>
+                            <div class="text-xs text-gray-200">
+                                <strong class="text-white block mb-0.5">Lokasi Bersejarah Sidang 18 Agustus 1945:</strong>
+                                Tempat berlangsungnya rapat musyawarah akbar pengesahan konstitusi dan pembentukan aparatur negara.
+                            </div>
+                        </div>
+
+                        <!-- Right Slot B (Matches Left 2) -->
+                        <div id="right-2" onclick="handleSelectRight(2)" data-id="2" class="match-card p-3.5 flex items-start gap-3">
+                            <span class="w-6 h-6 rounded-full bg-slate-800 text-amber-400 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 border border-slate-700">D</span>
+                            <div class="text-xs text-gray-200">
+                                <strong class="text-white block mb-0.5">Badan Pembantu Tugas Presiden:</strong>
+                                Bertugas mendampingi presiden dan menjalankan fungsi legislatif sementara sebelum MPR/DPR terbentuk lewat Pemilu.
+                            </div>
+                        </div>
+
+                        <!-- Right Slot D (Matches Left 4) -->
+                        <div id="right-4" onclick="handleSelectRight(4)" data-id="4" class="match-card p-3.5 flex items-start gap-3">
+                            <span class="w-6 h-6 rounded-full bg-slate-800 text-amber-400 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 border border-slate-700">E</span>
+                            <div class="text-xs text-gray-200">
+                                <strong class="text-white block mb-0.5">Pengusul Pemilihan Aklamasi:</strong>
+                                Tokoh yang mengusulkan pemilihan Sukarno sebagai Presiden dan Hatta sebagai Wakil Presiden secara mufakat bulat.
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Action & Feedback Bar -->
+                <div class="mt-8 pt-4 border-t border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div id="match-feedback" class="text-xs sm:text-sm font-semibold text-gray-400 text-center sm:text-left">
+                        Klik 1 kartu di kolom kiri, lalu pasangkan dengan kartu di kolom kanan!
+                    </div>
+
+                    <button onclick="resetMatchingGame()" class="px-5 py-2.5 bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white font-semibold rounded-xl border border-gray-700 text-xs transition flex items-center gap-2">
+                        <i class="fa-solid fa-rotate-left"></i> Reset Pasangan
+                    </button>
+                </div>
+            </section>
+
+            <div id="quiz-cta-container"></div>
+
+        <!-- NAVIGASI LEVEL (SEBELUMNYA & SELANJUTNYA) -->
+            <div class="mt-8 pt-6 border-t border-gray-800">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <a href="dunia3-level2.html" class="w-full sm:w-auto px-5 py-3 bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white font-bold rounded-xl border border-gray-700 transition flex items-center justify-center gap-2 text-xs sm:text-sm">
+                        <i class="fa-solid fa-chevron-left"></i> Sebelumnya: Level 10
+                    </a>
+                    
+                    <a href="dunia3.html" class="text-xs text-gray-400 hover:text-white flex items-center gap-1.5 font-semibold">
+                        <i class="fa-solid fa-map"></i> Peta Dunia 3 (Level 11/20)
+                    </a>
+
+                    <a href="dunia3-level4.html" class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold rounded-xl shadow-lg shadow-red-600/30 transition transform hover:scale-105 flex items-center justify-center gap-2 text-xs sm:text-sm">
+                        Selanjutnya: Level 12 (Boss) <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-brand-dark text-gray-400 py-8 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-sm text-center flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-2">
+                <img src="Logo Edukacivic.png" alt="EdukaCivic" class="h-6 w-auto">
+                <span class="font-bold text-white">Eduka<span class="text-brand-red">Civic</span></span>
+            </div>
+            <p>&copy; 2026 EdukaCivic | Fadilatul Fajri · SMP Negeri 5 Purwokerto</p>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Reading Progress Tracker
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const pct = docHeight > 0 ? Math.min(100, Math.round((scrollTop / docHeight) * 100)) : 0;
+            document.getElementById('read-bar').style.width = pct + '%';
+            document.getElementById('read-pct').textContent = pct + '%';
+        });
+
+        // Image Modal Logic
+        function openImageModal() {
+            document.getElementById('image-modal').classList.remove('hidden');
+        }
+        function closeImageModal() {
+            document.getElementById('image-modal').classList.add('hidden');
+        }
+
+        // Interactive Matching Game State
+        let selectedLeftId = null;
+        let matchedCount = 0;
+        let pointsAwarded = false;
+
+        function handleSelectLeft(id) {
+            const leftEl = document.getElementById(`left-${id}`);
+            if (leftEl.classList.contains('matched')) return;
+
+            // Clear previous left selection
+            document.querySelectorAll('[id^="left-"]').forEach(el => {
+                if (!el.classList.contains('matched')) el.classList.remove('selected');
+            });
+
+            leftEl.classList.add('selected');
+            selectedLeftId = id;
+            playSound('correct');
+
+            const fb = document.getElementById('match-feedback');
+            fb.className = "text-xs sm:text-sm font-semibold text-amber-300 text-center sm:text-left";
+            fb.textContent = "Kartu dipilih! Sekarang pilih pasangan yang tepat di kolom sebelah kanan.";
+        }
+
+        function handleSelectRight(id) {
+            const rightEl = document.getElementById(`right-${id}`);
+            if (rightEl.classList.contains('matched')) return;
+
+            if (!selectedLeftId) {
+                const fb = document.getElementById('match-feedback');
+                fb.className = "text-xs sm:text-sm font-semibold text-yellow-400 text-center sm:text-left";
+                fb.textContent = "⚠️ Pilih dulu kartu Tokoh/Lembaga/Dokumen di kolom kiri!";
+                playSound('wrong');
+                return;
+            }
+
+            const leftEl = document.getElementById(`left-${selectedLeftId}`);
+
+            if (selectedLeftId === id) {
+                // MATCHED! (Correct)
+                leftEl.classList.remove('selected');
+                leftEl.classList.add('matched');
+                rightEl.classList.add('matched');
+
+                leftEl.innerHTML += ` <span class="ml-auto text-green-400 font-bold text-sm"><i class="fa-solid fa-circle-check"></i></span>`;
+                rightEl.innerHTML += ` <span class="ml-auto text-green-400 font-bold text-sm"><i class="fa-solid fa-circle-check"></i></span>`;
+
+                matchedCount++;
+                selectedLeftId = null;
+                document.getElementById('match-counter').textContent = `${matchedCount} / 5 Terjodohkan`;
+                playSound('correct');
+
+                const fb = document.getElementById('match-feedback');
+                fb.className = "text-xs sm:text-sm font-semibold text-green-400 text-center sm:text-left";
+                fb.textContent = "✨ Tepat sekali! Pasangan berhasil dihubungkan dengan benar.";
+
+                if (matchedCount === 5) {
+                    handleAllMatched();
+                }
+            } else {
+                // WRONG MATCH
+                rightEl.classList.add('wrong');
+                playSound('wrong');
+                const fb = document.getElementById('match-feedback');
+                fb.className = "text-xs sm:text-sm font-semibold text-red-400 text-center sm:text-left";
+                fb.textContent = "❌ Belum tepat! Pasangan tersebut kurang sesuai, coba cari peran yang tepat.";
+
+                setTimeout(() => {
+                    rightEl.classList.remove('wrong');
+                }, 600);
+            }
+        }
+
+        function handleAllMatched() {
+            sessionStorage.setItem('edukacivic_act_d3l3', 'true');
+            setQuizButtonUnlocked('d3l3', 'dunia3-level3-kuis.html', 'quiz-cta-container');
+            playSound('victory');
+            triggerConfetti();
+
+            const fb = document.getElementById('match-feedback');
+            fb.className = "text-xs sm:text-sm font-bold text-green-300 bg-green-950/60 p-3 rounded-xl border border-green-500/40 text-center sm:text-left w-full";
+            fb.innerHTML = "🎉 Luar Biasa! Semua 5 Keputusan Sidang PPKI 18 Agustus 1945 berhasil kamu jodohkan dengan sempurna! (+25 Poin)";
+
+            if (!pointsAwarded) {
+                pointsAwarded = true;
+                const p = getProgress();
+                p.poin = (p.poin || 0) + 25;
+                localStorage.setItem('edukacivic_progress', JSON.stringify(p));
+                document.getElementById('nav-poin').textContent = p.poin;
+
+                // Sync with student database
+                try {
+                    const curStudent = JSON.parse(localStorage.getItem('edukacivic_siswa'));
+                    if (curStudent) {
+                        curStudent.poin = p.poin;
+                        localStorage.setItem('edukacivic_siswa', JSON.stringify(curStudent));
+                    }
+                } catch(e) {}
+            }
+        }
+
+        function resetMatchingGame() {
+            selectedLeftId = null;
+            matchedCount = 0;
+            document.getElementById('match-counter').textContent = "0 / 5 Terjodohkan";
+
+            // Reset Left cards
+            const leftData = [
+                { id: 1, icon: '🇮🇩', title: 'Ir. Sukarno & Drs. Mohammad Hatta', sub: 'Dua Tokoh Proklamator Bangsa' },
+                { id: 2, icon: '🏛️', title: 'Komite Nasional Indonesia Pusat (KNIP)', sub: 'Lembaga Pembantu Presiden Pertama' },
+                { id: 3, icon: '📜', title: 'UUD NRI Tahun 1945 (Pembukaan & Batang Tubuh)', sub: 'Naskah Konstitusi Tertulis Negara' },
+                { id: 4, icon: '🗣️', title: 'Otto Iskandardinata', sub: 'Tokoh Pahlawan Nasional Jawa Barat' },
+                { id: 5, icon: '📍', title: 'Gedung Tyuuoo Sangi-in (Gedung Pancasila)', sub: 'Jl. Pejambon No. 6, Jakarta Pusat' }
+            ];
+
+            leftData.forEach(item => {
+                const el = document.getElementById(`left-${item.id}`);
+                el.className = "match-card p-3.5 flex items-center gap-3";
+                el.innerHTML = `
+                    <span class="text-2xl">${item.icon}</span>
+                    <div>
+                        <h4 class="font-bold text-white text-xs sm:text-sm">${item.title}</h4>
+                        <p class="text-[11px] text-gray-400">${item.sub}</p>
+                    </div>
+                `;
+            });
+
+            // Reset Right cards
+            const rightData = [
+                { id: 3, letter: 'A', strong: 'Hukum Dasar Tertinggi Negara:', desc: 'Pedoman utama penyelenggaraan negara merdeka dan landasan hukum positif tertinggi di Indonesia.' },
+                { id: 1, letter: 'B', strong: 'Presiden & Wakil Presiden Pertama:', desc: 'Ditetapkan secara bulat (aklamasi) sebagai Kepala Negara dan Wakil Kepala Negara pertama Republik Indonesia.' },
+                { id: 5, letter: 'C', strong: 'Lokasi Bersejarah Sidang 18 Agustus 1945:', desc: 'Tempat berlangsungnya rapat musyawarah akbar pengesahan konstitusi dan pembentukan aparatur negara.' },
+                { id: 2, letter: 'D', strong: 'Badan Pembantu Tugas Presiden:', desc: 'Bertugas mendampingi presiden dan menjalankan fungsi legislatif sementara sebelum MPR/DPR terbentuk lewat Pemilu.' },
+                { id: 4, letter: 'E', strong: 'Pengusul Pemilihan Aklamasi:', desc: 'Tokoh yang mengusulkan pemilihan Sukarno sebagai Presiden dan Hatta sebagai Wakil Presiden secara mufakat bulat.' }
+            ];
+
+            rightData.forEach(item => {
+                const el = document.getElementById(`right-${item.id}`);
+                el.className = "match-card p-3.5 flex items-start gap-3";
+                el.innerHTML = `
+                    <span class="w-6 h-6 rounded-full bg-slate-800 text-amber-400 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 border border-slate-700">${item.letter}</span>
+                    <div class="text-xs text-gray-200">
+                        <strong class="text-white block mb-0.5">${item.strong}</strong>
+                        ${item.desc}
+                    </div>
+                `;
+            });
+
+            const fb = document.getElementById('match-feedback');
+            fb.className = "text-xs sm:text-sm font-semibold text-gray-400 text-center sm:text-left";
+            fb.textContent = "Klik 1 kartu di kolom kiri, lalu pasangkan dengan kartu di kolom kanan!";
+        }
+
+        function triggerConfetti() {
+            var duration = 2.5 * 1000;
+            var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 150 };
+
+            function randomInRange(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            var interval = setInterval(function() {
+                var timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) return clearInterval(interval);
+
+                var particleCount = 40 * (timeLeft / duration);
+                confetti(Object.assign({}, defaults, { particleCount,
+                    origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
+                }));
+                confetti(Object.assign({}, defaults, { particleCount,
+                    origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
+                }));
+            }, 250);
+        }
+    
+        document.addEventListener("DOMContentLoaded", () => {
+            initInteractiveActivityGating("d3l3", "dunia3-level3-kuis.html");
+        });
+    </script>
+</body>
+</html>
+
+

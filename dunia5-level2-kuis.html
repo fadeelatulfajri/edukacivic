@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Level 18: Hak & Kewajiban di Lingkungan Tempat Tinggal - EdukaCivic</title>
+    <link rel="icon" type="image/png" href="Logo Edukacivic.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="student-system.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            emerald: '#10B981', emeraldLight: '#34D399', emeraldDark: '#059669',
+                            teal: '#14B8A6',
+                            cyan: '#06B6D4',
+                            dark: '#0F172A', darker: '#020617', light: '#F8FAFC'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0F172A; }
+        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4B5563; }
+
+        .quiz-card {
+            background: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(12px);
+            border: 2px solid rgba(16, 185, 129, 0.4);
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 30px -5px rgba(16, 185, 129, 0.15);
+        }
+
+        .opt-btn {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .opt-btn:hover {
+            transform: translateX(4px);
+        }
+    </style>
+    <script>
+        function getProgress() {
+            try { return JSON.parse(localStorage.getItem('edukacivic_progress')) || { poin: 0, level: 1, dunia: 5, completedLevels: [] }; }
+            catch(e) { return { poin: 0, level: 1, dunia: 5, completedLevels: [] }; }
+        }
+        const prog = getProgress();
+        if (!prog.completedLevels || !prog.completedLevels.includes('d5l1')) {
+            window.location.href = 'dunia5.html';
+        }
+    </script>
+</head>
+<body class="bg-brand-darker text-white font-sans antialiased min-h-screen flex flex-col justify-between selection:bg-emerald-600 selection:text-white">
+
+    <!-- Web Audio Sound Effects -->
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            try {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'correct') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.setValueAtTime(659.25, now + 0.08);
+                    osc.frequency.setValueAtTime(783.99, now + 0.16);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, now);
+                    osc.frequency.exponentialRampToValueAtTime(130, now + 0.25);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                } else if (type === 'victory') {
+                    [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+                        const o = audioCtx.createOscillator();
+                        const g = audioCtx.createGain();
+                        o.connect(g);
+                        g.connect(audioCtx.destination);
+                        o.type = 'triangle';
+                        o.frequency.setValueAtTime(freq, now + i * 0.1);
+                        g.gain.setValueAtTime(0.3, now + i * 0.1);
+                        g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.1 + 0.4);
+                        o.start(now + i * 0.1);
+                        o.stop(now + i * 0.1 + 0.4);
+                    });
+                }
+            } catch(e) {}
+        }
+    </script>
+
+    <!-- NAVBAR -->
+    <nav class="fixed w-full z-50 bg-brand-dark/90 backdrop-blur-md border-b border-gray-800 transition-all duration-300">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-3">
+                    <a href="dunia5-level2.html" class="flex items-center gap-2 text-gray-400 hover:text-white transition group">
+                        <div class="w-8 h-8 bg-gray-800 rounded-lg flex items-center justify-center group-hover:bg-gray-700">
+                            <i class="fa-solid fa-arrow-left text-sm"></i>
+                        </div>
+                        <span class="text-xs sm:text-sm font-semibold hidden sm:inline">Materi Level 18</span>
+                    </a>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <span class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold px-3 py-1.5 rounded-full">
+                        Kuis Level 18
+                    </span>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-1.5 bg-gray-800 px-3 py-1.5 rounded-lg border border-gray-700 text-xs font-bold text-yellow-400">
+                        <i class="fa-solid fa-bolt"></i>
+                        <span id="nav-poin">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <script>document.getElementById('nav-poin').textContent = prog.poin || 0;</script>
+
+    <!-- MAIN QUIZ AREA -->
+    <main class="flex-grow pt-24 pb-12 px-4 flex items-center justify-center">
+        <div class="max-w-2xl w-full">
+
+            <!-- QUIZ CONTAINER -->
+            <div id="quiz-container" class="quiz-card p-6 md:p-8">
+                <!-- Header: Step & Score -->
+                <div class="flex items-center justify-between gap-4 mb-4 pb-4 border-b border-gray-700">
+                    <div class="flex items-center gap-2">
+                        <span id="q-badge" class="bg-emerald-500/20 text-emerald-300 text-xs font-black px-3 py-1 rounded-full uppercase border border-emerald-500/40">
+                            Soal 1 / 10
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-3 text-xs">
+                        <span class="text-gray-400">Benar: <strong id="score-correct" class="text-emerald-400 font-bold">0</strong></span>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="w-full h-2 bg-gray-900 rounded-full mb-6 overflow-hidden border border-gray-800">
+                    <div id="quiz-bar" class="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-300" style="width: 10%"></div>
+                </div>
+
+                <!-- Question Box -->
+                <div class="mb-6">
+                    <h2 id="q-text" class="text-base sm:text-lg font-bold text-white leading-relaxed">
+                        Memuat pertanyaan...
+                    </h2>
+                </div>
+
+                <!-- Options -->
+                <div id="options-box" class="space-y-3">
+                    <!-- Injected here -->
+                </div>
+
+                <!-- Feedback Toast -->
+                <div id="q-feedback" class="hidden mt-4 p-3.5 rounded-xl text-xs font-bold"></div>
+            </div>
+
+            <!-- VICTORY / RESULT CONTAINER -->
+            <div id="result-container" class="hidden quiz-card p-6 md:p-8 text-center border-2 border-emerald-500/70">
+                <div class="w-20 h-20 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center text-4xl mx-auto mb-4 border border-emerald-500/40 shadow-xl">
+                    🏆
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-black text-white mb-2">Selamat, Kuis Level 18 Tuntas!</h2>
+                <p class="text-gray-300 text-xs sm:text-sm mb-6 leading-relaxed">
+                    Kamu telah menguasai seluruh hak dan kewajiban warga negara di lingkungan masyarakat, pos kamling, hak suara Pemilu, hingga ketaatan hukum & pajak!
+                </p>
+
+                <div class="grid grid-cols-2 gap-3 max-w-sm mx-auto mb-6">
+                    <div class="bg-slate-950/80 p-3 rounded-2xl border border-slate-800">
+                        <p class="text-[11px] text-gray-400 uppercase font-semibold">Skor Jawaban</p>
+                        <p id="final-score" class="text-2xl font-black text-emerald-400">10 / 10</p>
+                    </div>
+                    <div class="bg-slate-950/80 p-3 rounded-2xl border border-slate-800">
+                        <p class="text-[11px] text-gray-400 uppercase font-semibold">Bonus Poin</p>
+                        <p class="text-2xl font-black text-yellow-400">+25 Poin</p>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                    <a href="dunia5-level3.html" class="px-6 py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-xl text-xs shadow-lg shadow-emerald-600/30 transition transform hover:scale-105 flex items-center justify-center gap-2">
+                        Lanjut ke Level 19 <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                    <a href="dunia5.html" class="px-5 py-3.5 bg-gray-800 hover:bg-gray-700 text-gray-300 font-semibold rounded-xl text-xs border border-gray-700 transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-map"></i> Peta Dunia 5
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-brand-dark text-gray-400 py-4 border-t border-gray-800 text-center text-xs">
+        <p>&copy; 2026 EdukaCivic | Fadilatul Fajri</p>
+    </footer>
+
+    <!-- QUIZ JAVASCRIPT ENGINE -->
+    <script>
+        const quizData = [
+            {
+                q: "Kegiatan Siskamling atau pos ronda malam di lingkungan tempat tinggal merupakan wujud nyata partisipasi warga negara dalam...",
+                opts: [
+                    "A. Usaha pertahanan dan keamanan negara (Bela Negara) sesuai Pasal 30 ayat (1)",
+                    "B. Usaha perdagangan dan perekonomian rakyat",
+                    "C. Kegiatan politik praktis untuk mendukung calon kepala desa",
+                    "D. Hiburan malam untuk mengisi waktu luang semata"
+                ],
+                ans: 0,
+                exp: "Siskamling merupakan implementasi sistem pertahanan dan keamanan rakyat semesta (Sishankamrata) yang dijamin Pasal 30 ayat (1)."
+            },
+            {
+                q: "Sikap hidup rukun dengan tetangga yang berbeda suku, adat, dan agama diatur dalam UUD NRI 1945 terutama...",
+                opts: [
+                    "A. Pasal 33 tentang perekonomian",
+                    "B. Pasal 29 ayat (2) tentang kebebasan beragama & Pasal 28J ayat (1) tentang menghormati HAM",
+                    "C. Pasal 36 tentang lagu kebangsaan",
+                    "D. Pasal 37 tentang perubahan UUD"
+                ],
+                ans: 1,
+                exp: "Menghormati perbedaan agama dan budaya tetangga adalah kewajiban asasi setiap warga negara."
+            },
+            {
+                q: "Mengapa setiap warga negara yang telah memenuhi syarat wajib menggunakan hak suaranya secara bertanggung jawab dalam Pemilu?",
+                opts: [
+                    "A. Karena kedaulatan berada di tangan rakyat sebagaimana diatur dalam Pasal 1 ayat (2) UUD 1945",
+                    "B. Agar tidak dikenai denda uang oleh panitia TPS",
+                    "C. Karena Pemilu hanya menguntungkan partai politik tertentu",
+                    "D. Untuk mendapatkan hadiah sembako saat hari pencoblosan"
+                ],
+                ans: 0,
+                exp: "Pemilu adalah sarana perwujudan kedaulatan rakyat untuk memilih Presiden, DPR, dan DPD secara demokratis."
+            },
+            {
+                q: "Prinsip bahwa segala warga negara bersamaan kedudukannya di dalam hukum dan pemerintahan (Equality Before the Law) ditegaskan dalam...",
+                opts: [
+                    "A. Pasal 27 ayat (1) UUD NRI Tahun 1945",
+                    "B. Pasal 34 ayat (1) UUD NRI Tahun 1945",
+                    "C. Pasal 28A UUD NRI Tahun 1945",
+                    "D. Pasal 17 UUD NRI Tahun 1945"
+                ],
+                ans: 0,
+                exp: "Pasal 27 ayat (1) menyatakan semua warga negara wajib menjunjung hukum dan pemerintahan tanpa ada kecualinya."
+            },
+            {
+                q: "Landasan konstitusional mengenai kewajiban warga negara membayar pajak dan pungutan lain untuk keperluan negara adalah...",
+                opts: [
+                    "A. Pasal 23A UUD NRI Tahun 1945",
+                    "B. Pasal 28B UUD NRI Tahun 1945",
+                    "C. Pasal 31 ayat (2) UUD NRI Tahun 1945",
+                    "D. Pasal 35 UUD NRI Tahun 1945"
+                ],
+                ans: 0,
+                exp: "Pasal 23A UUD 1945 menegaskan: 'Pajak dan pungutan lain yang bersifat memaksa untuk keperluan negara diatur dengan undang-undang'."
+            },
+            {
+                q: "Dana pajak yang disetorkan oleh masyarakat kepada negara digunakan pemerintah untuk...",
+                opts: [
+                    "A. Kepentingan pribadi para pejabat negara",
+                    "B. Membangun infrastruktur publik, sekolah, rumah sakit, dan subsidi rakyat",
+                    "C. Disimpan tanpa digunakan untuk pembangunan",
+                    "D. Membiayai kampanye partai politik tertentu"
+                ],
+                ans: 1,
+                exp: "Pajak merupakan tulang punggung APBN untuk membiayai fasilitas publik, pendidikan, dan kesehatan bagi seluruh rakyat."
+            },
+            {
+                q: "Tindakan menjenguk tetangga yang sedang sakit dan ikut kerja bakti membersihkan saluran air mencerminkan sikap...",
+                opts: [
+                    "A. Individualisme dan mementingkan diri sendiri",
+                    "B. Empati, kepedulian sosial, dan gotong royong dalam bermasyarakat",
+                    "C. Sikap ikut-ikutan tanpa tujuan yang jelas",
+                    "D. Pemborosan waktu di lingkungan RT"
+                ],
+                ans: 1,
+                exp: "Kepedulian sosial dan gotong royong mempererat persatuan dan kesatuan lingkungan tempat tinggal."
+            },
+            {
+                q: "Jika seorang pengendara menerobos lampu merah saat jalanan sepi, tindakan tersebut bertentangan dengan UUD 1945 karena...",
+                opts: [
+                    "A. Melanggar kewajiban menjunjung tinggi hukum sesuai Pasal 27 ayat (1)",
+                    "B. Rambu lalu lintas hanya berlaku jika ada polisi",
+                    "C. Pengendara bebas menentukan aturan sendiri di malam hari",
+                    "D. Lampu lalu lintas bukan bagian dari peraturan hukum"
+                ],
+                ans: 0,
+                exp: "Kepatuhan hukum harus didasari kesadaran penuh demi keselamatan bersama, bukan karena takut ditilang semata."
+            },
+            {
+                q: "Menghormati hak tetangga untuk beribadah dengan tenang di rumah ibadahnya merupakan cerminan dari...",
+                opts: [
+                    "A. Pasal 29 ayat (2) tentang jaminan kemerdekaan beribadah",
+                    "B. Pasal 33 ayat (3) tentang sumber daya alam",
+                    "C. Pasal 32 ayat (1) tentang kebudayaan daerah",
+                    "D. Pasal 36A tentang lambang negara"
+                ],
+                ans: 0,
+                exp: "Negara menjamin kemerdekaan tiap-tiap penduduk untuk memeluk agamanya dan beribadat menurut agamanya (Pasal 29 ayat 2)."
+            },
+            {
+                q: "Makna keseimbangan antara Hak dan Kewajiban bagi warga negara yang taat konstitusi adalah...",
+                opts: [
+                    "A. Menuntut seluruh hak pribadi terlebih dahulu sebelum mau menjalankan kewajiban",
+                    "B. Menjalankan kewajiban dengan penuh tanggung jawab bersamaan dengan pemenuhan hak secara adil",
+                    "C. Hanya menjalankan kewajiban tanpa pernah mendapatkan hak",
+                    "D. Menyerahkan semua kewajiban kepada pemerintah saja"
+                ],
+                ans: 1,
+                exp: "Warga negara yang baik selalu menyeimbangkan pelaksanaan kewajiban dan penuntutan hak secara proporsional dan adil."
+            }
+        ];
+
+        let currentIdx = 0;
+        let correctCount = 0;
+        let answered = false;
+
+        function loadQuestion() {
+            answered = false;
+            const q = quizData[currentIdx];
+            document.getElementById('q-badge').textContent = `Soal ${currentIdx + 1} / ${quizData.length}`;
+            document.getElementById('score-correct').textContent = correctCount;
+            document.getElementById('quiz-bar').style.width = `${((currentIdx + 1) / quizData.length) * 100}%`;
+            document.getElementById('q-text').textContent = q.q;
+
+            const fb = document.getElementById('q-feedback');
+            fb.classList.add('hidden');
+
+            const box = document.getElementById('options-box');
+            box.innerHTML = '';
+
+            q.opts.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'opt-btn w-full text-left p-4 bg-slate-900/90 hover:bg-slate-800 border border-gray-700 hover:border-emerald-500/50 rounded-2xl text-xs sm:text-sm text-gray-200 shadow-md flex items-start gap-3';
+                btn.innerHTML = `<span class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center shrink-0 text-xs">${String.fromCharCode(65 + idx)}</span> <span class="leading-relaxed">${opt.substring(3)}</span>`;
+                btn.onclick = () => checkAnswer(idx, btn);
+                box.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedIdx, btnEl) {
+            if (answered) return;
+            answered = true;
+
+            const q = quizData[currentIdx];
+            const allBtns = document.querySelectorAll('.opt-btn');
+            const fb = document.getElementById('q-feedback');
+            fb.classList.remove('hidden');
+
+            if (selectedIdx === q.ans) {
+                correctCount++;
+                document.getElementById('score-correct').textContent = correctCount;
+                playSound('correct');
+                btnEl.classList.remove('bg-slate-900/90', 'border-gray-700');
+                btnEl.classList.add('bg-green-600/30', 'border-green-500', 'text-green-300');
+                fb.className = 'mt-4 p-3.5 rounded-xl text-xs font-bold bg-green-500/20 border border-green-500/40 text-green-300';
+                fb.innerHTML = `✅ <strong>Jawaban Tepat!</strong> ${q.exp}`;
+            } else {
+                playSound('wrong');
+                btnEl.classList.remove('bg-slate-900/90', 'border-gray-700');
+                btnEl.classList.add('bg-red-600/30', 'border-red-500', 'text-red-300');
+                allBtns[q.ans].classList.remove('bg-slate-900/90', 'border-gray-700');
+                allBtns[q.ans].classList.add('bg-green-600/30', 'border-green-500', 'text-green-300');
+                fb.className = 'mt-4 p-3.5 rounded-xl text-xs font-bold bg-red-500/20 border border-red-500/40 text-red-300';
+                fb.innerHTML = `❌ <strong>Kurang Tepat.</strong> ${q.exp}`;
+            }
+
+            setTimeout(() => {
+                currentIdx++;
+                if (currentIdx < quizData.length) {
+                    loadQuestion();
+                } else {
+                    finishQuiz();
+                }
+            }, 2000);
+        }
+
+        function finishQuiz() {
+            document.getElementById('quiz-container').classList.add('hidden');
+            const res = document.getElementById('result-container');
+            res.classList.remove('hidden');
+            document.getElementById('final-score').textContent = `${correctCount} / ${quizData.length}`;
+
+            // Update Progress
+            const earnedPoints = Math.round((correctCount / quizData.length) * 25);
+            if (typeof recordLevelCompleted === "function") {
+                recordLevelCompleted("d5l2", earnedPoints);
+            } else {
+                const currentProg = getProgress();
+                if (!currentProg.completedLevels.includes('d5l2')) {
+                    currentProg.completedLevels.push('d5l2');
+                }
+                currentProg.poin = (currentProg.poin || 0) + earnedPoints;
+                if (currentProg.level < 19) currentProg.level = 19;
+                localStorage.setItem('edukacivic_progress', JSON.stringify(currentProg));
+            }
+            document.getElementById('nav-poin').textContent = (getPlayerProgress().poin || 0);
+
+            playSound('victory');
+            triggerDoubleConfetti();
+        }
+
+        function triggerDoubleConfetti() {
+            try {
+                confetti({ particleCount: 90, spread: 80, origin: { y: 0.6 } });
+                setTimeout(() => {
+                    confetti({ particleCount: 80, spread: 100, origin: { y: 0.4 } });
+                }, 350);
+            } catch(e) {}
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadQuestion();
+        });
+    </script>
+</body>
+</html>
+

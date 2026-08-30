@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level 4: Indonesia Membutuhkan UUD 1945 - EdukaCivic</title>
+    <link rel="icon" type="image/png" href="Logo Edukacivic.png">
+    
+    <!-- Google Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="student-system.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { 
+                        sans: ['Poppins', 'sans-serif'],
+                        cinzel: ['Cinzel', 'serif']
+                    },
+                    colors: {
+                        brand: {
+                            red: '#DC2626', redLight: '#EF4444', redDark: '#B91C1C',
+                            sky: '#0284C7', cyan: '#06B6D4',
+                            dark: '#0F172A', darker: '#020617', light: '#F8FAFC'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #020b18; }
+        ::-webkit-scrollbar-thumb { background: #0284c7; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #38bdf8; }
+
+        .glass-card {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(16px);
+            border: 2px solid rgba(56, 189, 248, 0.25);
+            border-radius: 2rem;
+            box-shadow: 0 15px 35px -5px rgba(2, 132, 199, 0.2);
+        }
+
+        /* Match Card Styles */
+        .match-card {
+            cursor: pointer;
+            transition: all 0.25s ease;
+            user-select: none;
+        }
+        .match-card:hover:not(.matched) {
+            transform: translateY(-3px);
+        }
+        .match-card.selected {
+            border-color: #38bdf8 !important;
+            background-color: rgba(56, 189, 248, 0.15) !important;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
+        }
+        .match-card.matched {
+            border-color: #10b981 !important;
+            background-color: rgba(16, 185, 129, 0.15) !important;
+            cursor: default;
+            opacity: 0.9;
+        }
+        .match-card.wrong {
+            border-color: #ef4444 !important;
+            background-color: rgba(239, 68, 68, 0.15) !important;
+            animation: shake 0.4s;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { transform: scale(1); opacity: 0.25; }
+            50% { transform: scale(1.1); opacity: 0.4; }
+        }
+        .pulse-glow {
+            animation: pulseGlow 4s ease-in-out infinite;
+        }
+    </style>
+    <script>
+        if (typeof isLevelUnlocked === "function" && !isLevelUnlocked("d1l4")) {
+            alert("🔒 Level ini masih terkunci! Selesaikan Level 3 terlebih dahulu.");
+            window.location.href = "index.html";
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-b from-[#020b18] via-[#081b33] to-[#020712] text-white font-sans antialiased min-h-screen flex flex-col justify-between selection:bg-sky-500 selection:text-slate-950 relative overflow-x-hidden">
+
+    <!-- Ambient Glowing Orbs -->
+    <div class="fixed top-16 left-1/4 w-96 h-96 bg-sky-500/15 rounded-full filter blur-3xl pointer-events-none pulse-glow"></div>
+    <div class="fixed bottom-12 right-1/4 w-80 h-80 bg-cyan-500/15 rounded-full filter blur-3xl pointer-events-none pulse-glow"></div>
+
+    <!-- NAVBAR -->
+    <nav class="fixed w-full z-50 bg-[#071322]/90 backdrop-blur-md border-b border-sky-900/40 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-4">
+                    <a href="dunia1.html" class="flex items-center gap-2 text-sky-300 hover:text-white transition group">
+                        <div class="w-8 h-8 bg-sky-950/80 border border-sky-800/60 rounded-xl flex items-center justify-center group-hover:bg-sky-900 transition">
+                            <i class="fa-solid fa-arrow-left text-sm"></i>
+                        </div>
+                        <span class="text-xs sm:text-sm font-semibold hidden sm:inline">Peta Dunia 1</span>
+                    </a>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <span class="bg-gradient-to-r from-sky-500/20 to-cyan-500/20 border border-sky-400/40 text-sky-300 text-xs font-black px-4 py-1.5 rounded-full flex items-center gap-2 shadow-sm">
+                        <i class="fa-solid fa-scroll text-cyan-400"></i> Level 4: Indonesia Membutuhkan UUD 1945
+                    </span>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-1.5 bg-slate-950/80 px-3.5 py-1.5 rounded-xl border border-sky-800/60 text-xs font-bold text-yellow-400 shadow-inner">
+                        <i class="fa-solid fa-bolt"></i>
+                        <span id="nav-poin">0</span>
+                        <span class="text-slate-500 text-[10px]">XP</span>
+                    </div>
+                    <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-brand-red to-orange-400 p-0.5 cursor-pointer shadow-md" onclick="window.location.href='profil-siswa.html'">
+                        <img id="nav-avatar-img" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Student" alt="Avatar" class="w-full h-full rounded-full bg-slate-900 object-cover">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-grow pt-24 pb-16 px-4 relative z-10 max-w-5xl mx-auto w-full space-y-10">
+
+        <!-- HERO BANNER -->
+        <div class="text-center space-y-3">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-sky-500/10 border border-sky-500/30 text-sky-400 text-xs font-extrabold uppercase tracking-wider">
+                <i class="fa-solid fa-feather-pointed"></i> Tonggak Sejarah 22 Juni 1945
+            </div>
+            <h1 class="text-3xl sm:text-5xl font-black tracking-tight text-white font-cinzel">
+                INDONESIA MEMBUTUHKAN UUD 1945
+            </h1>
+            <p class="text-slate-300 text-xs sm:text-base max-w-2xl mx-auto leading-relaxed">
+                Pelajari alasan pentingnya UUD bagi negara merdeka, langkah awal menuju konstitusi melalui Panitia Sembilan, dan kelahiran naskah Piagam Jakarta.
+            </p>
+        </div>
+
+        <!-- INFOGRAFIS & GAMBAR LEVEL 4 -->
+        <div class="glass-card p-4 sm:p-8 text-center border-2 border-sky-500/40 relative overflow-hidden">
+            <div class="flex items-center justify-between mb-4 pb-3 border-b border-sky-900/50">
+                <div class="flex items-center gap-2 text-sky-400 font-bold text-xs sm:text-sm uppercase tracking-wider">
+                    <i class="fa-solid fa-image"></i> Rekomendasi Visual Historis Level 4
+                </div>
+                <span class="text-[11px] text-slate-400 font-medium">Naskah Autentik & 9 Tokoh Panitia Sembilan</span>
+            </div>
+
+            <div class="overflow-hidden rounded-2xl border border-sky-800/60 bg-slate-950/80 shadow-2xl p-2">
+                <img src="Level 4.jfif" alt="Naskah Autentik Piagam Jakarta & Panitia Sembilan" class="w-full max-h-[460px] object-contain mx-auto rounded-xl hover:scale-[1.01] transition-transform duration-300">
+            </div>
+            <p class="text-slate-400 text-xs mt-3 italic">
+                Foto naskah autentik Piagam Jakarta 22 Juni 1945 beserta potret 9 tokoh anggota Panitia Sembilan.
+            </p>
+        </div>
+
+        <!-- MATERI PEMBELAJARAN (3 POIN UTAMA) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <!-- Poin 1: Alasan Pentingnya UUD -->
+            <div class="glass-card p-6 border border-sky-800/60 space-y-3">
+                <div class="w-12 h-12 rounded-2xl bg-sky-500/20 text-sky-400 flex items-center justify-center text-2xl mb-2">
+                    🏛️
+                </div>
+                <h3 class="text-base font-extrabold text-white">1. Alasan Pentingnya UUD</h3>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                    Negara merdeka memerlukan hukum dasar agar <strong>pemerintahan berjalan tertib</strong>, mencegah kekuasaan absolut/sewenang-wenang penguasa, serta <strong>melindungi hak-hak asasi warga negara</strong>.
+                </p>
+            </div>
+
+            <!-- Poin 2: Langkah Awal Menuju Konstitusi -->
+            <div class="glass-card p-6 border border-sky-800/60 space-y-3">
+                <div class="w-12 h-12 rounded-2xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-2xl mb-2">
+                    👥
+                </div>
+                <h3 class="text-base font-extrabold text-white">2. Langkah Awal Menuju Konstitusi</h3>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                    Setelah Sidang I BPUPK selesai, dibentuk <strong>Panitia Kecil (8 orang)</strong> dan <strong>Panitia Sembilan</strong> pada masa reses untuk menampung dan menyerap aspirasi dasar negara.
+                </p>
+            </div>
+
+            <!-- Poin 3: Kelahiran Rancangan Pembukaan -->
+            <div class="glass-card p-6 border border-sky-800/60 space-y-3">
+                <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-2xl mb-2">
+                    📜
+                </div>
+                <h3 class="text-base font-extrabold text-white">3. Kelahiran Rancangan Pembukaan</h3>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                    Pada <strong>22 Juni 1945</strong>, Panitia Sembilan berhasil merumuskan naskah <strong>Piagam Jakarta (Jakarta Charter)</strong> yang menjadi fondasi awal rancangan Pembukaan UUD.
+                </p>
+            </div>
+
+        </div>
+
+        <!-- 9 TOKOH PANITIA SEMBILAN SECTION -->
+        <div class="glass-card p-6 sm:p-8 border border-sky-500/40 space-y-4">
+            <div class="flex items-center gap-3 pb-3 border-b border-sky-900/50">
+                <div class="w-10 h-10 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center text-lg font-bold">
+                    🎖️
+                </div>
+                <div>
+                    <h3 class="text-lg font-extrabold text-white">9 Tokoh Anggota Panitia Sembilan</h3>
+                    <p class="text-xs text-slate-400">Negarawan perumus naskah Piagam Jakarta 22 Juni 1945</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 pt-2 text-center text-xs">
+                <div class="p-3 rounded-2xl bg-slate-950/80 border border-sky-900/60 hover:border-sky-500/80 transition">
+                    <p class="font-extrabold text-white">Ir. Soekarno</p>
+                    <p class="text-[10px] text-yellow-400 font-bold">Ketua</p>
+                </div>
+                <div class="p-3 rounded-2xl bg-slate-950/80 border border-sky-900/60 hover:border-sky-500/80 transition">
+                    <p class="font-extrabold text-white">Drs. Moh. Hatta</p>
+                    <p class="text-[10px] text-yellow-400 font-bold">Wakil Ketua</p>
+                </div>
+                <div class="p-3 rounded-2xl bg-slate-950/80 border border-sky-900/60 hover:border-sky-500/80 transition">
+                    <p class="font-extrabold text-white">Mr. A.A. Maramis</p>
+                    <p class="text-[10px] text-sky-400">Anggota</p>
+                </div>
+                <div class="p-3 rounded-2xl bg-slate-950/80 border border-sky-900/60 hover:border-sky-500/80 transition">
+                    <p class="font-extrabold text-white">Abikoesno Tjokrosoejoso</p>
+                    <p class="text-[10px] text-sky-400">Anggota</p>
+                </div>
+                <div class="p-3 rounded-2xl bg-slate-950/80 border border-sky-900/60 hover:border-sky-500/80 transition">
+                    <p class="font-extrabold text-white">Abdulkahar Muzakir</p>
+                    <p class="text-[10px] text-sky-400">Anggota</p>
+                </div>
+                <div class="p-3 rounded-2xl bg-slate-950/80 border border-sky-900/60 hover:border-sky-500/80 transition">
+                    <p class="font-extrabold text-white">H. Agus Salim</p>
+                    <p class="text-[10px] text-sky-400">Anggota</p>
+                </div>
+                <div class="p-3 rounded-2xl bg-slate-950/80 border border-sky-900/60 hover:border-sky-500/80 transition">
+                    <p class="font-extrabold text-white">Mr. Achmad Soebardjo</p>
+                    <p class="text-[10px] text-sky-400">Anggota</p>
+                </div>
+                <div class="p-3 rounded-2xl bg-slate-950/80 border border-sky-900/60 hover:border-sky-500/80 transition">
+                    <p class="font-extrabold text-white">K.H. Wahid Hasjim</p>
+                    <p class="text-[10px] text-sky-400">Anggota</p>
+                </div>
+                <div class="p-3 rounded-2xl bg-slate-950/80 border border-sky-900/60 hover:border-sky-500/80 transition col-span-2 sm:col-span-1">
+                    <p class="font-extrabold text-white">Mr. Mohammad Yamin</p>
+                    <p class="text-[10px] text-sky-400">Anggota</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- AKTIVITAS INTERAKTIF: ANALISIS SEBAB-AKIBAT PERMASALAHAN NEGARA TANPA ATURAN VS FUNGSI PERLINDUNGAN UUD 1945 -->
+        <!-- ============================================================== -->
+        <section class="glass-card p-6 sm:p-10 border-2 border-cyan-400/50 space-y-6 relative overflow-hidden">
+            
+            <div class="flex items-center gap-3 mb-2">
+                <div class="w-12 h-12 bg-cyan-500/20 text-cyan-400 rounded-2xl flex items-center justify-center text-2xl border border-cyan-500/30">
+                    <i class="fa-solid fa-code-compare"></i>
+                </div>
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-cyan-400">Aktivitas Interaktif Siswa</span>
+                    <h3 class="text-xl sm:text-2xl font-bold text-white">Aktivitas Analisis Sebab-Akibat</h3>
+                </div>
+            </div>
+
+            <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">
+                Jodohkan <strong>Kartu Permasalahan Negara Tanpa Aturan</strong> di kolom kiri dengan <strong>Kartu Fungsi Perlindungan UUD 1945</strong> yang tepat di kolom kanan. Klik 1 kartu permasalahan, lalu klik fungsi perlindungan hukum yang menjadi pasangannya!
+            </p>
+
+            <!-- Status Progres Matching -->
+            <div class="flex items-center justify-between bg-slate-950/90 px-4 py-2.5 rounded-xl border border-sky-800/60">
+                <span class="text-xs text-slate-300 font-medium">Pasangan Terhubung:</span>
+                <span id="match-status" class="text-xs font-bold text-cyan-400">0 / 4 Pasangan Selesai</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Kolom Kiri: Permasalahan Negara Tanpa Aturan -->
+                <div>
+                    <h4 class="text-xs font-extrabold text-rose-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-triangle-exclamation"></i> Permasalahan Negara Tanpa Aturan
+                    </h4>
+                    <div class="space-y-3" id="sebab-container">
+                        
+                        <div class="match-card bg-slate-950/80 border-2 border-slate-700 hover:border-rose-400 p-4 rounded-xl text-xs sm:text-sm leading-relaxed" data-pair="1" data-type="sebab" onclick="handleCardClick(this)">
+                            <div class="flex items-start gap-3">
+                                <span class="w-6 h-6 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">A</span>
+                                <span>Penguasa memegang kekuasaan mutlak tanpa batasan hukum sehingga <strong>bertindak sewenang-wenang (otoriter/absolut)</strong>.</span>
+                            </div>
+                        </div>
+
+                        <div class="match-card bg-slate-950/80 border-2 border-slate-700 hover:border-rose-400 p-4 rounded-xl text-xs sm:text-sm leading-relaxed" data-pair="2" data-type="sebab" onclick="handleCardClick(this)">
+                            <div class="flex items-start gap-3">
+                                <span class="w-6 h-6 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">B</span>
+                                <span>Hak-hak asasi warga negara (HAM) <strong>sering diabaikan, ditindas, dan tidak mendapat perlindungan</strong> yang pasti.</span>
+                            </div>
+                        </div>
+
+                        <div class="match-card bg-slate-950/80 border-2 border-slate-700 hover:border-rose-400 p-4 rounded-xl text-xs sm:text-sm leading-relaxed" data-pair="3" data-type="sebab" onclick="handleCardClick(this)">
+                            <div class="flex items-start gap-3">
+                                <span class="w-6 h-6 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">C</span>
+                                <span>Lembaga-lembaga negara saling tumpang tindih wewenang sehingga <strong>terjadi kekacauan pemerintahan (anarki)</strong>.</span>
+                            </div>
+                        </div>
+
+                        <div class="match-card bg-slate-950/80 border-2 border-slate-700 hover:border-rose-400 p-4 rounded-xl text-xs sm:text-sm leading-relaxed" data-pair="4" data-type="sebab" onclick="handleCardClick(this)">
+                            <div class="flex items-start gap-3">
+                                <span class="w-6 h-6 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">D</span>
+                                <span>Aspirasi dan keberagaman seluruh komponen rakyat <strong>tidak terakomodasi dalam landasan hukum bernegara</strong>.</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Kolom Kanan: Fungsi Perlindungan UUD 1945 -->
+                <div>
+                    <h4 class="text-xs font-extrabold text-emerald-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-shield-halved"></i> Fungsi Perlindungan UUD 1945
+                    </h4>
+                    <div class="space-y-3" id="akibat-container">
+                        
+                        <div class="match-card bg-slate-950/80 border-2 border-slate-700 hover:border-emerald-400 p-4 rounded-xl text-xs sm:text-sm leading-relaxed" data-pair="2" data-type="akibat" onclick="handleCardClick(this)">
+                            <div class="flex items-start gap-3">
+                                <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">1</span>
+                                <span>...UUD 1945 <strong>menjamin dan melindungi hak-hak asasi setiap warga negara</strong> secara sah dan tegas di hadapan hukum.</span>
+                            </div>
+                        </div>
+
+                        <div class="match-card bg-slate-950/80 border-2 border-slate-700 hover:border-emerald-400 p-4 rounded-xl text-xs sm:text-sm leading-relaxed" data-pair="1" data-type="akibat" onclick="handleCardClick(this)">
+                            <div class="flex items-start gap-3">
+                                <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">2</span>
+                                <span>...UUD 1945 <strong>membatasi kekuasaan penguasa</strong> agar tidak bertindak sewenang-wenang (mencegah kekuasaan absolut).</span>
+                            </div>
+                        </div>
+
+                        <div class="match-card bg-slate-950/80 border-2 border-slate-700 hover:border-emerald-400 p-4 rounded-xl text-xs sm:text-sm leading-relaxed" data-pair="4" data-type="akibat" onclick="handleCardClick(this)">
+                            <div class="flex items-start gap-3">
+                                <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">3</span>
+                                <span>...UUD 1945 menjadi <strong>fondasi konsensus luhur pemersatu</strong> yang menyerap aspirasi seluruh komponen bangsa.</span>
+                            </div>
+                        </div>
+
+                        <div class="match-card bg-slate-950/80 border-2 border-slate-700 hover:border-emerald-400 p-4 rounded-xl text-xs sm:text-sm leading-relaxed" data-pair="3" data-type="akibat" onclick="handleCardClick(this)">
+                            <div class="flex items-start gap-3">
+                                <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">4</span>
+                                <span>...UUD 1945 <strong>mengatur struktur dan batas wewenang lembaga negara</strong> agar tata pemerintahan berjalan tertib.</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reset Button & Feedback -->
+            <div class="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
+                <button onclick="resetMatchGame()" class="px-6 py-3 bg-slate-900 hover:bg-slate-800 text-slate-300 font-semibold rounded-xl border border-sky-900 transition flex items-center gap-2 text-xs">
+                    <i class="fa-solid fa-rotate-left"></i> Reset Pasangan Kartu
+                </button>
+            </div>
+
+            <div id="match-feedback" class="hidden mt-4 p-4 rounded-xl text-center font-bold text-xs sm:text-sm"></div>
+        </section>
+
+        <!-- ============================================================== -->
+        <!-- GATED QUIZ CTA CONTAINER -->
+        <!-- ============================================================== -->
+        <div id="quiz-cta-container"></div>
+
+        <!-- NAVIGASI LEVEL (SEBELUMNYA & SELANJUTNYA) -->
+        <div class="mt-8 pt-6 border-t border-sky-900/50">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <a href="dunia1-level3.html" class="w-full sm:w-auto px-5 py-3 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white font-bold rounded-xl border border-sky-900 transition flex items-center justify-center gap-2 text-xs sm:text-sm">
+                    <i class="fa-solid fa-chevron-left"></i> Sebelumnya: Level 3
+                </a>
+                
+                <a href="dunia1.html" class="text-xs text-sky-400 hover:text-white flex items-center gap-1.5 font-semibold">
+                    <i class="fa-solid fa-map"></i> Peta Dunia 1 (Level 4/20)
+                </a>
+
+                <a href="dunia2.html" class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-bold rounded-xl shadow-lg shadow-orange-600/30 transition transform hover:scale-105 flex items-center justify-center gap-2 text-xs sm:text-sm">
+                    Lanjut ke Dunia 2 <i class="fa-solid fa-chevron-right"></i>
+                </a>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-[#020712]/90 text-slate-500 py-6 border-t border-sky-950 text-xs text-center relative z-10">
+        <p>&copy; 2026 EdukaCivic | Fadilatul Fajri · SMP Negeri 5 Purwokerto</p>
+    </footer>
+
+    <!-- INTERACTIVE JAVASCRIPT LOGIC -->
+    <script>
+        function getProgress() {
+            try { return JSON.parse(localStorage.getItem('edukacivic_progress')) || { poin: 0, level: 1, dunia: 1, completedLevels: [] }; }
+            catch(e) { return { poin: 0, level: 1, dunia: 1, completedLevels: [] }; }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const prog = getProgress();
+            
+            const navPoin = document.getElementById('nav-poin');
+            if (navPoin) navPoin.textContent = prog.poin || 0;
+
+            initInteractiveActivityGating("d1l4", "dunia1-level4-kuis.html");
+        });
+
+        // ==============================================================
+        // AKTIVITAS SEBAB-AKIBAT MATCHING LOGIC
+        // ==============================================================
+        let selectedSebab = null;
+        let selectedAkibat = null;
+        let matchedPairsCount = 0;
+
+        function handleCardClick(card) {
+            if (card.classList.contains('matched')) return;
+
+            const type = card.dataset.type;
+
+            if (type === 'sebab') {
+                if (selectedSebab) selectedSebab.classList.remove('selected');
+                card.classList.add('selected');
+                selectedSebab = card;
+            } else if (type === 'akibat') {
+                if (selectedAkibat) selectedAkibat.classList.remove('selected');
+                card.classList.add('selected');
+                selectedAkibat = card;
+            }
+
+            if (selectedSebab && selectedAkibat) {
+                checkMatch();
+            }
+        }
+
+        function checkMatch() {
+            const pair1 = selectedSebab.dataset.pair;
+            const pair2 = selectedAkibat.dataset.pair;
+
+            if (pair1 === pair2) {
+                // Correct match!
+                selectedSebab.classList.remove('selected');
+                selectedAkibat.classList.remove('selected');
+                selectedSebab.classList.add('matched');
+                selectedAkibat.classList.add('matched');
+
+                matchedPairsCount++;
+                document.getElementById('match-status').textContent = `${matchedPairsCount} / 4 Pasangan Selesai`;
+
+                selectedSebab = null;
+                selectedAkibat = null;
+
+                if (matchedPairsCount === 4) {
+                    const fb = document.getElementById('match-feedback');
+                    if (fb) {
+                        fb.className = 'mt-6 p-5 rounded-2xl text-center font-bold text-xs sm:text-sm bg-emerald-950/80 border border-emerald-500/60 text-emerald-300 block shadow-lg';
+                        fb.innerHTML = '<div class="flex flex-col items-center gap-2">' +
+                            '<span class="text-base sm:text-lg">🎉 LUAR BIASA! Seluruh permasalahan negara tanpa aturan berhasil dijodohkan dengan fungsi perlindungan UUD 1945!</span>' +
+                            '<p class="text-xs text-emerald-200 font-normal">Kuis Level 4 di bawah telah terbuka. Silakan lanjut ke kuis untuk menyelesaikan Dunia 1!</p>' +
+                            '</div>';
+                    }
+                    
+                    setQuizButtonUnlocked("d1l4", "dunia1-level4-kuis.html");
+                    try { playCelebrationFanfare(); } catch(e) {}
+                    try { triggerCelebrationConfetti(); } catch(e) {}
+                }
+            } else {
+                // Wrong match
+                const s = selectedSebab;
+                const a = selectedAkibat;
+                s.classList.add('wrong');
+                a.classList.add('wrong');
+
+                setTimeout(() => {
+                    s.classList.remove('wrong', 'selected');
+                    a.classList.remove('wrong', 'selected');
+                }, 500);
+
+                selectedSebab = null;
+                selectedAkibat = null;
+            }
+        }
+
+        function resetMatchGame() {
+            document.querySelectorAll('.match-card').forEach(card => {
+                card.classList.remove('selected', 'matched', 'wrong');
+            });
+            selectedSebab = null;
+            selectedAkibat = null;
+            matchedPairsCount = 0;
+            document.getElementById('match-status').textContent = '0 / 4 Pasangan Selesai';
+            document.getElementById('match-feedback').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boss Battle Dunia 2: Singa Konstitusi - EdukaCivic</title>
+    <link rel="icon" type="image/png" href="Logo Edukacivic.png">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="student-system.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            red: '#DC2626', redLight: '#EF4444', redDark: '#B91C1C',
+                            dark: '#0F172A', darker: '#020617', light: '#F8FAFC'
+                        }
+                    },
+                    animation: {
+                        'boss-float': 'bossFloat 2.5s ease-in-out infinite',
+                        'boss-roar': 'bossRoar 1.8s ease-in-out infinite alternate',
+                        'flame-pulse': 'flamePulse 2s ease-in-out infinite alternate',
+                    },
+                    keyframes: {
+                        bossFloat: {
+                            '0%, 100%': { transform: 'translateY(0) scale(1)' },
+                            '50%': { transform: 'translateY(-12px) scale(1.03)' },
+                        },
+                        bossRoar: {
+                            '0%': { transform: 'scale(1) rotate(-1deg)', filter: 'drop-shadow(0 0 20px rgba(239,68,68,0.4))' },
+                            '100%': { transform: 'scale(1.06) rotate(1deg)', filter: 'drop-shadow(0 0 35px rgba(249,115,22,0.8))' },
+                        },
+                        flamePulse: {
+                            '0%': { opacity: '0.6', transform: 'scale(0.98)' },
+                            '100%': { opacity: '1', transform: 'scale(1.02)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0F172A; }
+        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4B5563; }
+        
+        .battle-panel {
+            background: rgba(20, 10, 8, 0.88);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 2px solid rgba(239, 68, 68, 0.4);
+            box-shadow: 0 0 50px rgba(220, 38, 38, 0.25);
+        }
+
+        .option-btn {
+            background: rgba(28, 12, 10, 0.85);
+            border: 2px solid rgba(120, 53, 15, 0.6);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            user-select: none;
+        }
+        .option-btn:hover:not(:disabled) {
+            border-color: #f97316;
+            background: rgba(249, 115, 22, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(249, 115, 22, 0.3);
+        }
+        .option-btn.correct {
+            border-color: #10b981 !important;
+            background: rgba(16, 185, 129, 0.3) !important;
+            color: #ecfdf5 !important;
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.5);
+        }
+        .option-btn.wrong {
+            border-color: #ef4444 !important;
+            background: rgba(239, 68, 68, 0.3) !important;
+            color: #fef2f2 !important;
+            animation: shake 0.4s;
+            box-shadow: 0 0 25px rgba(239, 68, 68, 0.5);
+        }
+
+        .boss-hit {
+            animation: shakeBoss 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+            filter: brightness(1.8) drop-shadow(0 0 35px #ef4444) !important;
+        }
+        @keyframes shakeBoss {
+            0%, 100% { transform: translateX(0) scale(1); }
+            20% { transform: translateX(-15px) rotate(-8deg) scale(0.92); }
+            40% { transform: translateX(15px) rotate(8deg) scale(1.08); }
+            60% { transform: translateX(-10px) rotate(-4deg); }
+            80% { transform: translateX(10px) rotate(4deg); }
+        }
+
+        .boss-attack {
+            animation: bossAttackAnim 0.5s ease-in-out;
+        }
+        @keyframes bossAttackAnim {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.25) translateY(15px); filter: drop-shadow(0 0 40px red); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            padding: 1rem;
+        }
+        .modal-pop {
+            animation: modalPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes modalPop {
+            0% { opacity: 0; transform: scale(0.85) translateY(25px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+    </style>
+    <script>
+        function getProgress() {
+            try { return JSON.parse(localStorage.getItem('edukacivic_progress')) || { poin: 0, level: 1, dunia: 2, completedLevels: [] }; }
+            catch(e) { return { poin: 0, level: 1, dunia: 2, completedLevels: [] }; }
+        }
+        const prog = getProgress();
+        if (!prog.completedLevels || !prog.completedLevels.includes('d2l3')) {
+            window.location.href = 'dunia2.html';
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-b from-[#150502] via-[#240803] to-[#0c0301] text-white font-sans antialiased min-h-screen flex flex-col selection:bg-red-600 selection:text-white relative overflow-x-hidden">
+
+    <!-- Ambient Fire Background Glows -->
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-red-600/15 rounded-full blur-[120px]"></div>
+        <div class="absolute bottom-10 left-10 w-[450px] h-[300px] bg-orange-600/10 rounded-full blur-[100px]"></div>
+        <div class="absolute bottom-10 right-10 w-[450px] h-[300px] bg-amber-600/10 rounded-full blur-[100px]"></div>
+    </div>
+
+    <!-- Web Audio Sound Effects -->
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            try {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'hit') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(350, now);
+                    osc.frequency.exponentialRampToValueAtTime(110, now + 0.25);
+                    gain.gain.setValueAtTime(0.35, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                } else if (type === 'boss-strike') {
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(150, now);
+                    osc.frequency.exponentialRampToValueAtTime(60, now + 0.35);
+                    gain.gain.setValueAtTime(0.35, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                } else if (type === 'victory') {
+                    [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((freq, i) => {
+                        const o = audioCtx.createOscillator();
+                        const g = audioCtx.createGain();
+                        o.connect(g);
+                        g.connect(audioCtx.destination);
+                        o.type = 'triangle';
+                        o.frequency.setValueAtTime(freq, now + i * 0.12);
+                        g.gain.setValueAtTime(0.3, now + i * 0.12);
+                        g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.12 + 0.5);
+                        o.start(now + i * 0.12);
+                        o.stop(now + i * 0.12 + 0.5);
+                    });
+                } else if (type === 'defeat') {
+                    [300, 240, 180, 120].forEach((freq, i) => {
+                        const o = audioCtx.createOscillator();
+                        const g = audioCtx.createGain();
+                        o.connect(g);
+                        g.connect(audioCtx.destination);
+                        o.type = 'sawtooth';
+                        o.frequency.setValueAtTime(freq, now + i * 0.15);
+                        g.gain.setValueAtTime(0.3, now + i * 0.15);
+                        g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.15 + 0.35);
+                        o.start(now + i * 0.15);
+                        o.stop(now + i * 0.15 + 0.35);
+                    });
+                }
+            } catch(e) {}
+        }
+    </script>
+
+    <!-- NAVBAR -->
+    <nav class="fixed w-full z-50 bg-[#160603]/90 backdrop-blur-md border-b border-red-950/80 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-4">
+                    <a href="dunia2-level4.html" class="flex items-center gap-2 text-gray-400 hover:text-white transition-colors group">
+                        <div class="w-8 h-8 bg-gray-900/80 rounded-lg flex items-center justify-center group-hover:bg-red-900/60 transition-colors border border-gray-700">
+                            <i class="fa-solid fa-arrow-left text-sm"></i>
+                        </div>
+                        <span class="text-sm font-medium hidden sm:inline">Kembali ke Rangkuman</span>
+                    </a>
+                    <div class="w-px h-8 bg-red-950"></div>
+                    <a href="index.html" class="flex items-center gap-2">
+                        <img src="Logo Edukacivic.png" alt="EdukaCivic" class="h-8 w-auto">
+                        <span class="font-bold text-lg text-white hidden sm:inline">Eduka<span class="text-brand-red">Civic</span></span>
+                    </a>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2 bg-red-500/10 border border-red-500/30 px-3.5 py-1.5 rounded-full animate-pulse">
+                        <i class="fa-solid fa-fire text-red-400 text-xs"></i>
+                        <span class="text-red-400 font-black text-xs uppercase tracking-wider">Boss Battle Dunia 2</span>
+                    </div>
+
+                    <div class="flex items-center gap-2 bg-gray-900/90 px-3 py-1.5 rounded-lg border border-red-900/50">
+                        <i class="fa-solid fa-bolt text-yellow-400 text-xs"></i>
+                        <span id="nav-poin" class="text-yellow-400 font-bold text-sm">0</span>
+                        <span class="text-gray-500 text-xs">Poin</span>
+                    </div>
+
+                    <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-brand-red to-orange-400 p-0.5 cursor-pointer shadow-md" onclick="window.location.href='profil-siswa.html'">
+                        <img id="nav-avatar-img" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Student" alt="Avatar" class="w-full h-full rounded-full bg-slate-900 object-cover">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <script>document.getElementById('nav-poin').textContent = prog.poin || 0;</script>
+
+    <!-- MAIN BOSS BATTLE CONTAINER -->
+    <main class="flex-grow flex items-center justify-center p-4 sm:p-6 w-full max-w-4xl mx-auto pt-24 pb-16 relative z-10">
+        
+        <!-- BATTLE ARENA CARD -->
+        <div id="battle-screen" class="battle-panel w-full p-6 sm:p-8 md:p-10 rounded-3xl relative overflow-hidden">
+            
+            <!-- BOSS DISPLAY AREA -->
+            <div class="text-center mb-8 relative">
+                
+                <!-- Fiery Aura Behind Boss -->
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 bg-gradient-to-tr from-red-600/30 to-orange-500/30 rounded-full blur-2xl pointer-events-none animate-flame-pulse"></div>
+
+                <!-- Boss Sprite / Avatar -->
+                <div id="boss-sprite" class="animate-boss-roar inline-block relative mb-4">
+                    <div class="w-28 h-28 sm:w-32 sm:h-32 rounded-3xl bg-gradient-to-tr from-red-700 via-orange-600 to-amber-500 p-1.5 shadow-[0_0_40px_rgba(239,68,68,0.5)] border-2 border-orange-400/80 mx-auto flex items-center justify-center">
+                        <div class="w-full h-full bg-slate-950/90 rounded-2xl flex items-center justify-center text-6xl sm:text-7xl">
+                            🦁
+                        </div>
+                    </div>
+                    <div class="absolute -bottom-2.5 left-1/2 -translate-x-1/2 bg-red-600 text-white text-[10px] font-black uppercase tracking-widest px-3 py-0.5 rounded-full border border-red-400 shadow-md">
+                        BOSS DUNIA 2
+                    </div>
+                </div>
+
+                <!-- Boss Name & Subtitle -->
+                <h1 class="text-2xl sm:text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-orange-300 to-amber-400 uppercase tracking-wide">
+                    Penjaga Dunia 2: Singa Konstitusi
+                </h1>
+                <p class="text-red-200/80 text-xs sm:text-sm mt-1 max-w-lg mx-auto font-medium">
+                    Kalahkan Singa Konstitusi dengan menghabiskan <strong class="text-yellow-400">25 HP</strong> tanpa cela. Jawab seluruh 25 pertanyaan dengan tepat!
+                </p>
+
+                <!-- BOSS HP BAR (25 HP) -->
+                <div class="max-w-md mx-auto mt-5">
+                    <div class="flex justify-between items-center text-xs font-bold mb-1.5 px-1">
+                        <span class="text-red-400 flex items-center gap-1.5">
+                            <i class="fa-solid fa-heart-pulse text-red-500"></i> HP Singa Konstitusi
+                        </span>
+                        <span id="hp-text" class="text-yellow-400 font-extrabold text-sm tracking-wider">25 / 25 HP</span>
+                    </div>
+                    <div class="w-full bg-slate-950 rounded-full h-5 p-1 border-2 border-red-500/60 shadow-inner overflow-hidden relative">
+                        <div id="hp-bar-fill" class="h-full bg-gradient-to-r from-red-600 via-orange-500 to-amber-400 rounded-full transition-all duration-300 shadow-[0_0_15px_rgba(239,68,68,0.7)]" style="width: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QUESTION CARD -->
+            <div class="bg-slate-950/90 rounded-2xl p-5 sm:p-7 border border-red-900/60 shadow-2xl relative">
+                
+                <!-- Question Header -->
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-4 pb-3 border-b border-red-950/80">
+                    <div class="flex items-center gap-2">
+                        <span class="px-3 py-1 bg-red-500/20 text-red-400 font-black text-xs rounded-full border border-red-500/30 uppercase tracking-wider" id="q-counter">
+                            Pertanyaan 1 / 25
+                        </span>
+                        <span class="text-[11px] text-gray-400 font-semibold hidden sm:inline" id="q-topic">
+                            Pilar Perumusan UUD
+                        </span>
+                    </div>
+
+                    <div class="flex items-center gap-1.5 text-xs font-bold text-yellow-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/30">
+                        <i class="fa-solid fa-bolt text-yellow-400"></i>
+                        <span>Combo Hit: <span id="combo-count">0</span></span>
+                    </div>
+                </div>
+
+                <!-- Question Text -->
+                <h3 id="battle-q-text" class="text-base sm:text-lg md:text-xl font-bold text-white leading-relaxed mb-6 text-center">
+                    Pertanyaan battle sedang dimuat...
+                </h3>
+
+                <!-- Options Grid -->
+                <div id="battle-options-grid" class="flex flex-col gap-3">
+                    <!-- 4 options injected dynamically -->
+                </div>
+
+                <!-- Battle Feedback Banner -->
+                <div id="battle-feedback" class="hidden mt-5 p-3.5 rounded-xl text-center font-bold text-xs sm:text-sm"></div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- MODAL VICTORY (PENJAGA DUNIA 2 TUMBANG) -->
+    <div id="modal-victory" class="modal-overlay hidden">
+        <div class="modal-pop bg-slate-950 border-2 border-green-500 rounded-3xl p-6 sm:p-10 max-w-lg w-full text-center shadow-[0_0_60px_rgba(16,185,129,0.4)]">
+            <div class="w-24 h-24 bg-gradient-to-tr from-green-500 to-emerald-400 rounded-3xl p-1 mx-auto mb-6 shadow-xl shadow-green-500/30 flex items-center justify-center">
+                <div class="w-full h-full bg-slate-900 rounded-2xl flex items-center justify-center text-5xl">
+                    👑
+                </div>
+            </div>
+            
+            <div class="inline-block px-4 py-1 rounded-full bg-green-500/20 text-green-400 border border-green-500/40 text-xs font-black uppercase tracking-wider mb-2">
+                🏆 Kemenangan Mutlak!
+            </div>
+            
+            <h2 class="text-2xl sm:text-3xl font-black text-white mb-3">
+                PENJAGA DUNIA 2 TUMBANG!
+            </h2>
+            
+            <p class="text-gray-300 text-xs sm:text-sm leading-relaxed mb-6">
+                Selamat! Kamu berhasil menaklukkan <strong>Singa Konstitusi (25/25 HP)</strong> dengan pemahaman sempurna tentang seluruh perumusan UUD 1945. Gerbang menuju <strong class="text-emerald-400">Dunia 3 (Pengesahan UUD NRI 1945)</strong> telah terbuka lebar!
+            </p>
+            
+            <div class="bg-gray-900/90 rounded-2xl p-4 mb-6 border border-gray-800 flex items-center justify-around">
+                <div>
+                    <span class="text-gray-400 text-xs block">Skor Selesai</span>
+                    <span class="text-green-400 text-xl font-black">25 / 25 Benar</span>
+                </div>
+                <div class="w-px h-10 bg-gray-800"></div>
+                <div>
+                    <span class="text-gray-400 text-xs block">Hadiah XP</span>
+                    <span class="text-yellow-400 text-xl font-black"><i class="fa-solid fa-bolt"></i> +25 Poin</span>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-3">
+                <a href="dunia3.html" class="w-full py-4 px-6 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold rounded-2xl shadow-xl shadow-red-600/30 hover:scale-105 transition flex items-center justify-center gap-2 text-sm sm:text-base">
+                    <span>Lanjut ke Dunia 3 (Pengesahan UUD)</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
+                <a href="dunia2.html" class="w-full py-3 px-6 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white font-semibold rounded-2xl border border-slate-700 transition flex items-center justify-center gap-2 text-xs sm:text-sm">
+                    <i class="fa-solid fa-map"></i> Kembali ke Peta Dunia 2
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DEFEAT (GAGAL & ULANGI) -->
+    <div id="modal-defeat" class="modal-overlay hidden">
+        <div class="modal-pop bg-slate-950 border-2 border-red-500 rounded-3xl p-6 sm:p-10 max-w-lg w-full text-center shadow-[0_0_60px_rgba(239,68,68,0.4)]">
+            <div class="w-24 h-24 bg-gradient-to-tr from-red-600 to-rose-700 rounded-3xl p-1 mx-auto mb-6 shadow-xl shadow-red-600/30 flex items-center justify-center">
+                <div class="w-full h-full bg-slate-900 rounded-2xl flex items-center justify-center text-5xl">
+                    💀
+                </div>
+            </div>
+            
+            <div class="inline-block px-4 py-1 rounded-full bg-red-500/20 text-red-400 border border-red-500/40 text-xs font-black uppercase tracking-wider mb-2">
+                ⚠️ Pertempuran Gagal!
+            </div>
+            
+            <h2 class="text-2xl sm:text-3xl font-black text-white mb-3">
+                SINGA KONSTITUSI BERTAHAN!
+            </h2>
+            
+            <p class="text-gray-300 text-xs sm:text-sm leading-relaxed mb-6">
+                Penjaga Dunia 2 menangkis seranganmu! Untuk mengalahkannya dan membuka gerbang Dunia 3, kamu harus menjawab <strong class="text-red-400">seluruh 25 pertanyaan dengan benar (25 HP Habis)</strong>.
+            </p>
+            
+            <div class="bg-gray-900/90 rounded-2xl p-4 mb-6 border border-gray-800 flex items-center justify-around">
+                <div>
+                    <span class="text-gray-400 text-xs block">Jawaban Benar</span>
+                    <span class="text-yellow-400 text-xl font-black" id="defeat-correct-count">0 / 25</span>
+                </div>
+                <div class="w-px h-10 bg-gray-800"></div>
+                <div>
+                    <span class="text-gray-400 text-xs block">Sisa HP Boss</span>
+                    <span class="text-red-400 text-xl font-black" id="defeat-remaining-hp">25 HP</span>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-3">
+                <button onclick="restartBattle()" class="w-full py-4 px-6 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-bold rounded-2xl shadow-xl shadow-orange-600/30 hover:scale-105 transition flex items-center justify-center gap-2 text-sm sm:text-base">
+                    <i class="fa-solid fa-rotate-left"></i> Ulangi Pertempuran
+                </button>
+                <a href="dunia2-level4.html" class="w-full py-3 px-6 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white font-semibold rounded-2xl border border-slate-700 transition flex items-center justify-center gap-2 text-xs sm:text-sm">
+                    <i class="fa-solid fa-book-open"></i> Pelajari Ulang Materi Level 8
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-[#120402] text-gray-500 py-6 text-center text-xs border-t border-red-950/80 mt-auto relative z-10">
+        <p>&copy; 2026 EdukaCivic | Fadilatul Fajri</p>
+    </footer>
+
+    <!-- BATTLE SCRIPT ENGINE -->
+    <script>
+        // 25 SOAL EPIC BOSS BATTLE DUNIA 2
+        const bossQuestions = [
+            {
+                topic: "Badan Penyelenggara",
+                q: "Apa kepanjangan resmi dari singkatan BPUPKI?",
+                opts: [
+                    "Badan Penyelidik Usaha-Usaha Persiapan Kemerdekaan Indonesia",
+                    "Badan Persiapan Usaha Pembebasan Kemerdekaan Indonesia",
+                    "Badan Penentu Usaha Pembentukan Kedaulatan Indonesia",
+                    "Badan Pengawas Usaha Pembangunan Kemerdekaan Indonesia"
+                ],
+                ans: 0
+            },
+            {
+                topic: "Nama Resmi Jepang",
+                q: "Apa nama resmi BPUPKI dalam bahasa Jepang?",
+                opts: [
+                    "Dokuritsu Zyunbi Tyoosakai (Dokuritsu Junbi Cosakai)",
+                    "Dokuritsu Junbi Inkai",
+                    "Chuo Sangi In Tokubetsu",
+                    "Jawa Hokokai Seinen"
+                ],
+                ans: 0
+            },
+            {
+                topic: "Tanggal Bersejarah",
+                q: "Kapan BPUPKI secara resmi diumumkan dan diresmikan pembentukannya?",
+                opts: [
+                    "1 Maret 1945 (Diumumkan) & 29 April 1945 (Diresmikan)",
+                    "29 Mei 1945 & 1 Juni 1945",
+                    "22 Juni 1945 & 10 Juli 1945",
+                    "17 Agustus 1945 & 18 Agustus 1945"
+                ],
+                ans: 0
+            },
+            {
+                topic: "Tujuan Pembentukan",
+                q: "Apa tujuan pokok dibentuknya BPUPKI bagi persiapan bangsa Indonesia?",
+                opts: [
+                    "Menyelidiki dan mempersiapkan segala hal penting terkait tata pemerintahan dan kemerdekaan",
+                    "Membantu tentara Jepang memenangkan perang Asia Timur Raya",
+                    "Memungut hasil bumi dan pajak dari rakyat Indonesia",
+                    "Membentuk perserikatan dagang antarpulau"
+                ],
+                ans: 0
+            },
+            {
+                topic: "Tokoh Pemimpin",
+                q: "Siapakah tokoh pergerakan nasional yang memimpin jalannya sidang BPUPKI sebagai Ketua?",
+                opts: [
+                    "Dr. K.R.T. Radjiman Wedyodiningrat",
+                    "Ir. Sukarno",
+                    "Prof. Dr. Soepomo",
+                    "Drs. Mohammad Hatta"
+                ],
+                ans: 0
+            },
+            {
+                topic: "Tokoh Pimpinan",
+                q: "Siapakah tokoh pejuang bangsa yang menjabat sebagai Wakil Ketua sekaligus Kepala Kantor Tata Usaha BPUPKI?",
+                opts: [
+                    "R.P. Soeroso",
+                    "Sayuti Melik",
+                    "Ki Bagoes Hadikoesoemo",
+                    "Mr. Achmad Soebardjo"
+                ],
+                ans: 0
+            },
+            {
+                topic: "Sidang Pertama",
+                q: "Apa fokus dan agenda utama yang dibahas pada Sidang I BPUPKI (29 Mei – 1 Juni 1945)?",
+                opts: [
+                    "Membahas dan merumuskan Dasar Negara Indonesia Merdeka",
+                    "Mengesahkan Undang-Undang Dasar 1945",
+                    "Memilih Presiden dan Wakil Presiden Republik Indonesia",
+                    "Membentuk kabinet kementerian pertama"
+                ],
+                ans: 0
+            },
+            {
+                topic: "Lahirnya Pancasila",
+                q: "Siapakah tokoh proklamator yang menyampaikan gagasan lima dasar negara dan menamai gagasannya 'Pancasila' pada 1 Juni 1945?",
+                opts: [
+                    "Ir. Sukarno",
+                    "Mr. Muhammad Yamin",
+                    "Prof. Dr. Soepomo",
+                    "Drs. Mohammad Hatta"
+                ],
+                ans: 0
+            },
+            {
+                topic: "Masa Reses",
+                q: "Panitia Sembilan dibentuk pada masa reses BPUPKI dengan mandat utama untuk...",
+                opts: [
+                    "Menyerap aspirasi, menampung saran, dan merumuskan rancangan Pembukaan UUD",
+                    "Mengambil alih senjata militer penjajah",
+                    "Menetapkan mata uang resmi Republik Indonesia",
+                    "Membagi wilayah Indonesia menjadi 8 provinsi"
+                ],
+                ans: 0
+            },
+            {
+                topic: "Piagam Jakarta",
+                q: "Apa karya monumental yang berhasil disepakati oleh Panitia Sembilan pada 22 Juni 1945?",
+                opts: [
+                    "Piagam Jakarta (Jakarta Charter) sebagai rancangan Pembukaan UUD",
+                    "Naskah Teks Proklamasi Kemerdekaan",
+                    "Dekrit Presiden Republik Indonesia",
+                    "Ikrar Sumpah Pemuda Indonesia"
+                ],
+                ans: 0
+            },
+            {
+                topic: "Tiga Panitia Kerja",
+                q: "Pada Sidang II BPUPKI (11 Juli 1945), berapa jumlah panitia kerja yang dibentuk?",
+                opts: [
+                    "3 Panitia Kerja (Hukum Dasar, Pembelaan Tanah Air, dan Keuangan & Ekonomi)",
+                    "2 Panitia Kerja (Dasar Negara dan Pembukaan)",
+                    "5 Panitia Kerja (Pendidikan, Militer, Agama, Hukum, Ekonomi)",
+                    "9 Panitia Kerja Khusus"
+                ],
+                ans: 0
+            },
+            {
+                topic: "Panitia Hukum Dasar",
+                q: "Siapakah tokoh proklamator yang memimpin Panitia Hukum Dasar yang beranggotakan 19 tokoh?",
+                opts: [
+                    "Ir. Sukarno",
+                    "Prof. Dr. Soepomo",
+                    "Dr. K.R.T. Radjiman Wedyodiningrat",
+                    "Drs. Mohammad Hatta"
+                ],
+                ans: 0
+            },
+            {
+                topic: "Kepanitiaan Kerja",
+                q: "Siapakah bapak proklamator dan pakar ekonomi yang memimpin Panitia Keuangan dan Perekonomian?",
+                opts: [
+                    "Drs. Mohammad Hatta",
+                    "Mr. A.A. Maramis",
+                    "Dr. Soekiman",
+                    "Abikoesno Tjokrosoejoso"
+                ],
+                ans: 0
+            },
+            {
+                topic: "Kepanitiaan Kerja",
+                q: "Siapakah tokoh pejuang bangsa yang dipercaya memimpin Panitia Pembelaan Tanah Air pada sidang BPUPKI?",
+                opts: [
+                    "Abikoesno Tjokrosoejoso",
+                    "Otto Iskandar Dinata",
+                    "Prof. Dr. Soepomo",
+                    "Supriyadi"
+                ],
+                ans: 0
+            },
+            {
+                topic: "Panitia Kecil Tim 7",
+                q: "Siapakah pakar hukum adat dan tata negara yang ditunjuk memimpin Panitia Kecil (Tim 7) perancang Batang Tubuh UUD?",
+                opts: [
+                    "Prof. Dr. Soepomo",
+                    "Mr. Achmad Soebardjo",
+                    "Mr. K.R.M.T. Wongsonegoro",
+                    "H. Agus Salim"
+                ],
+                ans: 0
+            },
+            {
+                topic: "Tugas Tim 7",
+                q: "Apa tugas pokok khusus yang diemban oleh Tim 7 pimpinan Prof. Dr. Soepomo?",
+                opts: [
+                    "Merancang naskah teks Batang Tubuh (pasal demi pasal) Undang-Undang Dasar",
+                    "Merancang lambang burung Garuda",
+                    "Menyusun teks naskah Proklamasi",
+                    "Mengumpulkan bantuan dana kemerdekaan"
+                ],
+                ans: 0
+            },
+            {
+                topic: "Perbedaan Panitia Kecil",
+                q: "Apa perbedaan pokok antara Panitia Kecil 1 Juni 1945 (Sukarno) dengan Panitia Kecil 11 Juli 1945 (Soepomo)?",
+                opts: [
+                    "Panitia 1 Juni menyerap aspirasi dasar negara, sedangkan Panitia 11 Juli merancang pasal-pasal UUD",
+                    "Panitia 1 Juni merancang mata uang, sedangkan Panitia 11 Juli merancang bendera",
+                    "Keduanya memiliki tugas yang sama tanpa ada perbedaan",
+                    "Panitia 1 Juni bentukan Jepang, sedangkan 11 Juli bentukan Sekutu"
+                ],
+                ans: 0
+            },
+            {
+                topic: "Sifat Konstitusi",
+                q: "Mengapa Prof. Dr. Soepomo menegaskan bahwa UUD Indonesia harus bersifat 'singkat dan supel (luwes)'?",
+                opts: [
+                    "Agar hanya memuat aturan-aturan pokok dan fleksibel mengikuti dinamika zaman",
+                    "Agar UUD dapat dihapus dan diganti sewaktu-waktu",
+                    "Karena para tokoh bangsa tidak memiliki waktu untuk menulis pasal panjang",
+                    "Supaya undang-undang tidak perlu ditaati oleh pemerintah"
+                ],
+                ans: 0
+            },
+            {
+                topic: "Penghalus Bahasa",
+                q: "Siapakah tiga tokoh ahli yang ditunjuk sebagai anggota Panitia Penghalus Bahasa pada 13 Juli 1945?",
+                opts: [
+                    "Prof. Dr. Soepomo, Prof. Dr. P.A. Hoesein Djajadiningrat, dan H. Agus Salim",
+                    "Ir. Soekarno, Drs. Moh. Hatta, dan Mr. Achmad Soebardjo",
+                    "Mr. Muhammad Yamin, K.H. Wachid Hasjim, dan Abikoesno Tjokrosoejoso",
+                    "Dr. K.R.T. Radjiman Wedyodiningrat, Sutan Sjahrir, dan Chaerul Saleh"
+                ],
+                ans: 0
+            },
+            {
+                topic: "Tugas Redaksi",
+                q: "Apa tugas utama Panitia Penghalus Bahasa dalam proses perumusan UUD?",
+                opts: [
+                    "Menyempurnakan redaksi kata, tata bahasa, dan susunan kalimat pada naskah UUD",
+                    "Menerjemahkan naskah UUD ke dalam bahasa Belanda dan Jepang",
+                    "Mencetak naskah UUD ke percetakan negara",
+                    "Menulis lagu kebangsaan Indonesia Raya"
+                ],
+                ans: 0
+            },
+            {
+                topic: "Sidang 14 Juli",
+                q: "Pada rapat pleno 14 Juli 1945, tiga naskah pokok apa yang dilaporkan oleh Ir. Soekarno?",
+                opts: [
+                    "Pernyataan Indonesia Merdeka, Pembukaan UUD, dan Batang Tubuh UUD (42 pasal)",
+                    "Teks Proklamasi, Lambang Garuda, dan Lagu Indonesia Raya",
+                    "Struktur Kementerian, Pembagian 8 Provinsi, dan Maklumat Presiden",
+                    "Piagam PBB, Deklarasi HAM, dan Perjanjian Renville"
+                ],
+                ans: 0
+            },
+            {
+                topic: "Filsafat Kenegaraan",
+                q: "Pada sidang 15 Juli 1945, paham kenegaraan apa yang dijelaskan secara mendalam oleh Prof. Soepomo?",
+                opts: [
+                    "Paham Negara Integralistik (Kekeluargaan dan Persatuan Seluruh Rakyat)",
+                    "Individualisme murni dan Liberalisme Barat",
+                    "Monarki Absolut kerajaan masa lalu",
+                    "Otoritarianisme dan militeristik mutlak"
+                ],
+                ans: 0
+            },
+            {
+                topic: "Struktur Naskah Awal",
+                q: "Berapa jumlah pasal dalam draf rancangan Batang Tubuh UUD yang dibahas pada Sidang Kedua BPUPKI?",
+                opts: [
+                    "42 pasal (termasuk pasal aturan peralihan dan aturan tambahan)",
+                    "100 pasal lengkap",
+                    "10 pasal pokok saja",
+                    "16 bab tanpa pasal"
+                ],
+                ans: 0
+            },
+            {
+                topic: "Sidang 16 Juli",
+                q: "Peristiwa puncak bersejarah apa yang terjadi pada tanggal 16 Juli 1945 dalam sidang BPUPKI?",
+                opts: [
+                    "Diterima dan disetujuinya Naskah Rancangan UUD secara bulat dan aklamasi",
+                    "Pembacaan Teks Proklamasi Kemerdekaan di Pegangsaan Timur",
+                    "Pengangkatan Sri Sultan Hamengkubuwono IX",
+                    "Kedatangan tentara Sekutu di Tanjung Priok"
+                ],
+                ans: 0
+            },
+            {
+                topic: "Jiwa Kenegarawanan",
+                q: "Nilai keteladanan luhur apa yang paling menonjol dari para pendiri bangsa saat menyepakati perumusan UUD?",
+                opts: [
+                    "Musyawarah mufakat, toleransi tinggi, dan mendahulukan persatuan bangsa di atas golongan",
+                    "Mempertahankan ego kedaerahan tanpa kompromi",
+                    "Mementingkan keuntungan jabatan politik pribadi",
+                    "Menyerahkan masa depan bangsa pada pihak asing"
+                ],
+                ans: 0
+            }
+        ];
+
+        const TOTAL_BOSS_HP = 25;
+        let currentBossHP = 25;
+        let currentBattleIndex = 0;
+        let correctAnswersCount = 0;
+        let currentCombo = 0;
+        let isProcessingAction = false;
+        const optionLetters = ['A', 'B', 'C', 'D'];
+
+        function loadBattleQuestion() {
+            isProcessingAction = false;
+            const qData = bossQuestions[currentBattleIndex];
+
+            // Update UI Counters
+            document.getElementById('q-counter').textContent = `Pertanyaan ${currentBattleIndex + 1} / ${TOTAL_BOSS_HP}`;
+            document.getElementById('q-topic').textContent = qData.topic;
+            document.getElementById('battle-q-text').textContent = qData.q;
+            document.getElementById('combo-count').textContent = currentCombo;
+
+            // Generate Options
+            const container = document.getElementById('battle-options-grid');
+            container.innerHTML = '';
+
+            // Shuffle display options while remembering correct item
+            const optObjects = qData.opts.map((text, idx) => ({ text, isCorrect: idx === qData.ans }));
+            for (let i = optObjects.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [optObjects[i], optObjects[j]] = [optObjects[j], optObjects[i]];
+            }
+
+            optObjects.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn w-full text-left p-3.5 sm:p-4 rounded-2xl flex items-start gap-3.5 text-xs sm:text-sm font-medium';
+                btn.innerHTML = `
+                    <span class="w-7 h-7 rounded-xl bg-slate-900 text-orange-400 font-black flex items-center justify-center shrink-0 text-xs border border-red-900/60">
+                        ${optionLetters[idx]}
+                    </span>
+                    <span class="pt-0.5 text-gray-200">${opt.text}</span>
+                `;
+                btn.onclick = () => handleBattleAnswer(opt.isCorrect, btn);
+                container.appendChild(btn);
+            });
+
+            document.getElementById('battle-feedback').classList.add('hidden');
+        }
+
+        function handleBattleAnswer(isCorrect, clickedBtn) {
+            if (isProcessingAction) return;
+            isProcessingAction = true;
+
+            const allBtns = document.querySelectorAll('.option-btn');
+            allBtns.forEach(b => b.disabled = true);
+
+            const fb = document.getElementById('battle-feedback');
+            fb.classList.remove('hidden');
+
+            const bossSprite = document.getElementById('boss-sprite');
+
+            if (isCorrect) {
+                clickedBtn.classList.add('correct');
+                correctAnswersCount++;
+                currentCombo++;
+                currentBossHP--;
+                updateBossHPDisplay();
+                playSound('hit');
+
+                // Boss Hit Animation
+                bossSprite.classList.remove('animate-boss-roar');
+                bossSprite.classList.add('boss-hit');
+                setTimeout(() => {
+                    bossSprite.classList.remove('boss-hit');
+                    bossSprite.classList.add('animate-boss-roar');
+                }, 450);
+
+                fb.className = 'mt-5 p-3.5 rounded-xl text-center font-bold text-xs sm:text-sm bg-green-500/20 border border-green-500/40 text-green-300';
+                fb.innerHTML = `💥 SERANGAN CRITICAL TEPAT! HP Singa Konstitusi berkurang (-1 HP)!`;
+
+                setTimeout(() => {
+                    advanceToNextQuestion();
+                }, 850);
+
+            } else {
+                clickedBtn.classList.add('wrong');
+                currentCombo = 0;
+                playSound('boss-strike');
+
+                // Boss Counter-Attack Animation
+                bossSprite.classList.add('boss-attack');
+                setTimeout(() => bossSprite.classList.remove('boss-attack'), 500);
+
+                fb.className = 'mt-5 p-3.5 rounded-xl text-center font-bold text-xs sm:text-sm bg-red-500/20 border border-red-500/40 text-red-300';
+                fb.innerHTML = `❌ SERANGAN MELESET! Singa Konstitusi menangkis dan HP-nya tidak berkurang!`;
+
+                setTimeout(() => {
+                    advanceToNextQuestion();
+                }, 1300);
+            }
+
+            document.getElementById('combo-count').textContent = currentCombo;
+        }
+
+        function updateBossHPDisplay() {
+            const pct = Math.max(0, (currentBossHP / TOTAL_BOSS_HP) * 100);
+            document.getElementById('hp-bar-fill').style.width = pct + '%';
+            document.getElementById('hp-text').textContent = `${currentBossHP} / ${TOTAL_BOSS_HP} HP`;
+        }
+
+        function advanceToNextQuestion() {
+            currentBattleIndex++;
+            if (currentBattleIndex < bossQuestions.length) {
+                loadBattleQuestion();
+            } else {
+                finalizeBattleResults();
+            }
+        }
+
+        function finalizeBattleResults() {
+            // Victory Condition: All 25 HP depleted (25 correct answers)
+            if (currentBossHP <= 0 && correctAnswersCount === TOTAL_BOSS_HP) {
+                playSound('victory');
+                triggerVictoryConfetti();
+
+                // Save completion progress
+                const currentProg = getProgress();
+                if (!currentProg.completedLevels.includes('d2l4')) {
+                    currentProg.completedLevels.push('d2l4');
+                    if (typeof recordLevelCompleted === 'function') recordLevelCompleted('d2l4', 25);
+                    currentProg.poin = (currentProg.poin || 0) + 25;
+                }
+                if (currentProg.level < 9) currentProg.level = 9;
+                if (currentProg.dunia < 3) currentProg.dunia = 3;
+
+                localStorage.setItem('edukacivic_progress', JSON.stringify(currentProg));
+                document.getElementById('nav-poin').textContent = currentProg.poin;
+
+                document.getElementById('modal-victory').classList.remove('hidden');
+
+            } else {
+                // Defeat / Need Retry Condition
+                playSound('defeat');
+                document.getElementById('defeat-correct-count').textContent = `${correctAnswersCount} / ${TOTAL_BOSS_HP}`;
+                document.getElementById('defeat-remaining-hp').textContent = `${currentBossHP} HP`;
+                document.getElementById('modal-defeat').classList.remove('hidden');
+            }
+        }
+
+        function restartBattle() {
+            document.getElementById('modal-defeat').classList.add('hidden');
+            currentBossHP = TOTAL_BOSS_HP;
+            currentBattleIndex = 0;
+            correctAnswersCount = 0;
+            currentCombo = 0;
+            updateBossHPDisplay();
+            document.getElementById('combo-count').textContent = '0';
+            loadBattleQuestion();
+        }
+
+        function triggerVictoryConfetti() {
+            try {
+                confetti({
+                    particleCount: 120,
+                    spread: 90,
+                    origin: { y: 0.6 }
+                });
+            } catch(e) {}
+        }
+
+        // Initialize battle on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateNavbarStudent();
+            loadBattleQuestion();
+        });
+    </script>
+</body>
+</html>
