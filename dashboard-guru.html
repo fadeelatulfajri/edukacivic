@@ -7,6 +7,8 @@
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="Logo Edukacivic.png">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <script src="student-system.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -575,26 +577,22 @@
         }
 
         function loadDashboardData() {
-            // Sinkronkan data active student & progress sebelum load
-            if (typeof syncCurrentStudentProgress === 'function') {
-                syncCurrentStudentProgress();
+            if (!firebase.apps.length) {
+                firebase.initializeApp({
+                    databaseURL: "https://edukacivic-default-rtdb.asia-southeast1.firebasedatabase.app"
+                });
             }
+            const db = firebase.database();
 
-            // Ambil data siswa terdaftar
-            allStudents = getRegisteredStudents();
-
-            // Sinkronkan juga siswa yang sedang aktif jika ada
-            const activeSiswa = getActiveStudent();
-            if (activeSiswa && activeSiswa.id) {
-                const idx = allStudents.findIndex(s => s.id === activeSiswa.id);
-                if (idx >= 0) {
-                    allStudents[idx] = activeSiswa;
-                } else if (activeSiswa.nama) {
-                    allStudents.push(activeSiswa);
+            db.ref('students').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    allStudents = Object.values(data);
+                } else {
+                    allStudents = [];
                 }
-            }
-
-            renderDashboard();
+                renderDashboard();
+            });
         }
 
         function refreshData() {
