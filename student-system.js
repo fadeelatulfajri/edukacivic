@@ -1,3 +1,9 @@
+// Inisialisasi Firebase Database
+if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+    firebase.initializeApp({
+        databaseURL: "https://edukacivic-default-rtdb.asia-southeast1.firebasedatabase.app"
+    });
+}
 /**
  * EdukaCivic Student & Avatar Management System
  * Mengelola 50 Avatar Unik (25 Laki-laki, 25 Perempuan),
@@ -515,8 +521,15 @@ function syncCurrentStudentProgress() {
         students.push(activeStudent);
     }
 
+    // Simpan lokal di browser
     localStorage.setItem('edukacivic_registered_students', JSON.stringify(students));
     localStorage.setItem('edukacivic_siswa', JSON.stringify(activeStudent));
+
+    // Kirim otomatis ke Firebase Database Online
+    if (typeof firebase !== 'undefined' && firebase.apps.length) {
+        firebase.database().ref('students/' + activeStudent.id).set(activeStudent);
+    }
+}
 }
 
 function recordLevelCompleted(levelKey, scoreEarned = 0) {
