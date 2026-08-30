@@ -22,6 +22,7 @@
         });
     }
 })();
+
 /**
  * EdukaCivic Student & Avatar Management System
  * Mengelola 50 Avatar Unik (25 Laki-laki, 25 Perempuan),
@@ -152,22 +153,21 @@ function getPlayerProgress() {
 }
 
 function isLevelUnlocked(levelKey) {
-    // Khusus Level 18 (d5l2) dan Level 19 (d5l3) selalu terbuka untuk game bersama kelompok
     if (levelKey === 'd5l2' || levelKey === 'd5l3') return true;
     
     const idx = EDUKACIVIC_LEVELS_ORDER.indexOf(levelKey);
-    if (idx <= 0) return true; // Level 1 selalu terbuka
+    if (idx <= 0) return true;
     const prevLevel = EDUKACIVIC_LEVELS_ORDER[idx - 1];
     const prog = getPlayerProgress();
     return prog.completedLevels.includes(prevLevel);
 }
 
-// 4.1 SISTEM TOKEN RAHASIA ANTAR-DUNIA (1 DUNIA = 1 PERTEMUAN PEMBELAJARAN)
+// 4.1 SISTEM TOKEN RAHASIA ANTAR-DUNIA
 const EDUKACIVIC_WORLD_TOKENS = {
-    2: 'uudnri1945',   // Dunia 2 (Pertemuan 2): Sidang BPUPKI & Perumusan UUD
-    3: 'ppki1945',     // Dunia 3 (Pertemuan 3): Pengesahan UUD 1945
-    4: 'hierarkiuud',  // Dunia 4 (Pertemuan 4): Tata Urutan Perundang-undangan
-    5: 'patuhhukum'    // Dunia 5 (Pertemuan 5): Taat Konstitusi & Duta Hukum
+    2: 'uudnri1945',
+    3: 'ppki1945',
+    4: 'hierarkiuud',
+    5: 'patuhhukum'
 };
 
 const EDUKACIVIC_WORLD_INFO = {
@@ -200,7 +200,7 @@ function isWorldPreviousCompleted(worldNum) {
 
 function isWorldTokenUnlocked(worldNum) {
     if (worldNum <= 1) return true;
-    if (sessionStorage.getItem('edukacivic_guru')) return true; // Mode guru selalu buka token
+    if (sessionStorage.getItem('edukacivic_guru')) return true;
     
     const unlockedTokens = getUnlockedWorldTokens();
     if (unlockedTokens.includes(Number(worldNum))) return true;
@@ -258,7 +258,6 @@ function showWorldTokenPromptModal(worldNum, redirectUrl) {
             <div class="absolute -top-12 -right-12 w-32 h-32 bg-orange-500/10 rounded-full blur-2xl pointer-events-none"></div>
             <div class="absolute -bottom-12 -left-12 w-32 h-32 bg-red-500/10 rounded-full blur-2xl pointer-events-none"></div>
 
-            <!-- Avatar / Icon Badge -->
             <div class="relative inline-block mx-auto mb-4">
                 <div class="w-20 h-20 rounded-3xl p-1 bg-gradient-to-tr from-orange-500 via-amber-500 to-red-500 shadow-xl shadow-orange-500/20">
                     <img src="${avatarUrl}" alt="${studentName}" class="w-full h-full rounded-2xl bg-slate-950 object-cover">
@@ -322,8 +321,8 @@ function handleWorldTokenSubmit(e, worldNum, redirectUrl) {
         errBox.classList.remove('hidden');
         if (input) input.disabled = true;
         
-        try { playCelebrationFanfare(); } catch(e) {}
-        try { triggerCelebrationConfetti(); } catch(e) {}
+        try { playCelebrationFanfare(); } catch(err) {}
+        try { triggerCelebrationConfetti(); } catch(err) {}
 
         setTimeout(() => {
             closeWorldTokenModal();
@@ -539,15 +538,12 @@ function syncCurrentStudentProgress() {
         students.push(activeStudent);
     }
 
-    // Simpan lokal di browser
     localStorage.setItem('edukacivic_registered_students', JSON.stringify(students));
     localStorage.setItem('edukacivic_siswa', JSON.stringify(activeStudent));
 
-    // Kirim otomatis ke Firebase Database Online
-    if (typeof firebase !== 'undefined' && firebase.apps.length) {
+    if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length) {
         firebase.database().ref('students/' + activeStudent.id).set(activeStudent);
     }
-}
 }
 
 function recordLevelCompleted(levelKey, scoreEarned = 0) {
@@ -581,7 +577,6 @@ function deleteStudentById(studentId) {
     students = students.filter(s => s.id !== studentId);
     localStorage.setItem('edukacivic_registered_students', JSON.stringify(students));
 
-    // If currently active student is deleted, reset active session
     const activeStudent = getActiveStudent();
     if (activeStudent && (activeStudent.id === studentId || (targetStudent && activeStudent.nama === targetStudent.nama && activeStudent.noAbsen === targetStudent.noAbsen))) {
         localStorage.removeItem('edukacivic_siswa');
@@ -626,7 +621,6 @@ function updateNavbarStudent() {
         if (siswa.kelas) studentClass = siswa.kelas;
     }
 
-    // 1. Update point counters
     const poinIds = ['nav-poin', 'user-points', 'nav-points', 'header-points', 'mobile-student-poin'];
     poinIds.forEach(id => {
         const el = document.getElementById(id);
@@ -639,7 +633,6 @@ function updateNavbarStudent() {
         }
     });
 
-    // 2. Update all navbar avatar images
     const targetImages = document.querySelectorAll(`
         #nav-avatar-img,
         #nav-avatar,
@@ -669,7 +662,6 @@ function updateNavbarStudent() {
         }
     });
 
-    // 3. Update any avatar wrapper containers with purple boxes or static placeholders
     document.querySelectorAll('nav .w-9.h-9.rounded-full, nav .w-8.h-8.rounded-full, nav .w-10.h-10.rounded-full').forEach(wrapper => {
         let img = wrapper.querySelector('img');
         if (!img) {
@@ -687,7 +679,6 @@ function updateNavbarStudent() {
         }
     });
 
-    // 4. Update index.html student navbar button & mobile box
     const navStudentBox = document.getElementById('nav-student-box');
     const mobStudentBox = document.getElementById('mobile-student-box');
     if (navStudentBox) {
@@ -724,10 +715,10 @@ function playCelebrationFanfare() {
         if (audioCtx.state === 'suspended') audioCtx.resume();
         const now = audioCtx.currentTime;
         const notes = [
-            { f: 523.25, d: 0.12 }, // C5
-            { f: 659.25, d: 0.12 }, // E5
-            { f: 783.99, d: 0.12 }, // G5
-            { f: 1046.50, d: 0.35 } // C6
+            { f: 523.25, d: 0.12 },
+            { f: 659.25, d: 0.12 },
+            { f: 783.99, d: 0.12 },
+            { f: 1046.50, d: 0.35 }
         ];
         let t = now;
         notes.forEach(n => {
@@ -778,7 +769,6 @@ function configureLevelCard(cardId, statusId, isUnlocked, isCompleted, href, lev
     const status = document.getElementById(statusId);
     if (!card) return;
 
-    // Remove old overlay
     const oldOverlay = card.querySelector('.locked-overlay');
     if (oldOverlay) oldOverlay.remove();
 
@@ -809,7 +799,6 @@ function configureLevelCard(cardId, statusId, isUnlocked, isCompleted, href, lev
             };
         }
     } else {
-        // Locked
         if (status) {
             status.className = 'bg-gray-700 text-gray-400 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase flex items-center gap-1';
             status.innerHTML = '<i class="fa-solid fa-lock text-[8px]"></i> Terkunci';
@@ -1063,7 +1052,6 @@ function renderQuizCelebration({
     modal.innerHTML = `
         <div class="glass-panel w-full max-w-lg p-6 sm:p-8 rounded-3xl shadow-2xl text-center border border-gray-700 transform scale-95 transition-all duration-300 max-h-[90vh] overflow-y-auto" id="${containerId}">
             
-            <!-- Student Avatar Celebration Badge -->
             <div class="relative inline-block mx-auto mb-4">
                 <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl p-1 bg-gradient-to-tr from-amber-400 via-rose-500 to-indigo-500 shadow-2xl shadow-rose-500/30 animate-float">
                     <img src="${avatarUrl}" alt="${studentName}" class="w-full h-full rounded-2xl bg-slate-900 object-cover">
@@ -1073,7 +1061,6 @@ function renderQuizCelebration({
                 </div>
             </div>
 
-            <!-- Appreciation Title & Student Name -->
             <div class="inline-block px-3.5 py-1 rounded-full text-xs font-black border mb-2 uppercase tracking-wider ${badgeBg}">
                 ${badgeText}
             </div>
@@ -1084,7 +1071,6 @@ function renderQuizCelebration({
                 ${appreciationDesc}
             </p>
 
-            <!-- Score Summary Card -->
             <div class="bg-gray-900/90 rounded-2xl p-5 mb-6 border border-gray-700/80 space-y-3">
                 <div class="flex justify-between items-center border-b border-gray-800 pb-2.5">
                     <span class="text-xs text-gray-400 font-semibold">Skor Kuis</span>
@@ -1104,7 +1090,6 @@ function renderQuizCelebration({
                 </div>
             </div>
 
-            <!-- Action Buttons -->
             ${actionButtonsHtml}
         </div>
     `;
