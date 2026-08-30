@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <script src="student-system.js"></script>
     <script>
         tailwind.config = {
@@ -152,7 +152,7 @@
                                 <option value="VIII A">Kelas VIII A</option>
                                 <option value="VIII B">Kelas VIII B</option>
                                 <option value="VIII C">Kelas VIII C</option>
-                                <option value="VIII D">Kelas VIII D</option>
+                                <option value="VIII D" selected>Kelas VIII D</option>
                                 <option value="VIII E">Kelas VIII E</option>
                                 <option value="VIII F">Kelas VIII F</option>
                                 <option value="VIII G">Kelas VIII G</option>
@@ -168,17 +168,14 @@
                     <div>
                         <label class="block text-gray-300 font-semibold mb-1.5">Jenis Kelamin <span class="text-red-400">*</span></label>
                         <div class="grid grid-cols-2 gap-2.5">
-                            <!-- Hidden Accessible Radio Inputs -->
                             <input type="radio" id="genderL" name="gender" value="L" checked class="sr-only">
                             <input type="radio" id="genderP" name="gender" value="P" class="sr-only">
 
-                            <!-- Interactive Button Card Laki-laki -->
                             <button type="button" id="btnGenderL" onclick="selectGender('L')" class="flex items-center justify-center gap-2.5 p-3.5 bg-blue-950/70 border-2 border-blue-500 rounded-xl cursor-pointer transition-all duration-200 text-blue-300 font-bold shadow-lg shadow-blue-500/20 active:scale-95">
                                 <i class="fa-solid fa-mars text-blue-400 text-base"></i>
                                 <span class="font-bold text-xs">Laki-laki</span>
                             </button>
 
-                            <!-- Interactive Button Card Perempuan -->
                             <button type="button" id="btnGenderP" onclick="selectGender('P')" class="flex items-center justify-center gap-2.5 p-3.5 bg-slate-950 border border-gray-700 rounded-xl cursor-pointer hover:border-pink-500 transition-all duration-200 text-gray-400 font-semibold active:scale-95">
                                 <i class="fa-solid fa-venus text-pink-400 text-base"></i>
                                 <span class="font-semibold text-xs">Perempuan</span>
@@ -244,7 +241,7 @@
 
                 <!-- Avatar Grid Container -->
                 <div id="avatarGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-3 max-h-96 overflow-y-auto pr-2 p-1">
-                    <!-- Dynamic Injected by JS -->
+                    <!-- Dinamis Diisi JS -->
                 </div>
             </div>
 
@@ -273,24 +270,21 @@
         let currentStudentId = null;
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Check if existing student
             let initialGender = 'L';
-            const existing = getActiveStudent();
+            const existing = (typeof getActiveStudent === 'function') ? getActiveStudent() : null;
+            
             if (existing) {
                 currentStudentId = existing.id;
                 document.getElementById('inputNama').value = existing.nama || '';
                 document.getElementById('inputAbsen').value = existing.noAbsen || '';
                 if (existing.kelas) document.getElementById('inputKelas').value = existing.kelas;
                 if (existing.sekolah) document.getElementById('inputSekolah').value = existing.sekolah;
-                if (existing.gender) {
-                    initialGender = existing.gender;
-                }
-                if (existing.avatarId) {
-                    selectAvatar(existing.avatarId);
-                }
+                if (existing.gender) initialGender = existing.gender;
+                if (existing.avatarId) selectAvatar(existing.avatarId);
             }
 
-            selectGender(initialGender);
+            updateGenderUI(initialGender);
+            renderAvatarGrid('ALL');
         });
 
         function selectGender(g) {
@@ -328,14 +322,24 @@
             currentFilter = filter;
             
             // Update tabs UI
-            document.getElementById('tabAll').className = filter === 'ALL' ? 'px-3 py-1.5 rounded-lg font-semibold bg-gray-800 text-white transition' : 'px-3 py-1.5 rounded-lg font-semibold text-gray-400 hover:text-white transition';
-            document.getElementById('tabL').className = filter === 'L' ? 'px-3 py-1.5 rounded-lg font-semibold bg-blue-900/60 text-blue-300 border border-blue-500/50 transition' : 'px-3 py-1.5 rounded-lg font-semibold text-gray-400 hover:text-white transition';
-            document.getElementById('tabP').className = filter === 'P' ? 'px-3 py-1.5 rounded-lg font-semibold bg-pink-900/60 text-pink-300 border border-pink-500/50 transition' : 'px-3 py-1.5 rounded-lg font-semibold text-gray-400 hover:text-white transition';
+            const tabAll = document.getElementById('tabAll');
+            const tabL = document.getElementById('tabL');
+            const tabP = document.getElementById('tabP');
+
+            if (tabAll) tabAll.className = filter === 'ALL' ? 'px-3 py-1.5 rounded-lg font-semibold bg-gray-800 text-white transition' : 'px-3 py-1.5 rounded-lg font-semibold text-gray-400 hover:text-white transition';
+            if (tabL) tabL.className = filter === 'L' ? 'px-3 py-1.5 rounded-lg font-semibold bg-blue-900/60 text-blue-300 border border-blue-500/50 transition' : 'px-3 py-1.5 rounded-lg font-semibold text-gray-400 hover:text-white transition';
+            if (tabP) tabP.className = filter === 'P' ? 'px-3 py-1.5 rounded-lg font-semibold bg-pink-900/60 text-pink-300 border border-pink-500/50 transition' : 'px-3 py-1.5 rounded-lg font-semibold text-gray-400 hover:text-white transition';
 
             const grid = document.getElementById('avatarGrid');
+            if (!grid) return;
             grid.innerHTML = '';
 
-            const occupiedMap = getOccupiedAvatars(currentStudentId);
+            if (typeof EDUKACIVIC_AVATARS === 'undefined') {
+                grid.innerHTML = '<p class="text-red-400 text-xs col-span-full py-4 text-center">Gagal memuat daftar avatar. Pastikan student-system.js sudah dimuat.</p>';
+                return;
+            }
+
+            const occupiedMap = (typeof getOccupiedAvatars === 'function') ? getOccupiedAvatars(currentStudentId) : {};
 
             const filteredList = EDUKACIVIC_AVATARS.filter(av => {
                 if (filter === 'L') return av.gender === 'L';
@@ -358,13 +362,13 @@
                             : 'border-gray-700 bg-slate-950/80 hover:border-gray-500 cursor-pointer'
                 }`;
 
-                const avUrl = getAvatarUrl(av);
+                const avUrl = (typeof getAvatarUrl === 'function') ? getAvatarUrl(av) : `https://api.dicebear.com/7.x/adventurer/svg?seed=${av.seed}`;
 
                 card.innerHTML = `
                     <div class="relative mx-auto w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden bg-slate-900 flex items-center justify-center border border-gray-800 shadow-sm mb-1.5">
-                        <img src="${avUrl}" alt="Avatar" class="w-full h-full object-cover">
+                        <img src="${avUrl}" alt="${av.name}" class="w-full h-full object-cover">
                         ${isOccupied ? `
-                            <div class="absolute inset-0 bg-red-950/85 flex flex-col items-center justify-center p-1 text-center backdrop-blur-xs">
+                            <div class="absolute inset-0 bg-red-950/85 flex flex-col items-center justify-center p-1 text-center">
                                 <i class="fa-solid fa-lock text-red-400 text-sm mb-0.5"></i>
                                 <span class="text-[9px] font-black text-red-200 leading-tight">Terpakai</span>
                             </div>
@@ -381,7 +385,7 @@
                         </div>
                     ` : `
                         <div class="text-[10px] text-gray-400 hover:text-emerald-400 font-semibold">
-                            Tersedia
+                            ${av.name}
                         </div>
                     `}
                 `;
@@ -391,7 +395,7 @@
                 } else {
                     card.onclick = () => {
                         playSound('error');
-                        showFeedback(`❌ Wajah avatar ini sudah dipilih oleh ${occupant.nama} (Kelas ${occupant.kelas}, No. ${occupant.noAbsen})! Silakan pilih wajah avatar lain yang masih tersedia.`, 'error');
+                        showFeedback(`❌ Karakter ini sudah dipilih oleh ${occupant.nama} (Kelas ${occupant.kelas}, No. ${occupant.noAbsen})! Silakan pilih avatar lain.`, 'error');
                     };
                 }
 
@@ -400,10 +404,10 @@
         }
 
         function selectAvatar(avatarId) {
-            const occupiedMap = getOccupiedAvatars(currentStudentId);
+            const occupiedMap = (typeof getOccupiedAvatars === 'function') ? getOccupiedAvatars(currentStudentId) : {};
             if (occupiedMap[avatarId]) {
                 playSound('error');
-                showFeedback(`❌ Wajah avatar ini sudah dipilih oleh siswa lain (${occupiedMap[avatarId].nama}). Silakan pilih avatar yang berstatus Tersedia.`, 'error');
+                showFeedback(`❌ Karakter ini sudah dipilih oleh siswa lain (${occupiedMap[avatarId].nama}). Silakan pilih avatar yang berstatus Tersedia.`, 'error');
                 return;
             }
 
@@ -414,9 +418,11 @@
             const avObj = EDUKACIVIC_AVATARS.find(a => a.id === avatarId);
             if (avObj) {
                 const preview = document.getElementById('selectedAvatarPreview');
-                preview.classList.remove('hidden');
-                document.getElementById('previewImg').src = getAvatarUrl(avObj);
-                document.getElementById('previewName').textContent = avObj.gender === 'L' ? 'Karakter Laki-laki' : 'Karakter Perempuan';
+                if (preview) {
+                    preview.classList.remove('hidden');
+                    document.getElementById('previewImg').src = (typeof getAvatarUrl === 'function') ? getAvatarUrl(avObj) : `https://api.dicebear.com/7.x/adventurer/svg?seed=${avObj.seed}`;
+                    document.getElementById('previewName').textContent = `${avObj.name} (${avObj.desc})`;
+                }
             }
 
             renderAvatarGrid(currentFilter);
@@ -424,6 +430,7 @@
 
         function showFeedback(msg, type) {
             const fb = document.getElementById('formFeedback');
+            if (!fb) return;
             fb.classList.remove('hidden');
             if (type === 'error') {
                 fb.className = 'mb-4 p-4 rounded-xl text-xs font-bold bg-red-500/20 border border-red-500/50 text-red-300';
@@ -448,11 +455,17 @@
 
             if (!avatarId) {
                 playSound('error');
-                showFeedback('⚠️ Harap pilih salah satu Avatar terlebih dahulu sebelum memulai!', 'error');
+                showFeedback('⚠️ Harap klik salah satu Avatar terlebih dahulu sebelum melanjutkan!', 'error');
+                return;
+            }
+
+            if (typeof saveAndLoginStudent !== 'function') {
+                showFeedback('❌ Sistem student-system.js belum terhubung dengan benar.', 'error');
                 return;
             }
 
             const res = saveAndLoginStudent({
+                id: currentStudentId,
                 nama: nama,
                 noAbsen: noAbsen,
                 kelas: kelas,
@@ -467,13 +480,11 @@
                 return;
             }
 
-            showFeedback(`🎉 Selamat datang, <strong>${res.student.nama}</strong>! Profilmu berhasil disimpan. Memulai petualangan...`, 'success');
-            if (typeof firebase !== 'undefined' && firebase.apps.length && res.student) {
-        firebase.database().ref('students/' + res.student.id).set(res.student);
-    }
+            showFeedback(`🎉 Selamat datang, <strong>${res.student.nama}</strong>! Profilmu berhasil disimpan. Menuju petualangan...`, 'success');
+            
             setTimeout(() => {
                 window.location.href = 'index.html';
-            }, 1000);
+            }, 800);
         });
     </script>
 </body>
