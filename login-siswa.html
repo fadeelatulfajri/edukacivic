@@ -11,6 +11,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <script src="student-system.js"></script>
     <script>
         tailwind.config = {
@@ -466,7 +468,9 @@
             }
 
             showFeedback(`🎉 Selamat datang, <strong>${res.student.nama}</strong>! Profilmu berhasil disimpan. Memulai petualangan...`, 'success');
-
+            if (typeof firebase !== 'undefined' && firebase.apps.length && res.student) {
+        firebase.database().ref('students/' + res.student.id).set(res.student);
+    }
             setTimeout(() => {
                 window.location.href = 'index.html';
             }, 1000);
