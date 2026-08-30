@@ -1,9 +1,27 @@
-// Inisialisasi Firebase Database
-if (typeof firebase !== 'undefined' && !firebase.apps.length) {
-    firebase.initializeApp({
-        databaseURL: "https://edukacivic-default-rtdb.asia-southeast1.firebasedatabase.app"
-    });
-}
+// Memuat Firebase CDN secara otomatis jika belum ada di halaman
+(function loadFirebaseAuto() {
+    if (typeof firebase === 'undefined') {
+        const s1 = document.createElement('script');
+        s1.src = "https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js";
+        document.head.appendChild(s1);
+
+        const s2 = document.createElement('script');
+        s2.src = "https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js";
+        document.head.appendChild(s2);
+
+        s2.onload = () => {
+            if (!firebase.apps.length) {
+                firebase.initializeApp({
+                    databaseURL: "https://edukacivic-default-rtdb.asia-southeast1.firebasedatabase.app"
+                });
+            }
+        };
+    } else if (!firebase.apps.length) {
+        firebase.initializeApp({
+            databaseURL: "https://edukacivic-default-rtdb.asia-southeast1.firebasedatabase.app"
+        });
+    }
+})();
 /**
  * EdukaCivic Student & Avatar Management System
  * Mengelola 50 Avatar Unik (25 Laki-laki, 25 Perempuan),
